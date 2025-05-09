@@ -14,7 +14,7 @@ android {
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = libs.versions.compile.sdk.get().toInt()
         versionCode = libs.versions.version.code.get().toInt()
-        versionName = libs.versions.version.code.get().toString()
+        versionName = libs.versions.version.code.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -29,11 +29,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.version.get().toString())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.java.version.get().toString())
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.version.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.java.version.get())
     }
     kotlinOptions {
-        jvmTarget = libs.versions.java.version.get().toString()
+        jvmTarget = libs.versions.java.version.get()
     }
     buildFeatures {
         compose = true
