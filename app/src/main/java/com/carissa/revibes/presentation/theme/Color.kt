@@ -1,4 +1,4 @@
-package com.carissa.revibes.ui.theme
+package com.carissa.revibes.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

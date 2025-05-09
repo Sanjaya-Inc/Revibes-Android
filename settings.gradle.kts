@@ -17,6 +17,17 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    versionCatalogs {
+        create("core") {
+            from(files("sjy-version-catalog-core/core.versions.toml"))
+        }
+        create("ui") {
+            from(files("sjy-version-catalog-ui/ui.versions.toml"))
+        }
+        create("essentials") {
+            from(files("sjy-version-catalog-essentials/essentials.versions.toml"))
+        }
+    }
 }
 
 rootProject.name = "Revibes"

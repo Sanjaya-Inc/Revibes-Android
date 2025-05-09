@@ -1,19 +1,20 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(core.plugins.android.application)
+    alias(core.plugins.kotlin.android)
+    alias(core.plugins.kotlin.compose)
+    alias(core.plugins.ksp)
 }
 
 android {
     namespace = "com.carissa.revibes"
-    compileSdk = 35
+    compileSdk = libs.versions.compile.sdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.carissa.revibes"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = libs.versions.min.sdk.get().toInt()
+        targetSdk = libs.versions.compile.sdk.get().toInt()
+        versionCode = libs.versions.version.code.get().toInt()
+        versionName = libs.versions.version.code.get().toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,11 +29,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.version.get().toString())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.java.version.get().toString())
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = libs.versions.java.version.get().toString()
     }
     buildFeatures {
         compose = true
@@ -40,20 +41,26 @@ android {
 }
 
 dependencies {
+    implementation(core.androidx.core.ktx)
+    implementation(ui.androidx.lifecycle.runtime.ktx)
+    implementation(platform(ui.androidx.compose.bom))
+    implementation(ui.bundles.androidx.compose)
+    androidTestImplementation(platform(ui.androidx.compose.bom))
+    androidTestImplementation(ui.bundles.androidx.compose.test)
+    debugImplementation(ui.bundles.androidx.compose.debug)
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(core.bundles.coroutines)
+
+    implementation(ui.bundles.orbit.mvi)
+
+    implementation(platform(core.koin.bom))
+    implementation(core.bundles.koin.android)
+    implementation(core.koin.annotation)
+    ksp(core.koin.ksp)
+    testImplementation(core.bundles.koin.test)
+    testImplementation(ui.bundles.orbit.test)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }
