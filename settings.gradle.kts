@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("sjy-build-logic")
     repositories {
         google {
             content {
