@@ -1,8 +1,6 @@
 plugins {
-    alias(core.plugins.android.application)
-    alias(core.plugins.kotlin.android)
-    alias(core.plugins.kotlin.compose)
-    alias(core.plugins.ksp)
+    id("com.sanjaya.buildlogic.app")
+    id("com.sanjaya.buildlogic.compose")
 }
 
 android {
@@ -32,12 +30,12 @@ android {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.java.version.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.java.version.get())
     }
-    kotlinOptions {
-        jvmTarget = libs.versions.java.version.get()
-    }
-    buildFeatures {
-        compose = true
-    }
+//    kotlinOptions {
+//        jvmTarget = libs.versions.java.version.get()
+//    }
+//    buildFeatures {
+//        compose = true
+//    }
 }
 
 dependencies {
