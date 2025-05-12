@@ -4,4 +4,6 @@ plugins {
     alias(core.plugins.kotlin.android) apply false
     alias(core.plugins.kotlin.compose) apply false
     alias(core.plugins.ksp) apply false
+    alias(core.plugins.detekt) apply true
+    id("com.sanjaya.buildlogic.detekt") apply true
 }
