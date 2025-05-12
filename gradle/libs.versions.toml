@@ -5,9 +5,21 @@ espressoCore = "3.6.1"
 compile-sdk = "35"
 min-sdk = "24"
 version-code = "1"
+version-name = "1.0.0"
 java-version = "17"
+agp = "8.9.2"
+kotlin = "2.1.20"
+coreKtx = "1.16.0"
+appcompat = "1.7.0"
+material = "1.10.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+[plugins]
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

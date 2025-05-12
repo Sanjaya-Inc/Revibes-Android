@@ -1,16 +1,13 @@
 plugins {
-    id("com.sanjaya.buildlogic.app")
+    id("com.sanjaya.buildlogic.lib")
     id("com.sanjaya.buildlogic.compose")
 }
 
 android {
-    namespace = "com.carissa.revibes"
-
+    namespace = "com.carissa.revibes.core"
     defaultConfig {
-        applicationId = "com.carissa.revibes"
-        versionCode = libs.versions.version.code.get().toInt()
-        versionName = libs.versions.version.name.get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
     buildTypes {
         release {
@@ -24,6 +21,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":features:splash"))
+    api(ui.androidx.lifecycle.runtime.ktx)
+    api(ui.bundles.orbit.mvi)
+
+    testApi(libs.junit)
+    androidTestApi(libs.androidx.junit)
+    androidTestApi(libs.androidx.espresso.core)
 }

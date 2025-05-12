@@ -32,4 +32,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Revibes"
-include(":app")
+include(":app", ":features")
+include(":features:splash")
+include(":core")
