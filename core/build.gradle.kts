@@ -1,6 +1,13 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.sanjaya.buildlogic.lib")
     id("com.sanjaya.buildlogic.compose")
+}
+
+val localProperties = Properties().apply {
+    load(FileInputStream(rootProject.file("local.properties")))
 }
 
 android {
@@ -8,6 +15,21 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        buildConfigField(
+            "String",
+            "MOCK_BASE_URL",
+            "${localProperties.getProperty("MOCK_BASE_URL")}"
+        )
+
+        buildConfigField(
+            "String",
+            "PROD_BASE_URL",
+            "${localProperties.getProperty("PROD_BASE_URL")}"
+        )
+    }
+    buildFeatures {
+        buildConfig = true
     }
     buildTypes {
         release {

@@ -6,5 +6,8 @@ plugins {
     alias(core.plugins.kotlin.compose) apply false
     alias(core.plugins.ksp) apply false
     alias(core.plugins.detekt) apply true
+    alias(core.plugins.ktorfit) apply false
+    alias(essentials.plugins.gms.services) apply false
+    alias(essentials.plugins.crashlytics) apply false
     id("com.sanjaya.buildlogic.detekt") apply true
 }

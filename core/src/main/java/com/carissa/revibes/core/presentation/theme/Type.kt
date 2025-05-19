@@ -1,4 +1,4 @@
-package com.carissa.revibes.presentation.theme
+package com.carissa.revibes.core.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
