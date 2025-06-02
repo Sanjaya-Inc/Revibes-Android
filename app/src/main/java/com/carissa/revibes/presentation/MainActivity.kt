@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.carissa.revibes.core.data.remote.TestRemoteApi
+import com.carissa.revibes.auth.data.AuthRepository
 import com.carissa.revibes.core.presentation.theme.RevibesTheme
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 fun Greeting(
     name: String,
     modifier: Modifier = Modifier,
-    testRemoteApi: TestRemoteApi = koinInject()
+    authRepo: AuthRepository = koinInject()
 ) {
     Column(modifier = modifier) {
         Text(
@@ -52,7 +52,7 @@ fun Greeting(
         Button(onClick = {
             lifecycleScope.launch {
                 runCatching {
-                    testRemoteApi.getPerson()
+                    authRepo.loginWithEmail("ghanbudi@gmail.com", "Giri123#")
                 }.onSuccess {
                     Log.d("ketai", "Success: $it")
                 }.onFailure {

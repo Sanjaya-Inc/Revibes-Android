@@ -1,8 +1,6 @@
 package com.carissa.revibes.core.di
 
 import com.carissa.revibes.core.data.remote.KtorfitCreator
-import com.carissa.revibes.core.data.remote.TestRemoteApi
-import com.carissa.revibes.core.data.remote.createTestRemoteApi
 import com.carissa.revibes.core.data.util.JsonParserCreator
 import de.jensklingenberg.ktorfit.Ktorfit
 import kotlinx.serialization.json.Json
@@ -30,12 +28,5 @@ object CoreModule {
         creator: KtorfitCreator
     ): Ktorfit {
         return creator.create()
-    }
-
-    @Single
-    internal fun provideTest(
-        ktorfit: Ktorfit
-    ): TestRemoteApi {
-        return ktorfit.createTestRemoteApi()
     }
 }
