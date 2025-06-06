@@ -29,11 +29,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.LocalContentColor
-import com.carissa.revibes.core.presentation.components.foundation.ButtonElevation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.carissa.revibes.core.presentation.components.LocalContentColor
+import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.components.foundation.ButtonElevation
 
 @Composable
 fun Button(
@@ -129,7 +129,7 @@ private fun DefaultButtonContent(
                 AnimatedVisibility(loading) {
                     CircularProgressIndicator(
                         color = contentColor,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.padding(end = 16.dp).size(20.dp),
                         strokeWidth = 2.dp
                     )
                 }

@@ -4,6 +4,8 @@
 package com.carissa.revibes.auth.presentation.screen.login
 
 import androidx.compose.ui.text.input.TextFieldValue
+import com.carissa.revibes.auth.presentation.screen.login.handler.LoginExceptionHandler
+import com.carissa.revibes.auth.presentation.screen.login.handler.LoginSubmitHandler
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.util.EmailValidator
 import com.carissa.revibes.core.presentation.util.PasswordValidator
@@ -29,11 +31,17 @@ sealed interface LoginScreenUiEvent {
     data object NavigateToRegister : LoginScreenUiEvent
     data class EmailChanged(val email: TextFieldValue) : LoginScreenUiEvent
     data class PasswordChanged(val password: TextFieldValue) : LoginScreenUiEvent
+    data object SubmitLogin : LoginScreenUiEvent
+    data class LoginError(val message: String) : LoginScreenUiEvent
 }
 
 @KoinViewModel
-class LoginScreenViewModel :
-    BaseViewModel<LoginScreenUiState, LoginScreenUiEvent>(LoginScreenUiState()) {
+class LoginScreenViewModel(
+    private val loginSubmitHandler: LoginSubmitHandler,
+    private val loginExceptionHandler: LoginExceptionHandler
+) : BaseViewModel<LoginScreenUiState, LoginScreenUiEvent>(LoginScreenUiState(), exceptionHandler = {
+    loginExceptionHandler.onLoginError(this, it)
+}) {
 
     override fun onEvent(event: LoginScreenUiEvent) {
         intent {
@@ -46,6 +54,8 @@ class LoginScreenViewModel :
                 is LoginScreenUiEvent.PasswordChanged -> reduce {
                     this.state.copy(password = event.password)
                 }
+
+                LoginScreenUiEvent.SubmitLogin -> loginSubmitHandler.doLogin(this)
 
                 else -> postSideEffect(event)
             }

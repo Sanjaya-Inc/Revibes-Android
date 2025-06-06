@@ -4,6 +4,8 @@
 package com.carissa.revibes.auth.presentation.screen.register
 
 import androidx.compose.ui.text.input.TextFieldValue
+import com.carissa.revibes.auth.presentation.screen.register.handler.RegisterExceptionHandler
+import com.carissa.revibes.auth.presentation.screen.register.handler.RegisterSubmitHandler
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.util.EmailValidator
 import com.carissa.revibes.core.presentation.util.FullNameValidator
@@ -48,11 +50,21 @@ sealed interface RegisterScreenUiEvent {
     data class PhoneChanged(val phone: TextFieldValue) : RegisterScreenUiEvent
     data class PasswordChanged(val password: TextFieldValue) : RegisterScreenUiEvent
     data class ConfirmPasswordChanged(val confirmPassword: TextFieldValue) : RegisterScreenUiEvent
+    data object SubmitRegister : RegisterScreenUiEvent
+    data class RegisterError(val message: String) : RegisterScreenUiEvent
 }
 
 @KoinViewModel
-class RegisterScreenViewModel :
-    BaseViewModel<RegisterScreenUiState, RegisterScreenUiEvent>(RegisterScreenUiState()) {
+class RegisterScreenViewModel(
+    private val registerSubmitHandler: RegisterSubmitHandler,
+    private val registerExceptionHandler: RegisterExceptionHandler
+) :
+    BaseViewModel<RegisterScreenUiState, RegisterScreenUiEvent>(
+        RegisterScreenUiState(),
+        exceptionHandler = {
+            registerExceptionHandler.onRegisterError(this, it)
+        }
+    ) {
 
     override fun onEvent(event: RegisterScreenUiEvent) {
         intent {
@@ -77,6 +89,8 @@ class RegisterScreenViewModel :
                 is RegisterScreenUiEvent.PhoneChanged -> reduce {
                     this.state.copy(phone = event.phone)
                 }
+
+                RegisterScreenUiEvent.SubmitRegister -> registerSubmitHandler.doRegister(this)
 
                 else -> postSideEffect(event)
             }

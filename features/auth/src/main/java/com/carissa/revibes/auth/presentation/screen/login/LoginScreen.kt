@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.auth.presentation.screen.login
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +74,7 @@ fun LoginScreen(
 ) {
     val state = viewModel.collectAsState().value
     val navigator = RevibesTheme.navigator
+    val context = LocalContext.current
     viewModel.collectSideEffect { event ->
         when (event) {
             is LoginScreenUiEvent.NavigateBack -> navigator.navigateUp()
@@ -79,6 +82,9 @@ fun LoginScreen(
                 popUpTo(LoginScreenDestination) {
                     inclusive = true
                 }
+            }
+            is LoginScreenUiEvent.LoginError -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
             else -> Unit
         }
@@ -152,6 +158,7 @@ private fun LoginScreenContent(
                     onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.EmailChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_email)) },
                     singleLine = true,
+                    enabled = !uiState.isLoading,
                     isError = !uiState.emailError.isNullOrBlank(),
                     supportingText = {
                         if (uiState.emailError != null) {
@@ -165,6 +172,7 @@ private fun LoginScreenContent(
                     onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.PasswordChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_pass)) },
                     singleLine = true,
+                    enabled = !uiState.isLoading,
                     isError = !uiState.passwordError.isNullOrBlank(),
                     supportingText = {
                         if (uiState.passwordError != null) {
@@ -192,7 +200,11 @@ private fun LoginScreenContent(
                 Button(
                     text = stringResource(R.string.cta_login),
                     enabled = uiState.isButtonEnabled,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    loading = uiState.isLoading,
+                    onClick = {
+                        eventReceiver.onEvent(LoginScreenUiEvent.SubmitLogin)
+                    }
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

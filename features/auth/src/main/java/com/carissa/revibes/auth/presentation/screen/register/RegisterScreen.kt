@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.auth.presentation.screen.register
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +74,7 @@ fun RegisterScreen(
 ) {
     val state = viewModel.collectAsState().value
     val navigator = RevibesTheme.navigator
+    val context = LocalContext.current
     viewModel.collectSideEffect { event ->
         when (event) {
             is RegisterScreenUiEvent.NavigateBack -> navigator.navigateUp()
@@ -79,6 +82,9 @@ fun RegisterScreen(
                 popUpTo(RegisterScreenDestination) {
                     inclusive = true
                 }
+            }
+            is RegisterScreenUiEvent.RegisterError -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
             else -> Unit
@@ -159,6 +165,7 @@ private fun RegisterScreenContent(
                             Text(uiState.fullNameError.orEmpty())
                         }
                     },
+                    enabled = !uiState.isLoading,
                     singleLine = true,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -167,6 +174,7 @@ private fun RegisterScreenContent(
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.EmailChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_email)) },
                     singleLine = true,
+                    enabled = !uiState.isLoading,
                     isError = !uiState.emailError.isNullOrBlank(),
                     supportingText = {
                         if (uiState.emailError != null) {
@@ -180,6 +188,7 @@ private fun RegisterScreenContent(
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.PhoneChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_phone)) },
                     singleLine = true,
+                    enabled = !uiState.isLoading,
                     isError = !uiState.phoneError.isNullOrBlank(),
                     supportingText = {
                         if (uiState.phoneError != null) {
@@ -193,6 +202,7 @@ private fun RegisterScreenContent(
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.PasswordChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_pass)) },
                     singleLine = true,
+                    enabled = !uiState.isLoading,
                     isError = !uiState.passwordError.isNullOrBlank(),
                     supportingText = {
                         if (uiState.passwordError != null) {
@@ -206,6 +216,7 @@ private fun RegisterScreenContent(
                     onValueChange = {
                         eventReceiver.onEvent(RegisterScreenUiEvent.ConfirmPasswordChanged(it))
                     },
+                    enabled = !uiState.isLoading,
                     isError = !uiState.confirmPasswordError.isNullOrBlank(),
                     supportingText = {
                         if (uiState.confirmPasswordError != null) {
@@ -227,7 +238,11 @@ private fun RegisterScreenContent(
                 Button(
                     text = stringResource(R.string.cta_register),
                     enabled = uiState.isButtonEnabled,
-                    modifier = Modifier.fillMaxWidth()
+                    loading = uiState.isLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        eventReceiver.onEvent(RegisterScreenUiEvent.SubmitRegister)
+                    }
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
