@@ -6,6 +6,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 val SmokePine = Color(0xFF43665f)
+val Spritzig = Color(0xFF74C0E8)
 
 val Black: Color = Color(0xFF000000)
 val Gray900: Color = Color(0xFF282828)
@@ -87,7 +88,7 @@ internal val LightColors =
     Colors(
         primary = SmokePine,
         onPrimary = White,
-        secondary = Gray400,
+        secondary = Spritzig,
         onSecondary = Black,
         tertiary = Blue900,
         onTertiary = White,

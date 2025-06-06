@@ -17,6 +17,6 @@ fun MainBackground(
         contentDescription = "bg",
         alignment = Alignment.Center,
         contentScale = ContentScale.Crop,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     )
 }

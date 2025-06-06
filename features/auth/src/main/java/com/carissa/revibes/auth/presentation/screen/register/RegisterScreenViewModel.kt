@@ -1,0 +1,57 @@
+/*
+ * Copyright (c) 2025 Sanjaya Inc. All rights reserved.
+ */
+package com.carissa.revibes.auth.presentation.screen.register
+
+import androidx.compose.ui.text.input.TextFieldValue
+import com.carissa.revibes.core.presentation.BaseViewModel
+import org.koin.android.annotation.KoinViewModel
+
+data class RegisterScreenUiState(
+    val isLoading: Boolean = false,
+    val fullName: TextFieldValue = TextFieldValue(),
+    val email: TextFieldValue = TextFieldValue(),
+    val phone: TextFieldValue = TextFieldValue(),
+    val password: TextFieldValue = TextFieldValue(),
+    val confirmPassword: TextFieldValue = TextFieldValue(),
+)
+
+sealed interface RegisterScreenUiEvent {
+    data object NavigateBack : RegisterScreenUiEvent
+    data object NavigateToLogin : RegisterScreenUiEvent
+    data class FullNameChanged(val fullName: TextFieldValue) : RegisterScreenUiEvent
+    data class EmailChanged(val email: TextFieldValue) : RegisterScreenUiEvent
+    data class PhoneChanged(val phone: TextFieldValue) : RegisterScreenUiEvent
+    data class PasswordChanged(val password: TextFieldValue) : RegisterScreenUiEvent
+    data class ConfirmPasswordChanged(val confirmPassword: TextFieldValue) : RegisterScreenUiEvent
+}
+
+@KoinViewModel
+class RegisterScreenViewModel :
+    BaseViewModel<RegisterScreenUiState, RegisterScreenUiEvent>(RegisterScreenUiState()) {
+
+    override fun onEvent(event: RegisterScreenUiEvent) {
+        intent {
+            super.onEvent(event)
+            when (event) {
+                is RegisterScreenUiEvent.ConfirmPasswordChanged -> reduce {
+                    this.state.copy(confirmPassword = event.confirmPassword)
+                }
+                is RegisterScreenUiEvent.EmailChanged -> reduce {
+                    this.state.copy(email = event.email)
+                }
+                is RegisterScreenUiEvent.FullNameChanged -> reduce {
+                    this.state.copy(fullName = event.fullName)
+                }
+                is RegisterScreenUiEvent.PasswordChanged -> reduce {
+                    this.state.copy(password = event.password)
+                }
+                is RegisterScreenUiEvent.PhoneChanged -> reduce {
+                    this.state.copy(phone = event.phone)
+                }
+
+                else -> postSideEffect(event)
+            }
+        }
+    }
+}

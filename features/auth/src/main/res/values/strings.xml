@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_welcome">WELCOME</string>
+    <string name="label_welcome_back">WELCOME BACK</string>
+    <string name="label_to">TO</string>
+    <string name="label_enter_full_name">Enter Your Full Name</string>
+    <string name="label_enter_email">Enter Your Email</string>
+    <string name="label_enter_phone">Enter Your Mobile Phone</string>
+    <string name="label_enter_pass">Create Password</string>
+    <string name="label_enter_confirm_pass">Confirm Password</string>
+    <string name="label_already_have_an_account">Already have an account?</string>
+    <string name="label_not_have_an_account">Not have an account?</string>
+</resources>

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.Text
@@ -39,13 +40,14 @@ fun OnboardingPage(
     }
 ) {
     val state = viewModel.collectAsState().value
-    OnboardingPageContent(state = state, modifier = modifier)
+    OnboardingPageContent(state = state, modifier = modifier, eventReceiver = viewModel)
 }
 
 @Composable
 private fun OnboardingPageContent(
     state: OnboardingPageUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    eventReceiver: EventReceiver<OnboardingPageUiEvent> = EventReceiver { }
 ) {
     Column(
         modifier = modifier
@@ -57,7 +59,10 @@ private fun OnboardingPageContent(
         AsyncImage(
             state.image,
             contentDescription = null,
-            modifier = Modifier.padding(16.dp).fillMaxWidth().height(350.dp)
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .height(350.dp)
         )
         Text(
             text = stringResource(state.text),
@@ -68,8 +73,20 @@ private fun OnboardingPageContent(
         )
         AnimatedVisibility(state.isShowLoginRegister) {
             Row(horizontalArrangement = Arrangement.spacedBy(48.dp)) {
-                Button(text = stringResource(R.string.cta_register), modifier = Modifier.weight(1f))
-                Button(text = stringResource(R.string.cta_login), modifier = Modifier.weight(1f))
+                Button(
+                    text = stringResource(R.string.cta_register),
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        eventReceiver.onEvent(OnboardingPageUiEvent.NavigateToRegister)
+                    }
+                )
+                Button(
+                    text = stringResource(R.string.cta_login),
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        eventReceiver.onEvent(OnboardingPageUiEvent.NavigateToLogin)
+                    }
+                )
             }
         }
     }
