@@ -121,7 +121,7 @@ private fun LoginScreenContent(
                 modifier = Modifier
                     .verticalScroll(scrollState)
                     .padding(horizontal = 32.dp)
-                    .padding(top = 32.dp, bottom = 158.dp),
+                    .padding(top = 32.dp, bottom = 100.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -152,6 +152,12 @@ private fun LoginScreenContent(
                     onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.EmailChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_email)) },
                     singleLine = true,
+                    isError = !uiState.emailError.isNullOrBlank(),
+                    supportingText = {
+                        if (uiState.emailError != null) {
+                            Text(uiState.emailError.orEmpty())
+                        }
+                    },
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 TextField(
@@ -159,7 +165,21 @@ private fun LoginScreenContent(
                     onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.PasswordChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_pass)) },
                     singleLine = true,
+                    isError = !uiState.passwordError.isNullOrBlank(),
+                    supportingText = {
+                        if (uiState.passwordError != null) {
+                            Text(uiState.passwordError.orEmpty())
+                        }
+                    },
                     modifier = Modifier.padding(bottom = 16.dp)
+                )
+                AsyncImage(
+                    R.drawable.main_char_both,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .height(256.dp)
                 )
             }
 
@@ -169,16 +189,9 @@ private fun LoginScreenContent(
                     .padding(32.dp)
                     .fillMaxWidth()
             ) {
-                AsyncImage(
-                    R.drawable.main_char_both,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(256.dp)
-                )
                 Button(
                     text = stringResource(R.string.cta_login),
+                    enabled = uiState.isButtonEnabled,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Row(

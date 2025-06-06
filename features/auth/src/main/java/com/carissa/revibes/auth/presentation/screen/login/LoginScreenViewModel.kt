@@ -5,13 +5,24 @@ package com.carissa.revibes.auth.presentation.screen.login
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
+import com.carissa.revibes.core.presentation.util.EmailValidator
+import com.carissa.revibes.core.presentation.util.PasswordValidator
 import org.koin.android.annotation.KoinViewModel
 
 data class LoginScreenUiState(
     val isLoading: Boolean = false,
     val email: TextFieldValue = TextFieldValue(),
-    val password: TextFieldValue = TextFieldValue(),
-)
+    val password: TextFieldValue = TextFieldValue()
+) {
+    val emailError: String?
+        get() = EmailValidator.validate(email.text)
+
+    val passwordError: String?
+        get() = PasswordValidator.validate(password.text)
+
+    val isButtonEnabled: Boolean
+        get() = emailError == null && passwordError == null
+}
 
 sealed interface LoginScreenUiEvent {
     data object NavigateBack : LoginScreenUiEvent
@@ -31,9 +42,11 @@ class LoginScreenViewModel :
                 is LoginScreenUiEvent.EmailChanged -> reduce {
                     this.state.copy(email = event.email)
                 }
+
                 is LoginScreenUiEvent.PasswordChanged -> reduce {
                     this.state.copy(password = event.password)
                 }
+
                 else -> postSideEffect(event)
             }
         }

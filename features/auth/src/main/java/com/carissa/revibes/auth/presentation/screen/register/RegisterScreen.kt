@@ -153,6 +153,12 @@ private fun RegisterScreenContent(
                     value = uiState.fullName,
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.FullNameChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_full_name)) },
+                    isError = !uiState.fullNameError.isNullOrBlank(),
+                    supportingText = {
+                        if (uiState.fullNameError != null) {
+                            Text(uiState.fullNameError.orEmpty())
+                        }
+                    },
                     singleLine = true,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -161,6 +167,12 @@ private fun RegisterScreenContent(
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.EmailChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_email)) },
                     singleLine = true,
+                    isError = !uiState.emailError.isNullOrBlank(),
+                    supportingText = {
+                        if (uiState.emailError != null) {
+                            Text(uiState.emailError.orEmpty())
+                        }
+                    },
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 TextField(
@@ -168,6 +180,12 @@ private fun RegisterScreenContent(
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.PhoneChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_phone)) },
                     singleLine = true,
+                    isError = !uiState.phoneError.isNullOrBlank(),
+                    supportingText = {
+                        if (uiState.phoneError != null) {
+                            Text(uiState.phoneError.orEmpty())
+                        }
+                    },
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 TextField(
@@ -175,12 +193,24 @@ private fun RegisterScreenContent(
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.PasswordChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_pass)) },
                     singleLine = true,
+                    isError = !uiState.passwordError.isNullOrBlank(),
+                    supportingText = {
+                        if (uiState.passwordError != null) {
+                            Text(uiState.passwordError.orEmpty())
+                        }
+                    },
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 TextField(
                     value = uiState.confirmPassword,
                     onValueChange = {
                         eventReceiver.onEvent(RegisterScreenUiEvent.ConfirmPasswordChanged(it))
+                    },
+                    isError = !uiState.confirmPasswordError.isNullOrBlank(),
+                    supportingText = {
+                        if (uiState.confirmPasswordError != null) {
+                            Text(uiState.confirmPasswordError.orEmpty())
+                        }
                     },
                     label = { Text(stringResource(R.string.label_enter_confirm_pass)) },
                     singleLine = true,
@@ -196,6 +226,7 @@ private fun RegisterScreenContent(
             ) {
                 Button(
                     text = stringResource(R.string.cta_register),
+                    enabled = uiState.isButtonEnabled,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Row(
