@@ -9,5 +9,6 @@ plugins {
     alias(core.plugins.ktorfit) apply false
     alias(essentials.plugins.gms.services) apply false
     alias(essentials.plugins.crashlytics) apply false
+    alias(ui.plugins.lumo) apply false
     id("com.sanjaya.buildlogic.detekt") apply true
 }

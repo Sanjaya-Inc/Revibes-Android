@@ -4,6 +4,7 @@ import java.io.FileInputStream
 plugins {
     id("com.sanjaya.buildlogic.lib")
     id("com.sanjaya.buildlogic.compose")
+    alias(ui.plugins.lumo)
 }
 
 val localProperties = Properties().apply {

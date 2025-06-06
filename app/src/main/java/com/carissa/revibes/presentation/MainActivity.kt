@@ -7,17 +7,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.carissa.revibes.auth.data.AuthRepository
-import com.carissa.revibes.core.presentation.theme.RevibesTheme
+import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.components.components.Button
+import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -44,24 +47,27 @@ fun Greeting(
     modifier: Modifier = Modifier,
     authRepo: AuthRepository = koinInject()
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.padding(16.dp)) {
         Text(
             text = "Hello $name!",
         )
         val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
-        Button(onClick = {
-            lifecycleScope.launch {
-                runCatching {
-                    authRepo.loginWithEmail("ghanbudi@gmail.com", "Giri123#")
-                }.onSuccess {
-                    Log.d("ketai", "Success: $it")
-                }.onFailure {
-                    Log.d("ketai", "Failure: $it")
+        Button(
+            text = "Test",
+            modifier = Modifier.fillMaxWidth(),
+            variant = ButtonVariant.Primary,
+            onClick = {
+                lifecycleScope.launch {
+                    runCatching {
+                        authRepo.loginWithEmail("ghanbudi@gmail.com", "Giri123#")
+                    }.onSuccess {
+                        Log.d("ketai", "Success: $it")
+                    }.onFailure {
+                        Log.d("ketai", "Failure: $it")
+                    }
                 }
             }
-        }) {
-            Text("Test API")
-        }
+        )
     }
 }
 
