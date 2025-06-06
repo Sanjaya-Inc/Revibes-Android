@@ -2,9 +2,10 @@ package com.carissa.revibes.core.presentation.util
 
 object FullNameValidator {
     fun validate(fullName: String): String? {
-        if (fullName.isBlank()) {
-            return ""
+        return when {
+            fullName.isBlank() -> ""
+            fullName.length < 4 -> "Full name is too short"
+            else -> null
         }
-        return null
     }
 }
