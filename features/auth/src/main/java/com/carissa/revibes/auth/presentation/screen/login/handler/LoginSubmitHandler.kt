@@ -16,7 +16,7 @@ class LoginSubmitHandler(
         syntax.reduce {
             this.state.copy(isLoading = true)
         }
-        authRepo.loginWithEmail(syntax.state.email.text, syntax.state.password.text)
+        authRepo.loginWithEmail(syntax.state.email.text.trim(), syntax.state.password.text.trim())
         syntax.reduce {
             this.state.copy(isLoading = false)
         }

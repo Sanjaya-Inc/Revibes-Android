@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +48,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,6 +88,7 @@ fun RegisterScreen(
                     inclusive = true
                 }
             }
+
             is RegisterScreenUiEvent.RegisterError -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
@@ -165,6 +171,11 @@ private fun RegisterScreenContent(
                             Text(uiState.fullNameError.orEmpty())
                         }
                     },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next,
+                        showKeyboardOnFocus = true
+                    ),
                     enabled = !uiState.isLoading,
                     singleLine = true,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -174,6 +185,11 @@ private fun RegisterScreenContent(
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.EmailChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_email)) },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next,
+                        showKeyboardOnFocus = true
+                    ),
                     enabled = !uiState.isLoading,
                     isError = !uiState.emailError.isNullOrBlank(),
                     supportingText = {
@@ -188,6 +204,11 @@ private fun RegisterScreenContent(
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.PhoneChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_phone)) },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next,
+                        showKeyboardOnFocus = true
+                    ),
                     enabled = !uiState.isLoading,
                     isError = !uiState.phoneError.isNullOrBlank(),
                     supportingText = {
@@ -201,7 +222,13 @@ private fun RegisterScreenContent(
                     value = uiState.password,
                     onValueChange = { eventReceiver.onEvent(RegisterScreenUiEvent.PasswordChanged(it)) },
                     label = { Text(stringResource(R.string.label_enter_pass)) },
+                    visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next,
+                        showKeyboardOnFocus = true
+                    ),
                     enabled = !uiState.isLoading,
                     isError = !uiState.passwordError.isNullOrBlank(),
                     supportingText = {
@@ -216,6 +243,15 @@ private fun RegisterScreenContent(
                     onValueChange = {
                         eventReceiver.onEvent(RegisterScreenUiEvent.ConfirmPasswordChanged(it))
                     },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done,
+                        showKeyboardOnFocus = true
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        if (uiState.isButtonEnabled) eventReceiver.onEvent(RegisterScreenUiEvent.SubmitRegister)
+                    }),
                     enabled = !uiState.isLoading,
                     isError = !uiState.confirmPasswordError.isNullOrBlank(),
                     supportingText = {
