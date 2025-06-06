@@ -27,3 +27,5 @@ local.properties
 /.idea/appInsightsSettings.xml
 /.idea/inspectionProfiles/Project_Default.xml
 /app/google-services.json
+/navigation-docs/
+/.kotlin/
