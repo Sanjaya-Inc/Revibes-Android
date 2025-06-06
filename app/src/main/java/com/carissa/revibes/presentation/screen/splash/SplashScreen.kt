@@ -10,11 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
+import com.carissa.revibes.R
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.presentation.navigation.RevibesNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.generated.app.navgraphs.RevibesGraph
+import com.ramcosta.composedestinations.generated.onboarding.destinations.OnboardingScreenDestination
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Destination<RevibesNavGraph>(start = true)
 @Composable
@@ -23,6 +27,18 @@ fun SplashScreen(
     viewModel: SplashScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
+    val navigator = RevibesTheme.navigator
+    viewModel.collectSideEffect {
+        when (it) {
+            SplashScreenUiEvent.NavigateToOnboarding -> {
+                navigator.navigate(OnboardingScreenDestination) {
+                    popUpTo(RevibesGraph.startRoute) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    }
     SplashScreenContent(uiState = state, modifier = modifier)
 }
 
@@ -42,7 +58,7 @@ private fun SplashScreenContent(
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                com.carissa.revibes.core.R.drawable.main_logo,
+                R.drawable.main_logo,
                 contentDescription = "Main Logo",
             )
         }

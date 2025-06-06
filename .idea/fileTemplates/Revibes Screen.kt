@@ -5,8 +5,10 @@
 #if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME}
 
 #end
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.ramcosta.composedestinations.annotation.Destination
@@ -35,6 +37,9 @@ private fun ${SCREEN_NAME}ScreenContent(
 @Preview
 private fun ${SCREEN_NAME}ScreenPreview() {
     RevibesTheme {
-        ${SCREEN_NAME}ScreenContent(${SCREEN_NAME}ScreenUiState())
+        ${SCREEN_NAME}ScreenContent(
+            modifier = Modifier.background(Color.White),
+            uiState = ${SCREEN_NAME}ScreenUiState()
+        )
     }
 }
