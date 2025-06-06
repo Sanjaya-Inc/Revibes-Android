@@ -9,7 +9,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="com.carissa.revibes.onboarding.di.OnboardingModuleInitializer"
+                android:name="com.carissa.revibes.onboarding.OnboardingModuleInitializer"
                 android:value="androidx.startup" />
         </provider>
     </application>

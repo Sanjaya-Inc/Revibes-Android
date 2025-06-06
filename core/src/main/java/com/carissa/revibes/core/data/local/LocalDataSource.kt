@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import com.tencent.mmkv.MMKV
 import org.koin.core.annotation.Single
 
-interface LocalPrefGateway : SharedPreferences
+interface LocalDataSource : SharedPreferences
 
-@Single(binds = [LocalPrefGateway::class])
-internal class LocalPrefGatewayImpl(
+@Single(binds = [LocalDataSource::class])
+internal class LocalDataSourceImpl(
     private val sharedPreferences: SharedPreferences = MMKV.defaultMMKV()
-) : LocalPrefGateway, SharedPreferences by sharedPreferences
+) : LocalDataSource, SharedPreferences by sharedPreferences

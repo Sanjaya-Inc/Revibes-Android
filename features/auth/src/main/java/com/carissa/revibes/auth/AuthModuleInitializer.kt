@@ -1,4 +1,4 @@
-package com.carissa.revibes.auth.di
+package com.carissa.revibes.auth
 
 import android.content.Context
 import androidx.startup.Initializer

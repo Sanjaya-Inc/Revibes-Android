@@ -1,4 +1,4 @@
-package com.carissa.revibes.di
+package com.carissa.revibes
 
 import android.content.Context
 import androidx.startup.Initializer

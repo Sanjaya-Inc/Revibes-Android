@@ -1,4 +1,4 @@
-package com.carissa.revibes.di
+package com.carissa.revibes
 
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module

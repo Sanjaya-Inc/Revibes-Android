@@ -1,4 +1,4 @@
-package com.carissa.revibes.auth.di
+package com.carissa.revibes.auth
 
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module

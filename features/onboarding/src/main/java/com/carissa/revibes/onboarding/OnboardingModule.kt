@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Sanjaya Inc. All rights reserved.
  */
 
-package com.carissa.revibes.onboarding.di
+package com.carissa.revibes.onboarding
 
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
