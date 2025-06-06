@@ -1,9 +1,8 @@
-package com.carissa.revibes.auth.presentation.initializer
+package com.carissa.revibes.auth.di
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.carissa.revibes.auth.di.AuthModule
-import com.carissa.revibes.core.presentation.inititalizer.KoinInitializer
+import com.carissa.revibes.core.di.KoinInitializer
 import org.koin.core.context.loadKoinModules
 import org.koin.ksp.generated.module
 

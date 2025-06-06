@@ -26,6 +26,6 @@ android {
 
 dependencies {
     implementation(project(":core"))
-    implementation(project(":features:splash"))
     implementation(project(":features:auth"))
+    implementation(project(":features:onboarding"))
 }

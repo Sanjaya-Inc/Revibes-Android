@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.carissa.revibes.splash"
+    namespace = "com.carissa.revibes.onboarding"
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

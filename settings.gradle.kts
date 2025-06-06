@@ -33,6 +33,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Revibes"
 include(":app", ":features")
-include(":features:splash")
 include(":core")
 include(":features:auth")
+include(":features:onboarding")

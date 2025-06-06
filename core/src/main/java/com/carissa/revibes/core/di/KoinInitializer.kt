@@ -1,8 +1,7 @@
-package com.carissa.revibes.core.presentation.inititalizer
+package com.carissa.revibes.core.di
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.carissa.revibes.core.di.CoreModule
 import com.tencent.mmkv.MMKV
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger

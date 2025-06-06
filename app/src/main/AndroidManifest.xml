@@ -30,7 +30,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="com.carissa.revibes.presentation.initializer.AppModuleInitializer"
+                android:name="com.carissa.revibes.di.AppModuleInitializer"
                 android:value="androidx.startup" />
         </provider>
     </application>
