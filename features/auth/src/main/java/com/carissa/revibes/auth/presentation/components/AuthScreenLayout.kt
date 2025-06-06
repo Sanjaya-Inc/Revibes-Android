@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.auth.R
 import com.carissa.revibes.core.presentation.components.RevibesTheme
@@ -159,7 +160,9 @@ fun AuthScrollButton(
         IconButton(
             onClick = onClick,
             modifier = Modifier
-                .offset(y = offsetY.dp)
+                .offset {
+                    IntOffset(0, offsetY.toInt())
+                }
                 .size(56.dp)
         ) {
             Icon(
