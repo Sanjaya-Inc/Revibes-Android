@@ -1,4 +1,4 @@
-package com.carissa.revibes.onboarding.presentation.screen.onboarding.component.indicator
+package com.carissa.revibes.core.presentation.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -19,10 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.carissa.revibes.core.presentation.components.RevibesTheme
 
 @Composable
-fun OnboardingIndicator(
+fun PagerIndicator(
     currentPage: Int,
     totalPage: Int,
     modifier: Modifier = Modifier
@@ -33,13 +32,13 @@ fun OnboardingIndicator(
         verticalAlignment = Alignment.CenterVertically
     ) {
         repeat(totalPage) {
-            OnboardingIndicatorItem(isCurrentActive = it == currentPage)
+            PagerIndicatorItem(isCurrentActive = it == currentPage)
         }
     }
 }
 
 @Composable
-private fun OnboardingIndicatorItem(
+private fun PagerIndicatorItem(
     isCurrentActive: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -89,8 +88,8 @@ private fun OnboardingIndicatorItem(
 
 @Composable
 @Preview
-private fun OnboardingIndicatorPreview() {
+private fun PagerIndicatorPreview() {
     RevibesTheme {
-        OnboardingIndicator(currentPage = 1, totalPage = 3, modifier = Modifier.padding(16.dp))
+        PagerIndicator(currentPage = 1, totalPage = 3, modifier = Modifier.padding(16.dp))
     }
 }

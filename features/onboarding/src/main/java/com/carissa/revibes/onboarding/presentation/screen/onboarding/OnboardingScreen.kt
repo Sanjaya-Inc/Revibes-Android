@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.onboarding.presentation.navigation.OnboardingGraph
-import com.carissa.revibes.onboarding.presentation.screen.onboarding.component.indicator.OnboardingIndicator
+import com.carissa.revibes.core.presentation.components.PagerIndicator
 import com.carissa.revibes.onboarding.presentation.screen.onboarding.component.page.OnboardingPage
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel
@@ -59,7 +59,7 @@ private fun OnboardingScreenContent(
             ) { page ->
                 OnboardingPage(page = page)
             }
-            OnboardingIndicator(
+            PagerIndicator(
                 currentPage = pagerState.currentPage,
                 totalPage = uiState.pageCount,
                 modifier = Modifier

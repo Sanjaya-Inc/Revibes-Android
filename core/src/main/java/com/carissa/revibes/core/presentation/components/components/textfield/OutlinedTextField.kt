@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -201,7 +201,7 @@ fun OutlinedTextField(
 @Immutable
 object OutlinedTextFieldDefaults {
     val MinHeight = TextFieldMinHeight
-    val Shape: Shape = RoundedCornerShape(8.dp)
+    val Shape: Shape = CircleShape
 
     private fun contentPadding(
         start: Dp = TextFieldHorizontalPadding,
@@ -320,10 +320,10 @@ object OutlinedTextFieldDefaults {
             unfocusedTextColor = RevibesTheme.colors.text,
             disabledTextColor = RevibesTheme.colors.onDisabled,
             errorTextColor = RevibesTheme.colors.text,
-            focusedContainerColor = RevibesTheme.colors.transparent,
-            unfocusedContainerColor = RevibesTheme.colors.transparent,
-            disabledContainerColor = RevibesTheme.colors.transparent,
-            errorContainerColor = RevibesTheme.colors.transparent,
+            focusedContainerColor = RevibesTheme.colors.primary,
+            unfocusedContainerColor = RevibesTheme.colors.primary,
+            disabledContainerColor = RevibesTheme.colors.primary,
+            errorContainerColor = RevibesTheme.colors.primary,
             cursorColor = RevibesTheme.colors.primary,
             errorCursorColor = RevibesTheme.colors.error,
             textSelectionColors = LocalTextSelectionColors.current,
