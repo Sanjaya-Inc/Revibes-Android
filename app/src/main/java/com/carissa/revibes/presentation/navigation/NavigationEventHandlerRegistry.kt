@@ -6,7 +6,7 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.presentation.navigation.handler.AuthScreenNavigationHandler
-import com.carissa.revibes.presentation.navigation.handler.NavigationEventHandler
+import com.carissa.revibes.presentation.navigation.handler.HomeScreenNavigationHandler
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.compose.koinInject
 import org.koin.core.annotation.Factory
@@ -17,8 +17,9 @@ import org.koin.core.parameter.parametersOf
 class NavigationEventHandlerRegistry(
     @InjectedParam navigator: DestinationsNavigator
 ) {
-    private val handlers = listOf<NavigationEventHandler>(
-        AuthScreenNavigationHandler(navigator)
+    private val handlers = listOf(
+        AuthScreenNavigationHandler(navigator),
+        HomeScreenNavigationHandler(navigator)
     )
 
     fun handle(event: NavigationEvent) {

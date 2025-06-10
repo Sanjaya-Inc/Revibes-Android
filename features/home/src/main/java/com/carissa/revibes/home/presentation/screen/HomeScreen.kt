@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.home.presentation.component.HomeFooter
 import com.carissa.revibes.home.presentation.component.HomeHeader
@@ -29,20 +30,24 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
-    HomeScreenContent(uiState = state, modifier = modifier)
+    HomeScreenContent(uiState = state, modifier = modifier, eventReceiver = viewModel)
 }
 
 @Composable
 private fun HomeScreenContent(
     uiState: HomeScreenUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    eventReceiver: EventReceiver<HomeScreenUiEvent> = EventReceiver { }
 ) {
     Scaffold(modifier, containerColor = Color.Transparent, topBar = {
         HomeHeader(
             uiState.searchValue,
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(16.dp)
+                .padding(16.dp),
+            onProfileClicked = {
+                eventReceiver.onEvent(HomeScreenUiEvent.NavigateToProfile)
+            }
         )
     }, bottomBar = {
         HomeFooter(uiState.footerItems)
