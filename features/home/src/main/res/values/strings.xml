@@ -2,4 +2,11 @@
 <resources>
     <string name="label_contact_us">Contact Us:</string>
     <string name="cta_chat_team_revibes">Chat Team Revibes</string>
+    <string name="cta_your_point">Your Point</string>
+    <string name="cta_help_center">HELP CENTER</string>
+    <string name="cta_drop_off">Drop Off</string>
+    <string name="cta_pick_up">Pick Up</string>
+    <string name="cta_exchange_points">Exchange Points to Voucher</string>
+    <string name="cta_shop">Shop</string>
+    <string name="cta_transacion_history">My Transaction History</string>
 </resources>
