@@ -3,6 +3,7 @@
   <component name="ExportableFileTemplateSettings">
     <default_templates>
       <template name="Revibes Annotation Graph.kt" file-name="${NAVIGATION_NAME}Graph" reformat="true" live-template-enabled="false" />
+      <template name="Revibes Compose Component.kt" file-name="${COMPONENT_NAME}.kt" reformat="true" live-template-enabled="false" />
       <template name="Revibes Local Data Source.kt" file-name="${DATA_SOURCE_NAME}DataSource.kt" reformat="true" live-template-enabled="false">
         <template name="Revibes Local Data Source.kt.child.0.kt" file-name="${DATA_SOURCE_NAME}DataSourceGetter" reformat="true" live-template-enabled="false" />
         <template name="Revibes Local Data Source.kt.child.1.kt" file-name="${DATA_SOURCE_NAME}DataSourceSetter" reformat="true" live-template-enabled="false" />
