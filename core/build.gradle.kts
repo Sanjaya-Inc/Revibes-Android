@@ -1,9 +1,10 @@
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.sanjaya.buildlogic.lib")
     id("com.sanjaya.buildlogic.compose")
+    kotlin("plugin.serialization") version core.versions.kotlin.core.get()
     alias(ui.plugins.lumo)
 }
 

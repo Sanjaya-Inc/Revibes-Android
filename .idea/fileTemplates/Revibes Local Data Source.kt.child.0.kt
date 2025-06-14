@@ -6,6 +6,7 @@
 
 #end
 
+import android.util.Log
 import com.carissa.revibes.core.data.main.local.LocalDataSource
 
 fun interface ${DATA_SOURCE_NAME}DataSourceGetter {
@@ -18,6 +19,12 @@ internal class ${DATA_SOURCE_NAME}DataSourceGetterImpl(
     override fun get${DATA_SOURCE_NAME}Value(): Result<${VALUE_TYPE}> {
         return localDataSource.runCatching {
             get${VALUE_TYPE}(${DATA_SOURCE_NAME}DataSource.KEY, ${DEFAULT_VALUE})
+        }.onFailure {
+            Log.e(TAG, "getTestValue: ")
         }
+    }
+
+    companion object {
+        private const val TAG = "TestDataSourceGetter"
     }
 }

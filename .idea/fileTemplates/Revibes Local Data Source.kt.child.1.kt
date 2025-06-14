@@ -7,6 +7,7 @@
 #end
 
 import androidx.core.content.edit
+import android.util.Log
 import com.carissa.revibes.core.data.main.local.LocalDataSource
 
 fun interface ${DATA_SOURCE_NAME}DataSourceSetter {
@@ -22,6 +23,12 @@ internal class ${DATA_SOURCE_NAME}DataSourceSetterImpl(
                 put${VALUE_TYPE}(${DATA_SOURCE_NAME}DataSource.KEY, value)
             }
             value
+        }.onFailure {
+            Log.e(TAG, "set${DATA_SOURCE_NAME}Value: $it")
         }
+    }
+
+    companion object {
+        private const val TAG = "${DATA_SOURCE_NAME}DataSourceSetter"
     }
 }

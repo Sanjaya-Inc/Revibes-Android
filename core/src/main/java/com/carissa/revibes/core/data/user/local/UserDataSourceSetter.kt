@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.core.data.user.local
 
+import android.util.Log
 import androidx.core.content.edit
 import com.carissa.revibes.core.data.main.local.LocalDataSource
 import com.carissa.revibes.core.data.user.model.UserData
@@ -25,7 +26,13 @@ internal class UserDataSourceSetterImpl(
                 putString(UserDataSource.KEY, userDataRaw)
             }
             value
+        }.onFailure {
+            Log.e(TAG, "setUserValue: $it")
         }
+    }
+
+    companion object {
+        private const val TAG = "UserDataSourceSetter"
     }
 
     override fun clearUserData() {

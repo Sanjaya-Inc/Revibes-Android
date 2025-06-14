@@ -2,9 +2,11 @@ package com.carissa.revibes.core.data.user.model
 
 import androidx.annotation.Keep
 import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
 
 @Keep
 @Stable
+@Serializable
 data class UserData(
     val name: String,
     val email: String,

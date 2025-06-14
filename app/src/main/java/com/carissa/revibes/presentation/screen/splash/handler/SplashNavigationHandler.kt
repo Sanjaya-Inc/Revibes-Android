@@ -16,7 +16,8 @@ class SplashNavigationHandler(
         syntax: Syntax<SplashScreenUiState, SplashScreenUiEvent>
     ) = syntax.run {
         delay(1.seconds)
-        if (userDataSource.getUserValue().getOrNull() != null) {
+        if (userDataSource.getUserValue().getOrNull() != null
+        ) {
             postSideEffect(SplashScreenUiEvent.NavigateToHome)
         } else {
             postSideEffect(SplashScreenUiEvent.NavigateToOnboarding)
