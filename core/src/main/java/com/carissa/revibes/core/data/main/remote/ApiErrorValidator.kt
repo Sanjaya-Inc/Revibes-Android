@@ -1,7 +1,7 @@
-package com.carissa.revibes.core.data.remote
+package com.carissa.revibes.core.data.main.remote
 
 import android.util.Log
-import com.carissa.revibes.core.data.model.ErrorModel
+import com.carissa.revibes.core.data.main.model.ErrorModel
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json

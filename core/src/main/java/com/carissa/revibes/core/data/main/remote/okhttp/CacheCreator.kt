@@ -1,4 +1,4 @@
-package com.carissa.revibes.core.data.remote.okhttp
+package com.carissa.revibes.core.data.main.remote.okhttp
 
 import android.content.Context
 import okhttp3.Cache

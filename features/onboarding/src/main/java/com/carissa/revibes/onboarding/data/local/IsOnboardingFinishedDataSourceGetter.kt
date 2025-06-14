@@ -4,7 +4,7 @@
 
 package com.carissa.revibes.onboarding.data.local
 
-import com.carissa.revibes.core.data.local.LocalDataSource
+import com.carissa.revibes.core.data.main.local.LocalDataSource
 
 fun interface IsOnboardingFinishedDataSourceGetter {
     fun getIsOnboardingFinishedValue(): Boolean

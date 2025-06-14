@@ -1,4 +1,4 @@
-package com.carissa.revibes.core.data.util
+package com.carissa.revibes.core.data.main.util
 
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single

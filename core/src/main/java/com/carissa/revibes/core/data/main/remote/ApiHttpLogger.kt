@@ -1,4 +1,4 @@
-package com.carissa.revibes.core.data.remote
+package com.carissa.revibes.core.data.main.remote
 
 import android.util.Log
 import io.ktor.client.plugins.logging.Logger

@@ -15,6 +15,7 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.presentation.navigation.RevibesNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.app.navgraphs.RevibesGraph
+import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.onboarding.destinations.OnboardingScreenDestination
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -37,6 +38,12 @@ fun SplashScreen(
                     }
                 }
             }
+            SplashScreenUiEvent.NavigateToHome ->
+                navigator.navigate(HomeScreenDestination) {
+                    popUpTo(RevibesGraph.startRoute) {
+                        inclusive = true
+                    }
+                }
         }
     }
     SplashScreenContent(uiState = state, modifier = modifier)

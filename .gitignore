@@ -29,3 +29,5 @@ local.properties
 /app/google-services.json
 /navigation-docs/
 /.kotlin/
+/sjy-build-logic/.kotlin/
+/.mcp/

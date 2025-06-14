@@ -1,4 +1,4 @@
-package com.carissa.revibes.core.data.remote.okhttp
+package com.carissa.revibes.core.data.main.remote.okhttp
 
 import okhttp3.ConnectionPool
 import okhttp3.Interceptor

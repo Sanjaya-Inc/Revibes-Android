@@ -5,7 +5,7 @@
 package com.carissa.revibes.onboarding.data.local
 
 import androidx.core.content.edit
-import com.carissa.revibes.core.data.local.LocalDataSource
+import com.carissa.revibes.core.data.main.local.LocalDataSource
 
 fun interface IsOnboardingFinishedDataSourceSetter {
     fun setIsOnboardingFinishedValue(value: Boolean)

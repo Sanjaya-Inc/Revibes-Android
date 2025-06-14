@@ -1,7 +1,7 @@
-package com.carissa.revibes.core.data.remote.okhttp
+package com.carissa.revibes.core.data.main.remote.okhttp
 
-import com.carissa.revibes.core.data.local.LocalDataSource
-import com.carissa.revibes.core.data.util.DataConstant
+import com.carissa.revibes.core.data.main.local.LocalDataSource
+import com.carissa.revibes.core.data.main.util.DataConstant
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.koin.core.annotation.Single

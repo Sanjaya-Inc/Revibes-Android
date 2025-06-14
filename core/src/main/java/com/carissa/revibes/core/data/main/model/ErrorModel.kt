@@ -1,4 +1,4 @@
-package com.carissa.revibes.core.data.model
+package com.carissa.revibes.core.data.main.model
 
 import kotlinx.serialization.Serializable
 

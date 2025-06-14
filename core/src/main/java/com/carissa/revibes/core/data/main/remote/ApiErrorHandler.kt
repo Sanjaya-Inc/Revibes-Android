@@ -1,6 +1,6 @@
-package com.carissa.revibes.core.data.remote
+package com.carissa.revibes.core.data.main.remote
 
-import com.carissa.revibes.core.data.model.ErrorModel
+import com.carissa.revibes.core.data.main.model.ErrorModel
 import io.ktor.client.plugins.HttpCallValidatorConfig
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.request.HttpRequest

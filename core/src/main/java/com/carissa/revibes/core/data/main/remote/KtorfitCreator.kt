@@ -1,6 +1,6 @@
-package com.carissa.revibes.core.data.remote
+package com.carissa.revibes.core.data.main.remote
 
-import com.carissa.revibes.core.data.remote.okhttp.ClientCreator
+import com.carissa.revibes.core.data.main.remote.okhttp.ClientCreator
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpCallValidator

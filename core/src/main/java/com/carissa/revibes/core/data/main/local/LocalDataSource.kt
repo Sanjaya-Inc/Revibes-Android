@@ -1,4 +1,4 @@
-package com.carissa.revibes.core.data.local
+package com.carissa.revibes.core.data.main.local
 
 import android.content.SharedPreferences
 import com.tencent.mmkv.MMKV
