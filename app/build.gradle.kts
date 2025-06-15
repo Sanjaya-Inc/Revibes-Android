@@ -30,4 +30,5 @@ dependencies {
     implementation(project(":features:onboarding"))
     implementation(project(":features:home"))
     implementation(project(":features:profile"))
+    implementation(project(":features:transaction-history"))
 }

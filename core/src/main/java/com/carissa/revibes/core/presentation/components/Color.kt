@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 
 val SmokePine = Color(0xFF43665f)
 val Spritzig = Color(0xFF74C0E8)
+val Honeydew = Color(0xFFE5F2E6)
 
 val Black: Color = Color(0xFF000000)
 val Gray900: Color = Color(0xFF282828)
@@ -90,8 +91,8 @@ internal val LightColors =
         onPrimary = White,
         secondary = Spritzig,
         onSecondary = White,
-        tertiary = Blue900,
-        onTertiary = White,
+        tertiary = Honeydew,
+        onTertiary = SmokePine,
         surface = Gray200,
         onSurface = Black,
         error = Red600,
