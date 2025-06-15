@@ -31,3 +31,7 @@ local.properties
 /.kotlin/
 /sjy-build-logic/.kotlin/
 /.mcp/
+/.idea/.name
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/graphql-settings.xml
+/.idea/codeStyles/Project.xml
