@@ -4,6 +4,7 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.home.presentation.screen.HomeScreenUiEvent
 import com.carissa.revibes.profile.presentation.screen.ProfileScreenUiEvent
 import com.ramcosta.composedestinations.generated.app.destinations.SplashScreenDestination
+import com.ramcosta.composedestinations.generated.exchangepoints.destinations.ExchangePointsScreenDestination
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.generated.shop.destinations.ShopScreenDestination
@@ -17,6 +18,7 @@ class HomeScreenNavigationHandler(
         HomeScreenUiEvent.NavigateToProfile,
         ProfileScreenUiEvent.LogoutClicked,
         HomeScreenUiEvent.NavigateToShop,
+        HomeScreenUiEvent.NavigateToExchangePoints,
     )
 
     override fun navigate(event: NavigationEvent) {
@@ -26,6 +28,7 @@ class HomeScreenNavigationHandler(
                 popUpTo(HomeScreenDestination) { inclusive = true }
             }
             is HomeScreenUiEvent.NavigateToShop -> navigator.navigate(ShopScreenDestination)
+            is HomeScreenUiEvent.NavigateToExchangePoints -> navigator.navigate(ExchangePointsScreenDestination)
         }
     }
 }

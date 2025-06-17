@@ -117,7 +117,10 @@ private fun HomeScreenContent(
                         CtaMenu(
                             stringResource(R.string.cta_exchange_points),
                             R.drawable.cta_exchange_points,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                eventReceiver.onEvent(HomeScreenUiEvent.NavigateToExchangePoints)
+                            }
                         )
                         CtaMenu(
                             stringResource(R.string.cta_shop),

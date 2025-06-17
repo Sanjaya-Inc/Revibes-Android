@@ -20,6 +20,7 @@ data class HomeScreenUiState(
 sealed interface HomeScreenUiEvent {
     data object NavigateToProfile : HomeScreenUiEvent, NavigationEvent
     data object NavigateToShop : HomeScreenUiEvent, NavigationEvent
+    data object NavigateToExchangePoints : HomeScreenUiEvent, NavigationEvent
 }
 
 @KoinViewModel
@@ -34,6 +35,7 @@ class HomeScreenViewModel(
             when (event) {
                 is HomeScreenUiEvent.NavigateToProfile -> navigationEventBus.post(event)
                 is HomeScreenUiEvent.NavigateToShop -> navigationEventBus.post(event)
+                is HomeScreenUiEvent.NavigateToExchangePoints -> navigationEventBus.post(event)
             }
         }
     }

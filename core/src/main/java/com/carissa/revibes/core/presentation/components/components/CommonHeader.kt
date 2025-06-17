@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
@@ -38,11 +40,13 @@ fun CommonHeader(
     @DrawableRes backgroundDrawRes: Int,
     searchTextFieldValue: TextFieldValue,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
     onTextChange: (TextFieldValue) -> Unit = {},
     onBackClicked: () -> Unit = {},
     onProfileClicked: () -> Unit = {},
 ) {
-    Box(modifier = modifier.height(272.dp)) {
+    val headerHeight = if (subtitle != null) 312.dp else 272.dp
+    Box(modifier = modifier.height(headerHeight)) {
         Box {
             AsyncImage(
                 model = backgroundDrawRes,
@@ -66,19 +70,49 @@ fun CommonHeader(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(36.dp)
+                .height(if (subtitle != null) 76.dp else 36.dp)
                 .padding(horizontal = 16.dp)
                 .align(Alignment.BottomCenter)
                 .clip(RoundedCornerShape(32.dp))
                 .background(RevibesTheme.colors.primary),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = title,
-                style = RevibesTheme.typography.h1,
-                color = RevibesTheme.colors.onPrimary,
-                modifier = Modifier.padding(4.dp)
-            )
+            if (subtitle != null) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = title,
+                        style = RevibesTheme.typography.h1,
+                        color = RevibesTheme.colors.onPrimary,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        thickness = 1.dp,
+                        color = RevibesTheme.colors.onPrimary.copy(alpha = 0.6f)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = subtitle,
+                        style = RevibesTheme.typography.body2,
+                        color = RevibesTheme.colors.onPrimary,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                }
+            } else {
+                Text(
+                    text = title,
+                    style = RevibesTheme.typography.h1,
+                    color = RevibesTheme.colors.onPrimary,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
         }
     }
 }
@@ -179,6 +213,23 @@ private fun CommonHeaderPreview() {
     RevibesTheme {
         CommonHeader(
             title = "Common Header",
+            backgroundDrawRes = -1,
+            searchTextFieldValue = TextFieldValue(""),
+            onTextChange = {},
+            onBackClicked = {},
+            onProfileClicked = {},
+            modifier = Modifier.background(Color.White)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CommonHeaderWithSubtitlePreview() {
+    RevibesTheme {
+        CommonHeader(
+            title = "Common Header",
+            subtitle = "This is a subtitle",
             backgroundDrawRes = -1,
             searchTextFieldValue = TextFieldValue(""),
             onTextChange = {},

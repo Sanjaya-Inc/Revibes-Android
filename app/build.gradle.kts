@@ -32,4 +32,5 @@ dependencies {
     implementation(project(":features:profile"))
     implementation(project(":features:transaction-history"))
     implementation(project(":features:shop"))
+    implementation(project(":features:exchange-points"))
 }
