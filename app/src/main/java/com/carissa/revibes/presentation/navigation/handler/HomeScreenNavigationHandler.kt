@@ -6,6 +6,7 @@ import com.carissa.revibes.profile.presentation.screen.ProfileScreenUiEvent
 import com.ramcosta.composedestinations.generated.app.destinations.SplashScreenDestination
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
+import com.ramcosta.composedestinations.generated.shop.destinations.ShopScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 class HomeScreenNavigationHandler(
@@ -14,7 +15,8 @@ class HomeScreenNavigationHandler(
 
     override val supportedEvents: Set<NavigationEvent> = setOf(
         HomeScreenUiEvent.NavigateToProfile,
-        ProfileScreenUiEvent.LogoutClicked
+        ProfileScreenUiEvent.LogoutClicked,
+        HomeScreenUiEvent.NavigateToShop,
     )
 
     override fun navigate(event: NavigationEvent) {
@@ -23,6 +25,7 @@ class HomeScreenNavigationHandler(
             is ProfileScreenUiEvent.LogoutClicked -> navigator.navigate(SplashScreenDestination) {
                 popUpTo(HomeScreenDestination) { inclusive = true }
             }
+            is HomeScreenUiEvent.NavigateToShop -> navigator.navigate(ShopScreenDestination)
         }
     }
 }

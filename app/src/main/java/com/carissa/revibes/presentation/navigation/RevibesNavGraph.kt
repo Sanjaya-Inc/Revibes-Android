@@ -8,6 +8,7 @@ import com.ramcosta.composedestinations.generated.home.navgraphs.HomeNavGraph
 import com.ramcosta.composedestinations.generated.onboarding.navgraphs.OnboardingNavGraph
 import com.ramcosta.composedestinations.generated.profile.navgraphs.ProfileNavGraph
 import com.ramcosta.composedestinations.generated.transactionhistory.navgraphs.TransactionHistoryNavGraph
+import com.ramcosta.composedestinations.generated.shop.navgraphs.ShopNavGraph
 
 @NavHostGraph(defaultTransitions = RevibesHostNavigationStyle::class)
 annotation class RevibesNavGraph {
@@ -17,5 +18,6 @@ annotation class RevibesNavGraph {
     @ExternalNavGraph<HomeNavGraph>
     @ExternalNavGraph<ProfileNavGraph>
     @ExternalNavGraph<TransactionHistoryNavGraph>
+    @ExternalNavGraph<ShopNavGraph>
     companion object Includes
 }

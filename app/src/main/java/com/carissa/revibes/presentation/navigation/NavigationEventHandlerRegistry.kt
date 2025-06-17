@@ -7,6 +7,7 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.presentation.navigation.handler.AuthScreenNavigationHandler
 import com.carissa.revibes.presentation.navigation.handler.HomeScreenNavigationHandler
+import com.carissa.revibes.presentation.navigation.handler.ShopScreenNavigationHandler
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.compose.koinInject
 import org.koin.core.annotation.Factory
@@ -19,7 +20,8 @@ class NavigationEventHandlerRegistry(
 ) {
     private val handlers = listOf(
         AuthScreenNavigationHandler(navigator),
-        HomeScreenNavigationHandler(navigator)
+        HomeScreenNavigationHandler(navigator),
+        ShopScreenNavigationHandler(navigator),
     )
 
     fun handle(event: NavigationEvent) {

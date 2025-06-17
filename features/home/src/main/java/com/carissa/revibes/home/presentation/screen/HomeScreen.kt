@@ -122,7 +122,8 @@ private fun HomeScreenContent(
                         CtaMenu(
                             stringResource(R.string.cta_shop),
                             R.drawable.cta_shop,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            onClick = { eventReceiver.onEvent(HomeScreenUiEvent.NavigateToShop) }
                         )
                         CtaMenu(
                             stringResource(R.string.cta_transacion_history),
