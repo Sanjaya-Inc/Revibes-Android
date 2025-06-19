@@ -3,4 +3,15 @@
     <string name="exchange_points_title">EXCHANGE POINTS to VOUCHER</string>
     <string name="exchange_points_subtitle">Total Revive Points = %1$d</string>
     <string name="exchange_points_description">Redeem Your Points for Coupons and\nGet Other Exciting Benefits</string>
+    
+    <string name="exchange_point_detail_title">COUPONS DETAILS</string>
+    <string name="time_to_shop">Time to Shop</string>
+    <string name="details">Details</string>
+    <string name="terms_conditions">Term &amp; Conditions</string>
+    <string name="buy_it_now">BUY IT NOW</string>
+    <string name="discount_label">DISCOUNT %1$d%%</string>
+    <string name="coupon_description">This coupon can be used to get a discount on your next purchase. Valid for all products in our store.</string>
+    <string name="confirmation">CONFIRMATION</string>
+    <string name="quantity">Quantity</string>
+
 </resources>

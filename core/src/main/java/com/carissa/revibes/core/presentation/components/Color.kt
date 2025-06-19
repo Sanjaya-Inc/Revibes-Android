@@ -56,6 +56,8 @@ val Green200: Color = Color(0xFFC2F5DA)
 val Green100: Color = Color(0xFFD0FBE9)
 val Green50: Color = Color(0xFFE0FAEC)
 
+val Yellow900: Color = Color(0xFFF3EA19)
+
 @Immutable
 data class Colors(
     val primary: Color,
