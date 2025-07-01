@@ -15,7 +15,7 @@ fun interface EventReceiver<Event : Any> {
 
 abstract class BaseViewModel<State : Any, Event : Any>(
     initialState: State,
-    exceptionHandler: (suspend Syntax<State, Event>.(Throwable) -> Unit)? = null,
+    exceptionHandler: (suspend EventReceiver<Event>.(Syntax<State, Event>, Throwable) -> Unit)? = null,
     onCreate: (suspend EventReceiver<Event>.(Syntax<State, Event>) -> Unit)? = null
 ) : ContainerHost<State, Event>, EventReceiver<Event>, ViewModel() {
 
@@ -25,7 +25,7 @@ abstract class BaseViewModel<State : Any, Event : Any>(
             buildSettings = {
                 if (exceptionHandler != null) {
                     this.exceptionHandler = CoroutineExceptionHandler { _, exception ->
-                        intent { exceptionHandler(this, exception) }
+                        intent { exceptionHandler(this@BaseViewModel, this, exception) }
                     }
                 }
             },

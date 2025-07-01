@@ -41,9 +41,12 @@ sealed interface LoginScreenUiEvent {
 class LoginScreenViewModel(
     private val loginSubmitHandler: LoginSubmitHandler,
     private val loginExceptionHandler: LoginExceptionHandler
-) : BaseViewModel<LoginScreenUiState, LoginScreenUiEvent>(LoginScreenUiState(), exceptionHandler = {
-    loginExceptionHandler.onLoginError(this, it)
-}) {
+) : BaseViewModel<LoginScreenUiState, LoginScreenUiEvent>(
+    LoginScreenUiState(),
+    exceptionHandler = { syntax, exception ->
+        loginExceptionHandler.onLoginError(syntax, exception)
+    }
+) {
 
     override fun onEvent(event: LoginScreenUiEvent) {
         intent {

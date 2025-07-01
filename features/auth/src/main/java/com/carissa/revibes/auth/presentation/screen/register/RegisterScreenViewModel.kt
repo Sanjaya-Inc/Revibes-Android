@@ -61,8 +61,8 @@ class RegisterScreenViewModel(
 ) :
     BaseViewModel<RegisterScreenUiState, RegisterScreenUiEvent>(
         RegisterScreenUiState(),
-        exceptionHandler = {
-            registerExceptionHandler.onRegisterError(this, it)
+        exceptionHandler = { syntax, exc ->
+            registerExceptionHandler.onRegisterError(syntax, exc)
         }
     ) {
 
