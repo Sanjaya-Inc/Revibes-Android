@@ -8,6 +8,7 @@ import com.ramcosta.composedestinations.generated.exchangepoints.destinations.Ex
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.generated.shop.destinations.ShopScreenDestination
+import com.ramcosta.composedestinations.generated.transactionhistory.destinations.TransactionHistoryScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 class HomeScreenNavigationHandler(
@@ -19,6 +20,8 @@ class HomeScreenNavigationHandler(
         ProfileScreenUiEvent.LogoutClicked,
         HomeScreenUiEvent.NavigateToShop,
         HomeScreenUiEvent.NavigateToExchangePoints,
+        HomeScreenUiEvent.NavigateToTransactionHistory,
+        HomeScreenUiEvent.NavigateToAboutUs,
     )
 
     override fun navigate(event: NavigationEvent) {
@@ -28,7 +31,15 @@ class HomeScreenNavigationHandler(
                 popUpTo(HomeScreenDestination) { inclusive = true }
             }
             is HomeScreenUiEvent.NavigateToShop -> navigator.navigate(ShopScreenDestination)
-            is HomeScreenUiEvent.NavigateToExchangePoints -> navigator.navigate(ExchangePointsScreenDestination)
+            is HomeScreenUiEvent.NavigateToExchangePoints -> navigator.navigate(
+                ExchangePointsScreenDestination
+            )
+
+            is HomeScreenUiEvent.NavigateToTransactionHistory -> navigator.navigate(
+                TransactionHistoryScreenDestination
+            )
+
+            is HomeScreenUiEvent.NavigateToAboutUs -> navigator.navigate(AboutScreenDestination)
         }
     }
 }

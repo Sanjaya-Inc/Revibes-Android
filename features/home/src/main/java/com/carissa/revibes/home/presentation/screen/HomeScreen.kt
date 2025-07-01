@@ -131,7 +131,8 @@ private fun HomeScreenContent(
                         CtaMenu(
                             stringResource(R.string.cta_transacion_history),
                             R.drawable.cta_transaction_history,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            onClick = { eventReceiver.onEvent(HomeScreenUiEvent.NavigateToTransactionHistory) }
                         )
                     }
                 }

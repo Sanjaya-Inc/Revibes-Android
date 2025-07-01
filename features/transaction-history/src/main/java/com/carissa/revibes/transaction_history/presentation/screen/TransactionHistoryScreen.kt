@@ -5,11 +5,14 @@
 package com.carissa.revibes.transaction_history.presentation.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.transaction_history.data.model.TransactionHistoryData
+import com.carissa.revibes.transaction_history.presentation.component.TransactionHistoryItem
 import com.carissa.revibes.transaction_history.presentation.navigation.TransactionHistoryGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel
@@ -30,7 +33,11 @@ private fun TransactionHistoryScreenContent(
     uiState: TransactionHistoryScreenUiState,
     modifier: Modifier = Modifier
 ) {
-    TODO()
+    LazyColumn {
+        items(10) { index ->
+            TransactionHistoryItem(TransactionHistoryData.dummy())
+        }
+    }
 }
 
 @Composable

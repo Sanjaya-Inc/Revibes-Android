@@ -407,16 +407,16 @@ private fun CouponConfirmationBottomSheet(
     }
 }
 
- @Composable
- @Preview
- private fun ExchangePointDetailScreenPreview() {
-     RevibesTheme {
-         ExchangePointDetailScreenContent(
-             modifier = Modifier.background(Color.White),
-             uiState = ExchangePointDetailScreenUiState()
-         )
-     }
- }
+@Composable
+@Preview
+private fun ExchangePointDetailScreenPreview() {
+    RevibesTheme {
+        ExchangePointDetailScreenContent(
+            modifier = Modifier.background(Color.White),
+            uiState = ExchangePointDetailScreenUiState()
+        )
+    }
+}
 
 @Composable
 @Preview(showBackground = true)
