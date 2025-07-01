@@ -85,7 +85,8 @@ private fun HomeScreenContent(
             HomeBanner(
                 banners = persistentListOf(
                     HomeBannerData(
-                        imageUrl = "https://sample-files.com/downloads/images/jpg/landscape_hires_4000x2667_6.83mb.jpg",
+                        imageUrl = "https://www.shutterstock.com/image-vector/" +
+                            "free-palestine-design-flag-designing-260nw-1975453430.jpg",
                         deeplink = ""
                     ),
                     HomeBannerData(
@@ -157,7 +158,14 @@ private fun HomeScreenContent(
                         text = stringResource(R.string.cta_help_center),
                         modifier = Modifier
                             .fillMaxWidth(0.72f)
-                            .padding(bottom = 32.dp)
+                    )
+                    Button(
+                        variant = ButtonVariant.Secondary,
+                        text = stringResource(R.string.about_us),
+                        modifier = Modifier
+                            .fillMaxWidth(0.72f)
+                            .padding(bottom = 32.dp),
+                        onClick = { eventReceiver.onEvent(HomeScreenUiEvent.NavigateToAboutUs) }
                     )
                 }
                 AsyncImage(
