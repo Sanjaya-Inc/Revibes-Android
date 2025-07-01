@@ -32,7 +32,6 @@ import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import com.carissa.revibes.core.presentation.components.components.Surface
 import com.carissa.revibes.home.R
-import com.carissa.revibes.home.data.model.HomeBannerData
 import com.carissa.revibes.home.presentation.component.CtaMenu
 import com.carissa.revibes.home.presentation.component.CtaYourPoint
 import com.carissa.revibes.home.presentation.component.HomeBanner
@@ -40,7 +39,6 @@ import com.carissa.revibes.home.presentation.component.HomeFooter
 import com.carissa.revibes.home.presentation.component.HomeHeader
 import com.carissa.revibes.home.presentation.navigation.HomeGraph
 import com.ramcosta.composedestinations.annotation.Destination
-import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 
@@ -82,23 +80,7 @@ private fun HomeScreenContent(
                 ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            HomeBanner(
-                banners = persistentListOf(
-                    HomeBannerData(
-                        imageUrl = "https://www.shutterstock.com/image-vector/" +
-                            "free-palestine-design-flag-designing-260nw-1975453430.jpg",
-                        deeplink = ""
-                    ),
-                    HomeBannerData(
-                        imageUrl = "https://sample-files.com/downloads/images/jpg/landscape_hires_4000x2667_6.83mb.jpg",
-                        deeplink = ""
-                    ),
-                    HomeBannerData(
-                        imageUrl = "https://sample-files.com/downloads/images/jpg/landscape_hires_4000x2667_6.83mb.jpg",
-                        deeplink = ""
-                    )
-                )
-            )
+            HomeBanner(banners = uiState.banners)
             Row {
                 CtaYourPoint(1650, modifier = Modifier.height(250.dp))
                 Column {

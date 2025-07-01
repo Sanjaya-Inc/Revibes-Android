@@ -1,5 +1,6 @@
 package com.carissa.revibes.auth.data.remote
 
+import com.carissa.revibes.auth.data.model.LoginResponse
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Field
 import de.jensklingenberg.ktorfit.http.FormUrlEncoded
@@ -9,7 +10,7 @@ import org.koin.core.annotation.Single
 interface AuthRemoteApi {
     @POST("auth/login/email")
     @FormUrlEncoded
-    suspend fun loginWithEmail(@Field("email") email: String, @Field("password") password: String)
+    suspend fun loginWithEmail(@Field("email") email: String, @Field("password") password: String): LoginResponse
 
     @POST("auth/signup/email")
     @FormUrlEncoded

@@ -1,26 +1,23 @@
 package com.carissa.revibes.auth.presentation.screen.login.handler
 
+import android.util.Log
 import com.carissa.revibes.auth.presentation.screen.login.LoginScreenUiEvent
 import com.carissa.revibes.auth.presentation.screen.login.LoginScreenUiState
-import com.carissa.revibes.core.data.user.local.UserDataSource
-import com.carissa.revibes.core.data.user.model.UserData
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import org.koin.core.annotation.Factory
 import org.orbitmvi.orbit.syntax.Syntax
 
 @Factory
-class LoginExceptionHandler(
-    private val navigationEventBus: NavigationEventBus,
-    private val userDataSource: UserDataSource
-) {
+class LoginExceptionHandler() {
     suspend fun onLoginError(
         syntax: Syntax<LoginScreenUiState, LoginScreenUiEvent>,
         throwable: Throwable
     ) = syntax.run {
         reduce { state.copy(isLoading = false) }
         postSideEffect(LoginScreenUiEvent.LoginError(throwable.message.orEmpty()))
-        // TODO: Remove this test navigation & remove dummy user data
-        userDataSource.setUserValue(UserData.dummy())
-        navigationEventBus.post(LoginScreenUiEvent.NavigateToHome)
+        Log.e(TAG, "onLoginError: ${throwable.message}", throwable)
+    }
+
+    companion object {
+        private const val TAG = "LoginExceptionHandler"
     }
 }

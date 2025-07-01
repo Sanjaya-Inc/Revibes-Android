@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.components.PagerIndicator
-import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -28,7 +28,7 @@ private const val AUTO_SCROLL_DELAY_MS = 3000L // 3 seconds
 
 @Composable
 fun <T> AutoScrollingBanner(
-    items: PersistentList<T>,
+    items: ImmutableList<T>,
     modifier: Modifier = Modifier,
     itemContent: @Composable (item: T) -> Unit
 ) {

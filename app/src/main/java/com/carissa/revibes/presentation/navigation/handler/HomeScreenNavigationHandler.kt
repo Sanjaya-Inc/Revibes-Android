@@ -23,6 +23,7 @@ class HomeScreenNavigationHandler(
         HomeScreenUiEvent.NavigateToExchangePoints,
         HomeScreenUiEvent.NavigateToTransactionHistory,
         HomeScreenUiEvent.NavigateToAboutUs,
+        HomeScreenUiEvent.NavigateToLogin,
     )
 
     override fun navigate(event: NavigationEvent) {
@@ -42,6 +43,9 @@ class HomeScreenNavigationHandler(
             )
 
             is HomeScreenUiEvent.NavigateToAboutUs -> navigator.navigate(AboutScreenDestination)
+            is HomeScreenUiEvent.NavigateToLogin -> navigator.navigate(SplashScreenDestination) {
+                popUpTo(HomeScreenDestination) { inclusive = true }
+            }
         }
     }
 }

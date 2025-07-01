@@ -1,10 +1,12 @@
 package com.carissa.revibes.auth.data
 
+import com.carissa.revibes.auth.data.mapper.toDomain
 import com.carissa.revibes.auth.data.remote.AuthRemoteApi
+import com.carissa.revibes.auth.domain.model.LoginResult
 import org.koin.core.annotation.Single
 
 interface AuthRepository {
-    suspend fun loginWithEmail(email: String, password: String)
+    suspend fun loginWithEmail(email: String, password: String): LoginResult
     suspend fun signUpWithEmail(
         email: String,
         displayName: String,
@@ -15,8 +17,8 @@ interface AuthRepository {
 
 @Single
 internal class AuthRepositoryImpl(private val remoteApi: AuthRemoteApi) : AuthRepository {
-    override suspend fun loginWithEmail(email: String, password: String) {
-        remoteApi.loginWithEmail(email, password)
+    override suspend fun loginWithEmail(email: String, password: String): LoginResult {
+        return remoteApi.loginWithEmail(email, password).toDomain()
     }
 
     override suspend fun signUpWithEmail(

@@ -42,7 +42,7 @@ class LoginScreenViewModel(
     private val loginSubmitHandler: LoginSubmitHandler,
     private val loginExceptionHandler: LoginExceptionHandler
 ) : BaseViewModel<LoginScreenUiState, LoginScreenUiEvent>(
-    LoginScreenUiState(),
+    initialState = LoginScreenUiState(),
     exceptionHandler = { syntax, exception ->
         loginExceptionHandler.onLoginError(syntax, exception)
     }

@@ -1,6 +1,7 @@
 plugins {
     id("com.sanjaya.buildlogic.lib")
     id("com.sanjaya.buildlogic.compose")
+    kotlin("plugin.serialization") version core.versions.kotlin.core.get()
 }
 
 android {
