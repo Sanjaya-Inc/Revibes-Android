@@ -16,7 +16,7 @@ fun interface EventReceiver<Event : Any> {
 abstract class BaseViewModel<State : Any, Event : Any>(
     initialState: State,
     exceptionHandler: (suspend Syntax<State, Event>.(Throwable) -> Unit)? = null,
-    onCreate: (suspend Syntax<State, Event>.() -> Unit)? = null
+    onCreate: (suspend EventReceiver<Event>.(Syntax<State, Event>) -> Unit)? = null
 ) : ContainerHost<State, Event>, EventReceiver<Event>, ViewModel() {
 
     override val container: Container<State, Event> =
@@ -30,7 +30,7 @@ abstract class BaseViewModel<State : Any, Event : Any>(
                 }
             },
             onCreate = {
-                intent { onCreate?.invoke(this) }
+                intent { onCreate?.invoke(this@BaseViewModel, this) }
             }
         )
 

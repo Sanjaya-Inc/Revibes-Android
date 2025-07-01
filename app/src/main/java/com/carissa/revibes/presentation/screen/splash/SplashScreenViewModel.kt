@@ -16,5 +16,5 @@ class SplashScreenViewModel(
     private val navigationHandler: SplashNavigationHandler
 ) : BaseViewModel<SplashScreenUiState, SplashScreenUiEvent>(
     SplashScreenUiState(),
-    onCreate = { navigationHandler.onSplashScreenEnter(this) }
+    onCreate = { navigationHandler.onSplashScreenEnter(it) }
 )
