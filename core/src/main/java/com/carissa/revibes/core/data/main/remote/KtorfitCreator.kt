@@ -3,7 +3,6 @@ package com.carissa.revibes.core.data.main.remote
 import com.carissa.revibes.core.data.main.remote.okhttp.ClientCreator
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.HttpCallValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -31,13 +30,13 @@ internal class KtorfitCreator(
                 }
                 expectSuccess = true
 
-                install(HttpCallValidator) {
-                    apiErrorHandler.configure(this)
-
-                    validateResponse { response ->
-                        apiErrorValidator.validate(response)
-                    }
-                }
+//                install(HttpCallValidator) {
+//                    apiErrorHandler.configure(this)
+//
+//                    validateResponse { response ->
+//                        apiErrorValidator.validate(response)
+//                    }
+//                }
                 install(Logging) {
                     logger = apiHttpLogger
                     level = LogLevel.ALL
