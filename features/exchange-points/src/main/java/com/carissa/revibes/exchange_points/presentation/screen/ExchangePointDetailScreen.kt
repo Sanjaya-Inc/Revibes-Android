@@ -104,7 +104,7 @@ private fun ExchangePointDetailScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Transparent),
+            .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CommonHeader(

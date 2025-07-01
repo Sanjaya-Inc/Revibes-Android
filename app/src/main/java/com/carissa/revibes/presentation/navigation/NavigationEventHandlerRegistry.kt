@@ -6,6 +6,7 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.presentation.navigation.handler.AuthScreenNavigationHandler
+import com.carissa.revibes.presentation.navigation.handler.ExchangePointConfirmationScreenNavigationHandler
 import com.carissa.revibes.presentation.navigation.handler.ExchangePointDetailScreenNavigationHandler
 import com.carissa.revibes.presentation.navigation.handler.ExchangePointsScreenNavigationHandler
 import com.carissa.revibes.presentation.navigation.handler.HomeScreenNavigationHandler
@@ -26,6 +27,7 @@ class NavigationEventHandlerRegistry(
         ShopScreenNavigationHandler(navigator),
         ExchangePointsScreenNavigationHandler(navigator),
         ExchangePointDetailScreenNavigationHandler(navigator),
+        ExchangePointConfirmationScreenNavigationHandler(navigator),
     )
 
     fun handle(event: NavigationEvent) {
