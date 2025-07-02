@@ -74,8 +74,8 @@ private fun ProfileScreenContent(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                ProfileMain(uiState.userData ?: UserData.dummy())
+            uiState.userData?.let { userData ->
+                item { ProfileMain(userData) }
             }
 
             items(uiState.menu) { menu ->

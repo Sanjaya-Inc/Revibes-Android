@@ -72,13 +72,11 @@ sealed interface ProfileScreenUiEvent {
 @KoinViewModel
 class ProfileScreenViewModel(
     userDataSource: UserDataSource,
-    private val logoutHandler: LogoutHandler
-) :
-    BaseViewModel<ProfileScreenUiState, ProfileScreenUiEvent>(
-        ProfileScreenUiState(
-            userData = userDataSource.getUserValue().getOrNull()
-        )
-    ) {
+    private val logoutHandler: LogoutHandler,
+) : BaseViewModel<ProfileScreenUiState, ProfileScreenUiEvent>(
+    initialState = ProfileScreenUiState(userData = userDataSource.getUserValue().getOrThrow()),
+    exceptionHandler = { logoutHandler.onLogout(this) }
+) {
     override fun onEvent(event: ProfileScreenUiEvent) {
         intent {
             when (event) {

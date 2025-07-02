@@ -2,10 +2,10 @@ package com.carissa.revibes.home.presentation.screen.handler
 
 import android.util.Log
 import com.carissa.revibes.core.data.auth.local.AuthTokenDataSource
-import com.carissa.revibes.core.data.main.remote.ApiException
 import com.carissa.revibes.core.data.user.local.UserDataSource
 import com.carissa.revibes.home.presentation.screen.HomeScreenUiEvent
 import com.carissa.revibes.home.presentation.screen.HomeScreenUiState
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.http.HttpStatusCode
 import org.koin.core.annotation.Factory
 import org.orbitmvi.orbit.syntax.Syntax
@@ -20,7 +20,10 @@ class HomeExceptionHandler(
         throwable: Throwable
     ) = syntax.run {
         reduce { state.copy(isLoading = false) }
-        if (throwable is ApiException && throwable.statusCode == HttpStatusCode.Unauthorized.value) {
+        if (
+            throwable is ClientRequestException &&
+            throwable.response.status.value == HttpStatusCode.Unauthorized.value
+        ) {
             postSideEffect(HomeScreenUiEvent.NavigateToLogin)
             authTokenDataSource.clearAuthToken()
             userDataSource.clearUserData()

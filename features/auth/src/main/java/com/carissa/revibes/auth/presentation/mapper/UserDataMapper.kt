@@ -9,6 +9,9 @@ internal fun AuthUser.toUserData(email: String): UserData {
         email = email,
         phoneNumber = "",
         profilePictureUrl = "",
-        coins = 0
+        coins = 0,
+        role = role,
+        createdAt = createdAt,
+        lastClaimedDate = null
     )
 }

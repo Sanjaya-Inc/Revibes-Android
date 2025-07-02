@@ -20,7 +20,9 @@ data class HomeScreenUiState(
     val isLoading: Boolean = false,
     val searchValue: TextFieldValue = TextFieldValue(),
     val footerItems: ImmutableList<FooterItem> = FooterItem.default(),
-    val banners: ImmutableList<HomeBannerData> = persistentListOf()
+    val banners: ImmutableList<HomeBannerData> = persistentListOf(),
+    val userPoints: Int = 0,
+    val userName: String = ""
 )
 
 sealed interface HomeScreenUiEvent {
@@ -30,7 +32,7 @@ sealed interface HomeScreenUiEvent {
     data object NavigateToTransactionHistory : HomeScreenUiEvent, NavigationEvent
     data object NavigateToAboutUs : HomeScreenUiEvent, NavigationEvent
     data object NavigateToLogin : HomeScreenUiEvent, NavigationEvent
-    data object LoadBanners : HomeScreenUiEvent
+    data object LoadHomeData : HomeScreenUiEvent
 }
 
 @KoinViewModel
@@ -41,7 +43,7 @@ class HomeScreenViewModel(
 ) : BaseViewModel<HomeScreenUiState, HomeScreenUiEvent>(
     initialState = HomeScreenUiState(),
     onCreate = {
-        onEvent(HomeScreenUiEvent.LoadBanners)
+        onEvent(HomeScreenUiEvent.LoadHomeData)
     },
     exceptionHandler = { exception ->
         homeExceptionHandler.onHomeError(this, exception)
@@ -57,19 +59,21 @@ class HomeScreenViewModel(
                 is HomeScreenUiEvent.NavigateToExchangePoints -> navigationEventBus.post(event)
                 is HomeScreenUiEvent.NavigateToTransactionHistory -> navigationEventBus.post(event)
                 is HomeScreenUiEvent.NavigateToAboutUs -> navigationEventBus.post(event)
-                is HomeScreenUiEvent.LoadBanners -> loadBanners()
+                is HomeScreenUiEvent.LoadHomeData -> loadHomeData()
                 is HomeScreenUiEvent.NavigateToLogin -> navigationEventBus.post(event)
             }
         }
     }
 
-    private fun loadBanners() {
+    private fun loadHomeData() {
         intent {
             reduce { state.copy(isLoading = true) }
-            val banners = homeRepository.getBanners()
+            val homeData = homeRepository.getHomeData()
             reduce {
                 state.copy(
-                    banners = banners.toImmutableList(),
+                    banners = homeData.banners.toImmutableList(),
+                    userPoints = homeData.userData.coins,
+                    userName = homeData.userData.name,
                     isLoading = false
                 )
             }

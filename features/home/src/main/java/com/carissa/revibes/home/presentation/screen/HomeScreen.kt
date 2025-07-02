@@ -82,7 +82,7 @@ private fun HomeScreenContent(
         ) {
             HomeBanner(banners = uiState.banners)
             Row {
-                CtaYourPoint(1650, modifier = Modifier.height(250.dp))
+                CtaYourPoint(uiState.userPoints, modifier = Modifier.height(250.dp))
                 Column {
                     Row {
                         CtaMenu(
