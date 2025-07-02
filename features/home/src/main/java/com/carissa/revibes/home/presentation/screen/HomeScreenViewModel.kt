@@ -45,8 +45,8 @@ class HomeScreenViewModel(
     onCreate = {
         onEvent(HomeScreenUiEvent.LoadHomeData)
     },
-    exceptionHandler = { exception ->
-        homeExceptionHandler.onHomeError(this, exception)
+    exceptionHandler = { syntax, exception ->
+        homeExceptionHandler.onHomeError(syntax, exception)
     }
 ) {
 

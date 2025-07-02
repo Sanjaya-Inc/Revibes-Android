@@ -75,7 +75,9 @@ class ProfileScreenViewModel(
     private val logoutHandler: LogoutHandler,
 ) : BaseViewModel<ProfileScreenUiState, ProfileScreenUiEvent>(
     initialState = ProfileScreenUiState(userData = userDataSource.getUserValue().getOrThrow()),
-    exceptionHandler = { logoutHandler.onLogout(this) }
+    exceptionHandler = { syntax, _ ->
+        logoutHandler.onLogout(syntax)
+    }
 ) {
     override fun onEvent(event: ProfileScreenUiEvent) {
         intent {
