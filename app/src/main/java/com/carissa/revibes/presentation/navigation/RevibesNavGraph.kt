@@ -4,6 +4,7 @@ import com.carissa.revibes.core.presentation.navigation.RevibesHostNavigationSty
 import com.ramcosta.composedestinations.annotation.ExternalNavGraph
 import com.ramcosta.composedestinations.annotation.NavHostGraph
 import com.ramcosta.composedestinations.generated.auth.navgraphs.AuthNavGraph
+import com.ramcosta.composedestinations.generated.dropoff.navgraphs.DropOffNavGraph
 import com.ramcosta.composedestinations.generated.exchangepoints.navgraphs.ExchangePointsNavGraph
 import com.ramcosta.composedestinations.generated.home.navgraphs.HomeNavGraph
 import com.ramcosta.composedestinations.generated.onboarding.navgraphs.OnboardingNavGraph
@@ -21,5 +22,6 @@ annotation class RevibesNavGraph {
     @ExternalNavGraph<TransactionHistoryNavGraph>
     @ExternalNavGraph<ShopNavGraph>
     @ExternalNavGraph<ExchangePointsNavGraph>
+    @ExternalNavGraph<DropOffNavGraph>
     companion object Includes
 }

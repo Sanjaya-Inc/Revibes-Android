@@ -58,6 +58,10 @@ val Green50: Color = Color(0xFFE0FAEC)
 
 val Yellow900: Color = Color(0xFFF3EA19)
 
+val DropOffTextFieldBg = Color(0xFFE6F3E8)
+val DropOffLabelColor = Color(0xFF42665F)
+val DropOffPlaceholderColor = Color(0xFF999999)
+
 @Immutable
 data class Colors(
     val primary: Color,

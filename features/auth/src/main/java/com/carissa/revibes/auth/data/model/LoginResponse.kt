@@ -1,6 +1,7 @@
 package com.carissa.revibes.auth.data.model
 
 import androidx.annotation.Keep
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Keep
@@ -33,7 +34,12 @@ data class User(
 @Serializable
 data class Tokens(
     val accessToken: String,
+
+    @SerialName("accessTokenExpiredAt")
     val accessTokenExpiresAt: String,
+
     val refreshToken: String,
+
+    @SerialName("refreshTokenExpiredAt")
     val refreshTokenExpiresAt: String
 )

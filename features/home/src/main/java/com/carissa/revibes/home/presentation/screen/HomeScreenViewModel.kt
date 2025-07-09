@@ -31,6 +31,7 @@ sealed interface HomeScreenUiEvent {
     data object NavigateToExchangePoints : HomeScreenUiEvent, NavigationEvent
     data object NavigateToTransactionHistory : HomeScreenUiEvent, NavigationEvent
     data object NavigateToAboutUs : HomeScreenUiEvent, NavigationEvent
+    data object NavigateToDropOff : HomeScreenUiEvent, NavigationEvent
     data object NavigateToLogin : HomeScreenUiEvent, NavigationEvent
     data object LoadHomeData : HomeScreenUiEvent
 }
@@ -59,6 +60,7 @@ class HomeScreenViewModel(
                 is HomeScreenUiEvent.NavigateToExchangePoints -> navigationEventBus.post(event)
                 is HomeScreenUiEvent.NavigateToTransactionHistory -> navigationEventBus.post(event)
                 is HomeScreenUiEvent.NavigateToAboutUs -> navigationEventBus.post(event)
+                is HomeScreenUiEvent.NavigateToDropOff -> navigationEventBus.post(event)
                 is HomeScreenUiEvent.LoadHomeData -> loadHomeData()
                 is HomeScreenUiEvent.NavigateToLogin -> navigationEventBus.post(event)
             }

@@ -88,7 +88,8 @@ private fun HomeScreenContent(
                         CtaMenu(
                             stringResource(R.string.cta_drop_off),
                             R.drawable.cta_dropoff,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            onClick = { eventReceiver.onEvent(HomeScreenUiEvent.NavigateToDropOff) }
                         )
                         CtaMenu(
                             stringResource(R.string.cta_pick_up),

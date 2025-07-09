@@ -190,7 +190,7 @@ fun OutlinedTextField(
                     enabled = enabled,
                     isError = isError,
                     interactionSource = interactionSource,
-                    colors = OutlinedTextFieldDefaults.colors(),
+                    colors = colors,
                     shape = shape,
                 )
             },
