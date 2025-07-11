@@ -6,14 +6,15 @@ import com.ramcosta.composedestinations.generated.app.navgraphs.RevibesGraph
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlin.reflect.KClass
 
 class DropOffScreenNavigationHandler(
     private val navigator: DestinationsNavigator
 ) : NavigationEventHandler() {
 
-    override val supportedEvents: Set<NavigationEvent> = setOf(
-        DropOffScreenUiEvent.NavigateToProfile,
-        DropOffScreenUiEvent.NavigateToHome,
+    override val supportedEvents: Set<KClass<out NavigationEvent>> = setOf(
+        DropOffScreenUiEvent.NavigateToProfile::class,
+        DropOffScreenUiEvent.NavigateToHome::class,
     )
 
     override fun navigate(event: NavigationEvent) {

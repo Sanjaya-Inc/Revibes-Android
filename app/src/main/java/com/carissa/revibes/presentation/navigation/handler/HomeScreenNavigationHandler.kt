@@ -12,20 +12,21 @@ import com.ramcosta.composedestinations.generated.profile.destinations.ProfileSc
 import com.ramcosta.composedestinations.generated.shop.destinations.ShopScreenDestination
 import com.ramcosta.composedestinations.generated.transactionhistory.destinations.TransactionHistoryScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlin.reflect.KClass
 
 class HomeScreenNavigationHandler(
     private val navigator: DestinationsNavigator
 ) : NavigationEventHandler() {
 
-    override val supportedEvents: Set<NavigationEvent> = setOf(
-        HomeScreenUiEvent.NavigateToProfile,
-        ProfileScreenUiEvent.LogoutClicked,
-        HomeScreenUiEvent.NavigateToShop,
-        HomeScreenUiEvent.NavigateToExchangePoints,
-        HomeScreenUiEvent.NavigateToTransactionHistory,
-        HomeScreenUiEvent.NavigateToAboutUs,
-        HomeScreenUiEvent.NavigateToDropOff,
-        HomeScreenUiEvent.NavigateToLogin,
+    override val supportedEvents: Set<KClass<out NavigationEvent>> = setOf(
+        HomeScreenUiEvent.NavigateToProfile::class,
+        ProfileScreenUiEvent.LogoutClicked::class,
+        HomeScreenUiEvent.NavigateToShop::class,
+        HomeScreenUiEvent.NavigateToExchangePoints::class,
+        HomeScreenUiEvent.NavigateToTransactionHistory::class,
+        HomeScreenUiEvent.NavigateToAboutUs::class,
+        HomeScreenUiEvent.NavigateToDropOff::class,
+        HomeScreenUiEvent.NavigateToLogin::class,
     )
 
     override fun navigate(event: NavigationEvent) {
