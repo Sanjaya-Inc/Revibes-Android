@@ -5,16 +5,15 @@ import com.carissa.revibes.exchange_points.presentation.screen.ExchangePointDeta
 import com.ramcosta.composedestinations.generated.exchangepoints.destinations.ExchangePointConfirmationScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlin.reflect.KClass
 
 class ExchangePointDetailScreenNavigationHandler(
     private val navigator: DestinationsNavigator
 ) : NavigationEventHandler() {
 
-    override val supportedEvents: Set<KClass<out NavigationEvent>> = setOf(
-        ExchangePointDetailScreenUiEvent.NavigateToProfile::class,
-        ExchangePointDetailScreenUiEvent.ConfirmPurchase::class
-    )
+    override fun canHandle(event: NavigationEvent): Boolean {
+        return event is ExchangePointDetailScreenUiEvent.NavigateToProfile ||
+            event is ExchangePointDetailScreenUiEvent.ConfirmPurchase
+    }
 
     override fun navigate(event: NavigationEvent) {
         when (event) {
