@@ -60,7 +60,7 @@ data class DropOffItem(
     val id: String,
     val name: String = "",
     val type: String = "",
-    val weight: Double? = null
+    val weight: Int? = null
 )
 
 @KoinViewModel
@@ -208,7 +208,7 @@ class DropOffScreenViewModel(
                         id = item.id,
                         name = item.name,
                         type = item.type,
-                        weight = item.weight ?: 0.0
+                        weight = item.weight ?: -1
                     )
                 }
 

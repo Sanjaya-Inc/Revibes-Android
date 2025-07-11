@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -26,12 +27,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -62,6 +69,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.components.DropOffDialogBg
+import com.carissa.revibes.core.presentation.components.DropOffDialogItemBg
 import com.carissa.revibes.core.presentation.components.DropOffLabelColor
 import com.carissa.revibes.core.presentation.components.DropOffPlaceholderColor
 import com.carissa.revibes.core.presentation.components.DropOffTextFieldBg
@@ -169,6 +178,9 @@ fun DropOffScreenContent(
             onValueChange = { eventReceiver.onEvent(DropOffScreenUiEvent.OnNameChange(it)) },
             placeholder = { Text("Name", color = DropOffPlaceholderColor) },
             modifier = Modifier.padding(horizontal = 16.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                capitalization = KeyboardCapitalization.Words
+            ),
             colors = OutlinedTextFieldDefaults.colors().copy(
                 focusedContainerColor = DropOffTextFieldBg,
                 unfocusedContainerColor = DropOffTextFieldBg,
@@ -224,11 +236,12 @@ fun DropOffScreenContent(
             AlertDialog(
                 onDismissRequest = { showStoreDropdown = false },
                 confirmButton = {},
+                containerColor = DropOffDialogBg,
                 title = {
                     Text(
                         text = "Nearest Delivery Location",
                         style = RevibesTheme.typography.h2,
-                        color = RevibesTheme.colors.text
+                        color = RevibesTheme.colors.onPrimary
                     )
                 },
                 text = {
@@ -240,14 +253,12 @@ fun DropOffScreenContent(
                                     .padding(vertical = 4.dp)
                                     .clickable {
                                         eventReceiver.onEvent(
-                                            DropOffScreenUiEvent.OnStoreSelected(
-                                                loc
-                                            )
+                                            DropOffScreenUiEvent.OnStoreSelected(loc)
                                         )
                                         showStoreDropdown = false
                                     },
                                 colors = CardDefaults.cardColors(
-                                    containerColor = RevibesTheme.colors.surface
+                                    containerColor = DropOffDialogItemBg
                                 )
                             ) {
                                 Column(Modifier.padding(16.dp)) {
@@ -261,15 +272,25 @@ fun DropOffScreenContent(
                                         style = RevibesTheme.typography.body2,
                                         color = RevibesTheme.colors.text
                                     )
-                                    Text(
-                                        text = String.format(
-                                            Locale.getDefault(),
-                                            "%.1f km",
-                                            loc.distance
-                                        ),
-                                        style = RevibesTheme.typography.body2,
-                                        color = RevibesTheme.colors.primary
-                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.LocationOn,
+                                            contentDescription = "Location Icon",
+                                            tint = RevibesTheme.colors.primary,
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                                .padding(end = 4.dp)
+                                        )
+                                        Text(
+                                            text = String.format(
+                                                Locale.getDefault(),
+                                                "%.2f km",
+                                                loc.distance
+                                            ),
+                                            style = RevibesTheme.typography.body2,
+                                            color = RevibesTheme.colors.primary
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -330,7 +351,14 @@ fun DropOffScreenContent(
             ItemSection(
                 item = item,
                 index = index,
-                onItemChange = { eventReceiver.onEvent(DropOffScreenUiEvent.UpdateItem(index, it)) },
+                onItemChange = {
+                    eventReceiver.onEvent(
+                        DropOffScreenUiEvent.UpdateItem(
+                            index,
+                            it
+                        )
+                    )
+                },
                 onRemove = { eventReceiver.onEvent(DropOffScreenUiEvent.RemoveItem(index)) },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
@@ -386,6 +414,7 @@ fun DropOffScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ItemSection(
     item: DropOffItem,
@@ -394,6 +423,22 @@ private fun ItemSection(
     onRemove: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val typeOptions = listOf(
+        "Organic" to "organic",
+        "Non-Organic" to "non-organic",
+        "B3" to "b3"
+    )
+    var expanded by remember { mutableStateOf(false) }
+    val weightOptions = listOf(
+        "< 1 kg" to 1,
+        ">4 kg - <6 kg" to 5,
+        ">7 kg - <9 kg" to 8,
+        ">10 kg" to 10
+    )
+    val selectedTypeLabel = typeOptions.find { it.second == item.type }?.first ?: ""
+    var weightExpanded by remember { mutableStateOf(false) }
+    val selectedWeightLabel = weightOptions.find { it.second == item.weight }?.first ?: ""
+
     Surface(
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 2.dp,
@@ -418,6 +463,9 @@ private fun ItemSection(
                 onValueChange = { onItemChange(item.copy(name = it)) },
                 placeholder = { Text("Daun Kering", color = DropOffPlaceholderColor) },
                 singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    capitalization = KeyboardCapitalization.Words
+                ),
                 colors = OutlinedTextFieldDefaults.colors().copy(
                     focusedContainerColor = DropOffTextFieldBg,
                     unfocusedContainerColor = DropOffTextFieldBg,
@@ -438,21 +486,45 @@ private fun ItemSection(
                         modifier = Modifier
                             .padding(top = 8.dp, bottom = 4.dp)
                     )
-                    OutlinedTextField(
-                        value = item.type,
-                        onValueChange = { onItemChange(item.copy(type = it)) },
-                        singleLine = true,
-                        placeholder = { Text("Organic", color = DropOffPlaceholderColor) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors().copy(
-                            focusedContainerColor = DropOffTextFieldBg,
-                            unfocusedContainerColor = DropOffTextFieldBg,
-                            disabledContainerColor = DropOffTextFieldBg,
-                            errorContainerColor = DropOffTextFieldBg,
-                            unfocusedOutlineColor = DropOffTextFieldBg
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    )
+
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = selectedTypeLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            placeholder = { Text("Organic", color = DropOffPlaceholderColor) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors().copy(
+                                focusedContainerColor = DropOffTextFieldBg,
+                                unfocusedContainerColor = DropOffTextFieldBg,
+                                disabledContainerColor = DropOffTextFieldBg,
+                                errorContainerColor = DropOffTextFieldBg,
+                                unfocusedOutlineColor = DropOffTextFieldBg
+                            ),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            typeOptions.forEach { (label, option) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        onItemChange(item.copy(type = option))
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
                 Column(Modifier.weight(1f)) {
                     Text(
@@ -460,29 +532,44 @@ private fun ItemSection(
                         color = DropOffLabelColor,
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                     )
-                    OutlinedTextField(
-                        value = item.weight?.toString() ?: "",
-                        onValueChange = { newValue ->
-                            when {
-                                newValue.isEmpty() -> onItemChange(item.copy(weight = null))
-                                else -> onItemChange(item.copy(weight = newValue.toDoubleOrNull()))
+                    ExposedDropdownMenuBox(
+                        expanded = weightExpanded,
+                        onExpandedChange = { weightExpanded = !weightExpanded },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = selectedWeightLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            placeholder = { Text("> 1kg", color = DropOffPlaceholderColor) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = weightExpanded) },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors().copy(
+                                focusedContainerColor = DropOffTextFieldBg,
+                                unfocusedContainerColor = DropOffTextFieldBg,
+                                disabledContainerColor = DropOffTextFieldBg,
+                                errorContainerColor = DropOffTextFieldBg,
+                                unfocusedOutlineColor = DropOffTextFieldBg
+                            ),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = weightExpanded,
+                            onDismissRequest = { weightExpanded = false }
+                        ) {
+                            weightOptions.forEach { (label, value) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        onItemChange(item.copy(weight = value))
+                                        weightExpanded = false
+                                    }
+                                )
                             }
-                        },
-                        singleLine = true,
-                        placeholder = { Text("> 1kg", color = DropOffPlaceholderColor) },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number
-                        ),
-                        colors = OutlinedTextFieldDefaults.colors().copy(
-                            focusedContainerColor = DropOffTextFieldBg,
-                            unfocusedContainerColor = DropOffTextFieldBg,
-                            disabledContainerColor = DropOffTextFieldBg,
-                            errorContainerColor = DropOffTextFieldBg,
-                            unfocusedOutlineColor = DropOffTextFieldBg
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    )
+                        }
+                    }
                 }
             }
             Text(
@@ -537,7 +624,7 @@ private fun ItemSectionPreview() {
                 id = "item_0",
                 name = "",
                 type = "",
-                weight = 0.1
+                weight = 1
             ),
             index = 0,
             onItemChange = {},

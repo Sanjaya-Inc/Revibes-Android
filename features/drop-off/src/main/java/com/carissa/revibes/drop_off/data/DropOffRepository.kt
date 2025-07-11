@@ -31,7 +31,7 @@ data class SubmitOrderItemData(
     val id: String,
     val name: String,
     val type: String,
-    val weight: Double
+    val weight: Int
 )
 
 @Single

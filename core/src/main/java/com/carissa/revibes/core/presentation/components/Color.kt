@@ -61,6 +61,8 @@ val Yellow900: Color = Color(0xFFF3EA19)
 val DropOffTextFieldBg = Color(0xFFE6F3E8)
 val DropOffLabelColor = Color(0xFF42665F)
 val DropOffPlaceholderColor = Color(0xFF999999)
+val DropOffDialogBg = Color(0xFFBACABC)
+val DropOffDialogItemBg = Color(0xFFE5F3E6)
 
 @Immutable
 data class Colors(
