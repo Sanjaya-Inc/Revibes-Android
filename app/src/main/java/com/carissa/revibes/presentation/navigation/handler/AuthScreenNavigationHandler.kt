@@ -8,10 +8,10 @@ import com.ramcosta.composedestinations.generated.auth.destinations.RegisterScre
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.onboarding.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.core.annotation.Factory
 
-class AuthScreenNavigationHandler(
-    private val navigator: DestinationsNavigator
-) : NavigationEventHandler() {
+@Factory
+class AuthScreenNavigationHandler : NavigationEventHandler() {
 
     override fun canHandle(event: NavigationEvent): Boolean {
         return event is OnboardingPageUiEvent.NavigateToLogin ||
@@ -19,7 +19,7 @@ class AuthScreenNavigationHandler(
             event is LoginScreenUiEvent.NavigateToHome
     }
 
-    override fun navigate(event: NavigationEvent) {
+    override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
         when (event) {
             is OnboardingPageUiEvent.NavigateToLogin -> navigator.navigate(LoginScreenDestination)
             is OnboardingPageUiEvent.NavigateToRegister -> navigator.navigate(RegisterScreenDestination)

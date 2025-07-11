@@ -12,10 +12,10 @@ import com.ramcosta.composedestinations.generated.profile.destinations.ProfileSc
 import com.ramcosta.composedestinations.generated.shop.destinations.ShopScreenDestination
 import com.ramcosta.composedestinations.generated.transactionhistory.destinations.TransactionHistoryScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.core.annotation.Factory
 
-class HomeScreenNavigationHandler(
-    private val navigator: DestinationsNavigator
-) : NavigationEventHandler() {
+@Factory
+class HomeScreenNavigationHandler : NavigationEventHandler() {
 
     override fun canHandle(event: NavigationEvent): Boolean {
         return event is HomeScreenUiEvent.NavigateToProfile ||
@@ -28,7 +28,7 @@ class HomeScreenNavigationHandler(
             event is HomeScreenUiEvent.NavigateToLogin
     }
 
-    override fun navigate(event: NavigationEvent) {
+    override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
         when (event) {
             is HomeScreenUiEvent.NavigateToProfile -> navigator.navigate(ProfileScreenDestination)
             is ProfileScreenUiEvent.LogoutClicked -> navigator.navigate(SplashScreenDestination) {

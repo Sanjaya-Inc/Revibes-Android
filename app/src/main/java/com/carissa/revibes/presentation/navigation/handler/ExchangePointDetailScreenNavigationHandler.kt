@@ -5,17 +5,17 @@ import com.carissa.revibes.exchange_points.presentation.screen.ExchangePointDeta
 import com.ramcosta.composedestinations.generated.exchangepoints.destinations.ExchangePointConfirmationScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.core.annotation.Factory
 
-class ExchangePointDetailScreenNavigationHandler(
-    private val navigator: DestinationsNavigator
-) : NavigationEventHandler() {
+@Factory
+class ExchangePointDetailScreenNavigationHandler : NavigationEventHandler() {
 
     override fun canHandle(event: NavigationEvent): Boolean {
         return event is ExchangePointDetailScreenUiEvent.NavigateToProfile ||
             event is ExchangePointDetailScreenUiEvent.ConfirmPurchase
     }
 
-    override fun navigate(event: NavigationEvent) {
+    override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
         when (event) {
             is ExchangePointDetailScreenUiEvent.NavigateToProfile -> navigator.navigate(
                 ProfileScreenDestination

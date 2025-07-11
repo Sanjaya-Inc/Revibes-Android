@@ -6,17 +6,17 @@ import com.ramcosta.composedestinations.generated.app.navgraphs.RevibesGraph
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.core.annotation.Factory
 
-class DropOffScreenNavigationHandler(
-    private val navigator: DestinationsNavigator
-) : NavigationEventHandler() {
+@Factory
+class DropOffScreenNavigationHandler : NavigationEventHandler() {
 
     override fun canHandle(event: NavigationEvent): Boolean {
         return event is DropOffScreenUiEvent.NavigateToProfile ||
             event is DropOffScreenUiEvent.NavigateToHome
     }
 
-    override fun navigate(event: NavigationEvent) {
+    override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
         when (event) {
             is DropOffScreenUiEvent.NavigateToProfile -> navigator.navigate(ProfileScreenDestination)
             is DropOffScreenUiEvent.NavigateToHome -> navigator.navigate(HomeScreenDestination) {
