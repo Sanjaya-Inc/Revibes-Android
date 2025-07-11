@@ -21,5 +21,4 @@ data class UserMeData(
     val email: String,
     val phoneNumber: String,
     val points: Int,
-    val lastClaimedDate: String?
 )

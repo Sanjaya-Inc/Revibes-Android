@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.drop_off.presentation.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,14 +31,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +51,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -58,6 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.R
+import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.DropOffLabelColor
 import com.carissa.revibes.core.presentation.components.DropOffPlaceholderColor
 import com.carissa.revibes.core.presentation.components.DropOffTextFieldBg
@@ -65,12 +69,15 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextField
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
+import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.navigation.DropOffGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
+import java.util.Locale
 
 @Destination<DropOffGraph>(start = true)
 @Composable
@@ -78,54 +85,78 @@ fun DropOffScreen(
     modifier: Modifier = Modifier,
     viewModel: DropOffScreenViewModel = koinViewModel()
 ) {
-    val items by viewModel.items.collectAsState()
-    DropOffScreenContent(
-        modifier = modifier.background(RevibesTheme.colors.background),
-        items = items.toImmutableList(),
-        name = viewModel.name,
-        onNameChange = viewModel::onNameChange,
-        addItem = viewModel::addItem,
-        makeOrder = viewModel::makeOrder,
-        updateItem = viewModel::updateItem,
-        removeItem = viewModel::removeItem,
-        nearestLocations = viewModel.nearestLocations,
-        onLocationSelected = viewModel::onLocationSelected,
-        selectedLocation = viewModel.selectedLocation
-    )
+    val context = LocalContext.current
+    val state by viewModel.collectAsState()
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    viewModel.collectSideEffect { event ->
+        when (event) {
+            is DropOffScreenUiEvent.OnMakeOrderFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            else -> Unit
+        }
+    }
+
+    Scaffold(
+        modifier = modifier,
+        containerColor = Color.Transparent,
+        topBar = {
+            CommonHeader(
+                title = "Drop Off",
+                backgroundDrawRes = R.drawable.bg_drop_off,
+                searchTextFieldValue = searchText,
+                onTextChange = { searchText = it },
+                onProfileClicked = {},
+            )
+        }
+    ) { contentPadding ->
+        if (state.isLoading || state.currentOrderId.isNullOrBlank()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = RevibesTheme.colors.primary
+                )
+            }
+        } else {
+            DropOffScreenContent(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .background(RevibesTheme.colors.background),
+                orderId = state.currentOrderId.orEmpty(),
+                items = state.items,
+                name = viewModel.name,
+                eventReceiver = viewModel,
+                nearestStores = state.stores,
+                selectedStore = viewModel.selectedStore
+            )
+        }
+    }
 }
 
 @Composable
 fun DropOffScreenContent(
     modifier: Modifier = Modifier,
+    orderId: String = "",
     items: ImmutableList<DropOffItem> = persistentListOf(),
     name: TextFieldValue = TextFieldValue(""),
-    onNameChange: (TextFieldValue) -> Unit = {},
-    addItem: () -> Unit = {},
-    makeOrder: () -> Unit = {},
-    updateItem: (Int, DropOffItem) -> Unit = { _, _ -> },
-    removeItem: (Int) -> Unit = {},
-    nearestLocations: ImmutableList<LocationInfo> = persistentListOf(),
-    onLocationSelected: (LocationInfo) -> Unit = {},
-    selectedLocation: LocationInfo? = null,
+    eventReceiver: EventReceiver<DropOffScreenUiEvent> = EventReceiver { },
+    nearestStores: ImmutableList<StoreData> = persistentListOf(),
+    selectedStore: StoreData? = null,
 ) {
     val scrollState = rememberScrollState()
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
-    // Dropdown state for location field
-    var showLocationDropdown by remember { mutableStateOf(false) }
+    var showStoreDropdown by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        CommonHeader(
-            title = "Drop Off",
-            backgroundDrawRes = R.drawable.bg_drop_off,
-            searchTextFieldValue = searchText,
-            onTextChange = { searchText = it },
-            onBackClicked = {},
-            onProfileClicked = {},
-        )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             "Name",
@@ -135,7 +166,7 @@ fun DropOffScreenContent(
         OutlinedTextField(
             value = name,
             singleLine = true,
-            onValueChange = onNameChange,
+            onValueChange = { eventReceiver.onEvent(DropOffScreenUiEvent.OnNameChange(it)) },
             placeholder = { Text("Name", color = DropOffPlaceholderColor) },
             modifier = Modifier.padding(horizontal = 16.dp),
             colors = OutlinedTextFieldDefaults.colors().copy(
@@ -143,7 +174,7 @@ fun DropOffScreenContent(
                 unfocusedContainerColor = DropOffTextFieldBg,
                 disabledContainerColor = DropOffTextFieldBg,
                 errorContainerColor = DropOffTextFieldBg,
-                unfocusedOutlineColor = RevibesTheme.colors.primary,
+                unfocusedOutlineColor = DropOffTextFieldBg
             ),
             shape = RoundedCornerShape(16.dp)
         )
@@ -157,7 +188,7 @@ fun DropOffScreenContent(
 
         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
             OutlinedTextField(
-                value = selectedLocation?.name.orEmpty(),
+                value = selectedStore?.name.orEmpty(),
                 onValueChange = { },
                 placeholder = { Text("Select location", color = DropOffPlaceholderColor) },
                 modifier = Modifier.fillMaxWidth(),
@@ -166,7 +197,7 @@ fun DropOffScreenContent(
                     unfocusedContainerColor = DropOffTextFieldBg,
                     disabledContainerColor = DropOffTextFieldBg,
                     errorContainerColor = DropOffTextFieldBg,
-                    unfocusedOutlineColor = RevibesTheme.colors.primary,
+                    unfocusedOutlineColor = DropOffTextFieldBg
                 ),
                 shape = RoundedCornerShape(16.dp),
                 trailingIcon = {
@@ -183,15 +214,15 @@ fun DropOffScreenContent(
                 Modifier
                     .matchParentSize()
                     .clickable {
-                        showLocationDropdown = true
+                        showStoreDropdown = true
                         focusManager.clearFocus()
                     }
                     .background(Color.Transparent)
             )
         }
-        if (showLocationDropdown) {
+        if (showStoreDropdown) {
             AlertDialog(
-                onDismissRequest = { showLocationDropdown = false },
+                onDismissRequest = { showStoreDropdown = false },
                 confirmButton = {},
                 title = {
                     Text(
@@ -202,14 +233,18 @@ fun DropOffScreenContent(
                 },
                 text = {
                     LazyColumn {
-                        items(nearestLocations) { loc ->
+                        items(nearestStores) { loc ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp)
                                     .clickable {
-                                        onLocationSelected(loc)
-                                        showLocationDropdown = false
+                                        eventReceiver.onEvent(
+                                            DropOffScreenUiEvent.OnStoreSelected(
+                                                loc
+                                            )
+                                        )
+                                        showStoreDropdown = false
                                     },
                                 colors = CardDefaults.cardColors(
                                     containerColor = RevibesTheme.colors.surface
@@ -227,7 +262,11 @@ fun DropOffScreenContent(
                                         color = RevibesTheme.colors.text
                                     )
                                     Text(
-                                        text = String.format("%.1f km", loc.distanceKm),
+                                        text = String.format(
+                                            Locale.getDefault(),
+                                            "%.1f km",
+                                            loc.distance
+                                        ),
                                         style = RevibesTheme.typography.body2,
                                         color = RevibesTheme.colors.primary
                                     )
@@ -239,7 +278,7 @@ fun DropOffScreenContent(
             )
         }
         OutlinedTextField(
-            value = selectedLocation?.address.orEmpty(),
+            value = selectedStore?.address.orEmpty(),
             onValueChange = {},
             placeholder = { Text("Address", color = DropOffLabelColor) },
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -253,13 +292,13 @@ fun DropOffScreenContent(
                 unfocusedContainerColor = DropOffTextFieldBg,
                 disabledContainerColor = DropOffTextFieldBg,
                 errorContainerColor = DropOffTextFieldBg,
-                unfocusedOutlineColor = RevibesTheme.colors.primary,
+                unfocusedOutlineColor = DropOffTextFieldBg
             ),
             shape = RoundedCornerShape(16.dp),
             readOnly = true
         )
         OutlinedTextField(
-            value = selectedLocation?.postalCode?.toString() ?: "",
+            value = selectedStore?.postalCode ?: "",
             onValueChange = {},
             singleLine = true,
             placeholder = { Text("Postal Code", color = DropOffLabelColor) },
@@ -272,7 +311,7 @@ fun DropOffScreenContent(
                 unfocusedContainerColor = DropOffTextFieldBg,
                 disabledContainerColor = DropOffTextFieldBg,
                 errorContainerColor = DropOffTextFieldBg,
-                unfocusedOutlineColor = RevibesTheme.colors.primary,
+                unfocusedOutlineColor = DropOffTextFieldBg
             ),
             shape = RoundedCornerShape(16.dp),
             readOnly = true
@@ -291,14 +330,14 @@ fun DropOffScreenContent(
             ItemSection(
                 item = item,
                 index = index,
-                onItemChange = { updateItem(index, it) },
-                onRemove = { removeItem(index) },
+                onItemChange = { eventReceiver.onEvent(DropOffScreenUiEvent.UpdateItem(index, it)) },
+                onRemove = { eventReceiver.onEvent(DropOffScreenUiEvent.RemoveItem(index)) },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
         val primaryColor = RevibesTheme.colors.primary
         OutlinedButton(
-            onClick = addItem,
+            onClick = { eventReceiver.onEvent(DropOffScreenUiEvent.AddItemToOrder(orderId)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -335,7 +374,7 @@ fun DropOffScreenContent(
             contentAlignment = Alignment.CenterEnd
         ) {
             Button(
-                onClick = makeOrder,
+                onClick = { eventReceiver.onEvent(DropOffScreenUiEvent.MakeOrder) },
                 colors = ButtonDefaults.buttonColors().copy(
                     containerColor = RevibesTheme.colors.primary,
                     contentColor = Color.White
@@ -370,10 +409,8 @@ private fun ItemSection(
                         .weight(1f)
                         .padding(top = 8.dp, bottom = 4.dp)
                 )
-                if (index != 0) {
-                    IconButton(onClick = onRemove) {
-                        Icon(Icons.Default.Delete, contentDescription = "Remove Item")
-                    }
+                IconButton(onClick = onRemove) {
+                    Icon(Icons.Default.Delete, contentDescription = "Remove Item")
                 }
             }
             OutlinedTextField(
@@ -386,7 +423,7 @@ private fun ItemSection(
                     unfocusedContainerColor = DropOffTextFieldBg,
                     disabledContainerColor = DropOffTextFieldBg,
                     errorContainerColor = DropOffTextFieldBg,
-                    unfocusedOutlineColor = RevibesTheme.colors.primary,
+                    unfocusedOutlineColor = DropOffTextFieldBg
                 ),
                 shape = RoundedCornerShape(16.dp)
             )
@@ -412,7 +449,7 @@ private fun ItemSection(
                             unfocusedContainerColor = DropOffTextFieldBg,
                             disabledContainerColor = DropOffTextFieldBg,
                             errorContainerColor = DropOffTextFieldBg,
-                            unfocusedOutlineColor = RevibesTheme.colors.primary,
+                            unfocusedOutlineColor = DropOffTextFieldBg
                         ),
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -424,8 +461,13 @@ private fun ItemSection(
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                     )
                     OutlinedTextField(
-                        value = item.weight,
-                        onValueChange = { onItemChange(item.copy(weight = it)) },
+                        value = item.weight?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            when {
+                                newValue.isEmpty() -> onItemChange(item.copy(weight = null))
+                                else -> onItemChange(item.copy(weight = newValue.toDoubleOrNull()))
+                            }
+                        },
                         singleLine = true,
                         placeholder = { Text("> 1kg", color = DropOffPlaceholderColor) },
                         modifier = Modifier.fillMaxWidth(),
@@ -437,7 +479,7 @@ private fun ItemSection(
                             unfocusedContainerColor = DropOffTextFieldBg,
                             disabledContainerColor = DropOffTextFieldBg,
                             errorContainerColor = DropOffTextFieldBg,
-                            unfocusedOutlineColor = RevibesTheme.colors.primary,
+                            unfocusedOutlineColor = DropOffTextFieldBg
                         ),
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -492,9 +534,10 @@ private fun ItemSectionPreview() {
     RevibesTheme {
         ItemSection(
             item = DropOffItem(
+                id = "item_0",
                 name = "",
                 type = "",
-                weight = ""
+                weight = 0.1
             ),
             index = 0,
             onItemChange = {},

@@ -33,6 +33,7 @@ import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextField
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Composable
 fun CommonHeader(
@@ -40,9 +41,10 @@ fun CommonHeader(
     @DrawableRes backgroundDrawRes: Int,
     searchTextFieldValue: TextFieldValue,
     modifier: Modifier = Modifier,
+    navigator: DestinationsNavigator = RevibesTheme.navigator,
     subtitle: String? = null,
     onTextChange: (TextFieldValue) -> Unit = {},
-    onBackClicked: () -> Unit = {},
+    onBackClicked: () -> Unit = { navigator.navigateUp() },
     onProfileClicked: () -> Unit = {},
 ) {
     val headerHeight = if (subtitle != null) 312.dp else 272.dp

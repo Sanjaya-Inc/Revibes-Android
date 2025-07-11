@@ -10,7 +10,7 @@ interface HomeRemoteApi {
     @GET("banners")
     suspend fun getBanners(): BannerResponse
 
-    @GET("users/me")
+    @GET("me/profile")
     suspend fun getUserMe(): UserMeResponse
 }
 
