@@ -215,10 +215,10 @@ class DropOffScreenViewModel(
                 onEvent(
                     DropOffScreenUiEvent.SubmitOrder(
                         orderId = orderId,
-                        type = "drop_off",
+                        type = ORDER_TYPE_DROP_OFF,
                         name = name.text,
                         country = selectedStore?.country.orEmpty(),
-                        storeLocation = selectedStore?.address.orEmpty(),
+                        storeLocation = selectedStore?.id.orEmpty(),
                         items = orderItems
                     )
                 )
@@ -246,5 +246,8 @@ class DropOffScreenViewModel(
                 )
             }
         }
+    }
+    companion object {
+        private const val ORDER_TYPE_DROP_OFF = "drop-off"
     }
 }
