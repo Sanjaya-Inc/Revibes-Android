@@ -22,7 +22,7 @@ interface DropOffRepository {
         type: String,
         name: String,
         country: String,
-        storeLocation: String,
+        storeId: String,
         items: List<SubmitOrderItemData>
     ): Boolean
 }
@@ -66,14 +66,14 @@ internal class DropOffRepositoryImpl(
         type: String,
         name: String,
         country: String,
-        storeLocation: String,
+        storeId: String,
         items: List<SubmitOrderItemData>
     ): Boolean {
         val request = SubmitOrderRequest(
             type = type,
             name = name,
             country = country,
-            storeLocation = storeLocation,
+            storeId = storeId,
             items = items.map { item ->
                 com.carissa.revibes.drop_off.data.model.SubmitOrderItem(
                     id = item.id,

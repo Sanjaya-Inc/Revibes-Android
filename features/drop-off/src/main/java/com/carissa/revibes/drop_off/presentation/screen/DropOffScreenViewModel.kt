@@ -11,14 +11,13 @@ import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.drop_off.data.DropOffRepository
-import com.carissa.revibes.drop_off.data.SubmitOrderItemData
 import com.carissa.revibes.drop_off.domain.model.StoreData
-import com.carissa.revibes.drop_off.presentation.handler.DropOffExceptionHandler
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.serialization.Serializable
 import org.koin.android.annotation.KoinViewModel
 
 data class DropOffScreenUiState(
@@ -30,7 +29,10 @@ data class DropOffScreenUiState(
 
 sealed interface DropOffScreenUiEvent : NavigationEvent {
     data object NavigateToProfile : DropOffScreenUiEvent
-    data object NavigateToHome : DropOffScreenUiEvent
+
+    data class NavigateToConfirmOrder(val arguments: DropOffConfirmationScreenArguments) :
+        DropOffScreenUiEvent
+
     data object LoadDropOffData : DropOffScreenUiEvent
     data class AddItemToOrder(val orderId: String) : DropOffScreenUiEvent
     data object MakeOrder : DropOffScreenUiEvent
@@ -45,36 +47,26 @@ sealed interface DropOffScreenUiEvent : NavigationEvent {
         val itemId: String,
         val contentType: String
     ) : DropOffScreenUiEvent
-
-    data class SubmitOrder(
-        val orderId: String,
-        val type: String,
-        val name: String,
-        val country: String,
-        val storeLocation: String,
-        val items: List<SubmitOrderItemData>
-    ) : DropOffScreenUiEvent
 }
 
+@Serializable
 data class DropOffItem(
     val id: String,
     val name: String = "",
     val type: String = "",
-    val weight: Int? = null
+    val weight: Pair<String, Int>? = null,
+    val photos: List<String> = emptyList(),
+    val point: Int = 0,
 )
 
 @KoinViewModel
 class DropOffScreenViewModel(
     private val navigationEventBus: NavigationEventBus,
     private val dropOffRepository: DropOffRepository,
-    private val dropOffExceptionHandler: DropOffExceptionHandler,
 ) : BaseViewModel<DropOffScreenUiState, DropOffScreenUiEvent>(
     initialState = DropOffScreenUiState(),
     onCreate = {
         onEvent(DropOffScreenUiEvent.LoadDropOffData)
-    },
-    exceptionHandler = { syntax, exception ->
-        dropOffExceptionHandler.onDropOffError(syntax, exception)
     }
 ) {
     var name by mutableStateOf(TextFieldValue(""))
@@ -87,7 +79,7 @@ class DropOffScreenViewModel(
         intent {
             when (event) {
                 is DropOffScreenUiEvent.NavigateToProfile -> navigationEventBus.post(event)
-                is DropOffScreenUiEvent.NavigateToHome -> navigationEventBus.post(event)
+                is DropOffScreenUiEvent.NavigateToConfirmOrder -> navigationEventBus.post(event)
                 is DropOffScreenUiEvent.LoadDropOffData -> loadDropOffData()
                 is DropOffScreenUiEvent.AddItemToOrder -> addItemToOrder(event.orderId)
                 is DropOffScreenUiEvent.MakeOrder -> makeOrder()
@@ -100,15 +92,6 @@ class DropOffScreenViewModel(
                     event.orderId,
                     event.itemId,
                     event.contentType
-                )
-
-                is DropOffScreenUiEvent.SubmitOrder -> submitLogisticOrder(
-                    event.orderId,
-                    event.type,
-                    event.name,
-                    event.country,
-                    event.storeLocation,
-                    event.items
                 )
 
                 is DropOffScreenUiEvent.OnMakeOrderFailed -> Unit
@@ -176,54 +159,25 @@ class DropOffScreenViewModel(
         }
     }
 
-    private fun submitLogisticOrder(
-        orderId: String,
-        type: String,
-        name: String,
-        country: String,
-        storeLocation: String,
-        items: List<SubmitOrderItemData>
-    ) {
-        intent {
-            reduce { state.copy(isLoading = true) }
-            dropOffRepository.submitOrder(
-                orderId = orderId,
-                type = type,
-                name = name,
-                country = country,
-                storeLocation = storeLocation,
-                items = items
-            )
-            reduce { state.copy(isLoading = false) }
-            navigationEventBus.post(DropOffScreenUiEvent.NavigateToHome)
-        }
-    }
-
     private fun makeOrder() {
         intent {
             reduce { state.copy(isLoading = true) }
-            state.currentOrderId?.let { orderId ->
-                val orderItems = state.items.map { item ->
-                    SubmitOrderItemData(
-                        id = item.id,
-                        name = item.name,
-                        type = item.type,
-                        weight = item.weight ?: -1
-                    )
-                }
-
-                onEvent(
-                    DropOffScreenUiEvent.SubmitOrder(
-                        orderId = orderId,
-                        type = ORDER_TYPE_DROP_OFF,
-                        name = name.text,
-                        country = selectedStore?.country.orEmpty(),
-                        storeLocation = selectedStore?.id.orEmpty(),
-                        items = orderItems
-                    )
-                )
-                reduce { state.copy(isLoading = false) }
-            }
+            val orderId = requireNotNull(
+                value = state.currentOrderId
+            ) { "Failed to initiate the Drop off session!" }
+            val selectedStore = requireNotNull(
+                value = selectedStore
+            ) { "Failed to initiate the Drop off session!" }
+            val arguments = DropOffConfirmationScreenArguments(
+                orderId = orderId,
+                type = ORDER_TYPE_DROP_OFF,
+                name = name.text,
+                store = selectedStore,
+                totalPoints = 200, // This should be calculated based on items
+                items = state.items,
+            )
+            onEvent(DropOffScreenUiEvent.NavigateToConfirmOrder(arguments))
+            reduce { state.copy(isLoading = false) }
         }
     }
 
@@ -247,6 +201,7 @@ class DropOffScreenViewModel(
             }
         }
     }
+
     companion object {
         private const val ORDER_TYPE_DROP_OFF = "drop-off"
     }

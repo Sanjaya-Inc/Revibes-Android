@@ -17,7 +17,7 @@ data class SubmitOrderRequest(
     val type: String,
     val name: String,
     val country: String,
-    val storeLocation: String,
+    val storeId: String,
     val items: List<SubmitOrderItem>
 )
 

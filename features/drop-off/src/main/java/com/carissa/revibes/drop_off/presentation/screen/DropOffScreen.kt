@@ -33,7 +33,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -76,6 +75,7 @@ import com.carissa.revibes.core.presentation.components.DropOffPlaceholderColor
 import com.carissa.revibes.core.presentation.components.DropOffTextFieldBg
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.RevibesLoading
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextField
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
 import com.carissa.revibes.drop_off.domain.model.StoreData
@@ -121,17 +121,7 @@ fun DropOffScreen(
         }
     ) { contentPadding ->
         if (state.isLoading || state.currentOrderId.isNullOrBlank()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = RevibesTheme.colors.primary
-                )
-            }
+            RevibesLoading(modifier = Modifier.padding(contentPadding))
         } else {
             DropOffScreenContent(
                 modifier = Modifier
@@ -437,7 +427,7 @@ private fun ItemSection(
     )
     val selectedTypeLabel = typeOptions.find { it.second == item.type }?.first ?: ""
     var weightExpanded by remember { mutableStateOf(false) }
-    val selectedWeightLabel = weightOptions.find { it.second == item.weight }?.first ?: ""
+    val selectedWeightLabel = weightOptions.find { it.second == item.weight?.second }?.first ?: ""
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -559,11 +549,12 @@ private fun ItemSection(
                             expanded = weightExpanded,
                             onDismissRequest = { weightExpanded = false }
                         ) {
-                            weightOptions.forEach { (label, value) ->
+                            weightOptions.forEach { weightOption ->
+                                val (label, _) = weightOption
                                 DropdownMenuItem(
                                     text = { Text(label) },
                                     onClick = {
-                                        onItemChange(item.copy(weight = value))
+                                        onItemChange(item.copy(weight = weightOption))
                                         weightExpanded = false
                                     }
                                 )
@@ -624,7 +615,7 @@ private fun ItemSectionPreview() {
                 id = "item_0",
                 name = "",
                 type = "",
-                weight = 1
+                weight = "Label" to 1
             ),
             index = 0,
             onItemChange = {},

@@ -1,5 +1,8 @@
 package com.carissa.revibes.drop_off.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class StoreData(
     val id: String,
     val name: String,
