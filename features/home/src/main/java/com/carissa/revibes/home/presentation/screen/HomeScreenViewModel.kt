@@ -22,7 +22,8 @@ data class HomeScreenUiState(
     val footerItems: ImmutableList<FooterItem> = FooterItem.default(),
     val banners: ImmutableList<HomeBannerData> = persistentListOf(),
     val userPoints: Int = 0,
-    val userName: String = ""
+    val userName: String = "",
+    val isAdmin: Boolean = false
 )
 
 sealed interface HomeScreenUiEvent {
@@ -34,6 +35,7 @@ sealed interface HomeScreenUiEvent {
     data object NavigateToDropOff : HomeScreenUiEvent, NavigationEvent
     data object NavigateToLogin : HomeScreenUiEvent, NavigationEvent
     data object NavigateToHelpCenter : HomeScreenUiEvent, NavigationEvent
+    data object NavigateToAdminMenu : HomeScreenUiEvent, NavigationEvent
     data object LoadHomeData : HomeScreenUiEvent
 }
 
@@ -72,6 +74,7 @@ class HomeScreenViewModel(
                     banners = homeData.banners.toImmutableList(),
                     userPoints = homeData.userData.coins,
                     userName = homeData.userData.name,
+                    isAdmin = homeData.userData.role == "admin",
                     isLoading = false
                 )
             }

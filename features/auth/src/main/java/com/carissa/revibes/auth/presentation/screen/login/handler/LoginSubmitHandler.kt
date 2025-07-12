@@ -1,5 +1,6 @@
 package com.carissa.revibes.auth.presentation.screen.login.handler
 
+import android.util.Log
 import com.carissa.revibes.auth.data.AuthRepository
 import com.carissa.revibes.auth.presentation.mapper.toUserData
 import com.carissa.revibes.auth.presentation.screen.login.LoginScreenUiEvent
@@ -27,7 +28,9 @@ class LoginSubmitHandler(
         val email = syntax.state.email.text.trim()
         val password = syntax.state.password.text.trim()
 
-        val loginResult = authRepo.loginWithEmail(email, password)
+        val loginResult = authRepo.loginWithEmail(email, password).also {
+            Log.d("ketai", "doLogin: $it")
+        }
 
         syntax.reduce {
             this.state.copy(isLoading = false)
