@@ -40,8 +40,11 @@ sealed interface DropOffScreenUiEvent : NavigationEvent {
     data object NavigateToProfile : DropOffScreenUiEvent
     data class NavigateToConfirmOrder(val arguments: DropOffConfirmationScreenArguments) :
         DropOffScreenUiEvent
+
     data object LoadDropOffData : DropOffScreenUiEvent
-    data class OnLoadDropOffDataFailed(override val message: String) : DropOffScreenUiEvent, Throwable(message)
+    data class OnLoadDropOffDataFailed(override val message: String) : DropOffScreenUiEvent,
+        Throwable(message)
+
     data class AddItemToOrder(val orderId: String) : DropOffScreenUiEvent
     data object MakeOrder : DropOffScreenUiEvent
     data class UpdateItem(val index: Int, val item: DropOffItem) : DropOffScreenUiEvent
@@ -97,10 +100,7 @@ class DropOffScreenViewModel(
             is DropOffScreenUiEvent.OnLoadDropOffDataFailed -> {
                 syntax.postSideEffect(throwable)
                 syntax.reduce {
-                    state.copy(
-                        isLoading = false,
-                        errorMsg = throwable.message
-                    )
+                    state.copy(isLoading = false)
                 }
             }
         }
@@ -171,14 +171,14 @@ class DropOffScreenViewModel(
         val errors = ValidationErrors()
         var isValid = true
 
-        val nameError = if (name.text.trim().isEmpty()) {
+        val nameError = if (state.name.text.trim().isEmpty()) {
             isValid = false
             NAME_REQUIRED_ERROR
         } else {
             null
         }
 
-        val storeError = if (selectedStore == null) {
+        val storeError = if (state.selectedStore == null) {
             isValid = false
             LOCATION_REQUIRED_ERROR
         } else {
@@ -217,7 +217,7 @@ class DropOffScreenViewModel(
 
     private fun loadDropOffData() {
         intent {
-            reduce { state.copy(isLoading = true, errorMsg = null) }
+            reduce { state.copy(isLoading = true) }
 
             coroutineScope {
                 runCatching {
@@ -346,7 +346,7 @@ class DropOffScreenViewModel(
             val arguments = DropOffConfirmationScreenArguments(
                 orderId = orderId,
                 type = ORDER_TYPE_DROP_OFF,
-                name = name,
+                name = state.name.text,
                 store = selectedStore,
                 totalPoints = 200, // This should be calculated based on items
                 items = state.items,
