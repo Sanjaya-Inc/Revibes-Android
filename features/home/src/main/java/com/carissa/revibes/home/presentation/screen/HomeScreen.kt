@@ -9,14 +9,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -58,106 +58,136 @@ private fun HomeScreenContent(
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<HomeScreenUiEvent> = EventReceiver { }
 ) {
-    Scaffold(modifier, containerColor = Color.Transparent, topBar = {
-        HomeHeader(
-            uiState.searchValue,
+    Scaffold(
+        modifier = modifier,
+        containerColor = Color.Transparent,
+        topBar = {
+            HomeHeader(
+                uiState.searchValue,
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(16.dp),
+                onProfileClicked = {
+                    eventReceiver.onEvent(HomeScreenUiEvent.NavigateToProfile)
+                }
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .statusBarsPadding()
-                .padding(16.dp),
-            onProfileClicked = {
-                eventReceiver.onEvent(HomeScreenUiEvent.NavigateToProfile)
-            }
-        )
-    }, bottomBar = {
-        HomeFooter(uiState.footerItems)
-    }) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(
-                    rememberScrollState()
-                ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            HomeBanner(banners = uiState.banners)
-            Row {
-                CtaYourPoint(uiState.userPoints, modifier = Modifier.height(250.dp))
-                Column {
-                    Row {
-                        CtaMenu(
-                            stringResource(R.string.cta_drop_off),
-                            R.drawable.cta_dropoff,
-                            modifier = Modifier.weight(1f),
-                            onClick = { eventReceiver.onEvent(HomeScreenUiEvent.NavigateToDropOff) }
-                        )
-                        CtaMenu(
-                            stringResource(R.string.cta_pick_up),
-                            R.drawable.cta_pickup,
-                            modifier = Modifier.weight(1f)
-                        )
+            item {
+                HomeBanner(
+                    uiState.banners,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                )
+            }
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                ) {
+                    CtaYourPoint(
+                        uiState.userPoints,
+                        modifier = Modifier
+                            .height(250.dp)
+                    )
+                    Column {
+                        Row {
+                            CtaMenu(
+                                stringResource(R.string.cta_drop_off),
+                                R.drawable.cta_dropoff,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    eventReceiver.onEvent(HomeScreenUiEvent.NavigateToDropOff)
+                                }
+                            )
+                            CtaMenu(
+                                stringResource(R.string.cta_pick_up),
+                                R.drawable.cta_pickup,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Row {
+                            CtaMenu(
+                                stringResource(R.string.cta_exchange_points),
+                                R.drawable.cta_exchange_points,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    eventReceiver.onEvent(HomeScreenUiEvent.NavigateToExchangePoints)
+                                }
+                            )
+                            CtaMenu(
+                                stringResource(R.string.cta_shop),
+                                R.drawable.cta_shop,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    eventReceiver.onEvent(HomeScreenUiEvent.NavigateToShop)
+                                }
+                            )
+                            CtaMenu(
+                                stringResource(R.string.cta_transacion_history),
+                                R.drawable.cta_transaction_history,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    eventReceiver.onEvent(HomeScreenUiEvent.NavigateToTransactionHistory)
+                                }
+                            )
+                        }
                     }
-                    Row {
-                        CtaMenu(
-                            stringResource(R.string.cta_exchange_points),
-                            R.drawable.cta_exchange_points,
-                            modifier = Modifier.weight(1f),
+                }
+            }
+
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Surface(
+                            color = Color.White,
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth(0.87f)
+                        ) {
+                            AsyncImage(
+                                R.drawable.main_logo,
+                                contentDescription = "Logo",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        Button(
+                            variant = ButtonVariant.Secondary,
+                            text = stringResource(R.string.cta_help_center),
+                            modifier = Modifier.fillMaxWidth(0.72f)
+                        )
+                        Button(
+                            variant = ButtonVariant.Secondary,
+                            text = stringResource(R.string.about_us),
+                            modifier = Modifier.fillMaxWidth(0.72f),
                             onClick = {
-                                eventReceiver.onEvent(HomeScreenUiEvent.NavigateToExchangePoints)
+                                eventReceiver.onEvent(HomeScreenUiEvent.NavigateToAboutUs)
                             }
                         )
-                        CtaMenu(
-                            stringResource(R.string.cta_shop),
-                            R.drawable.cta_shop,
-                            modifier = Modifier.weight(1f),
-                            onClick = { eventReceiver.onEvent(HomeScreenUiEvent.NavigateToShop) }
-                        )
-                        CtaMenu(
-                            stringResource(R.string.cta_transacion_history),
-                            R.drawable.cta_transaction_history,
-                            modifier = Modifier.weight(1f),
-                            onClick = { eventReceiver.onEvent(HomeScreenUiEvent.NavigateToTransactionHistory) }
-                        )
                     }
+
+                    AsyncImage(
+                        R.drawable.char_assistant,
+                        contentDescription = "Char Assistant",
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .width(95.dp)
+                    )
                 }
             }
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Surface(
-                        color = Color.White,
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth(0.87f)
-                    ) {
-                        AsyncImage(
-                            R.drawable.main_logo,
-                            contentDescription = "Logo",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                    Button(
-                        variant = ButtonVariant.Secondary,
-                        text = stringResource(R.string.cta_help_center),
-                        modifier = Modifier
-                            .fillMaxWidth(0.72f)
-                    )
-                    Button(
-                        variant = ButtonVariant.Secondary,
-                        text = stringResource(R.string.about_us),
-                        modifier = Modifier
-                            .fillMaxWidth(0.72f)
-                            .padding(bottom = 32.dp),
-                        onClick = { eventReceiver.onEvent(HomeScreenUiEvent.NavigateToAboutUs) }
-                    )
-                }
-                AsyncImage(
-                    R.drawable.char_assistant,
-                    contentDescription = "Char Assistant",
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .width(95.dp)
-                )
+
+            item {
+                HomeFooter(uiState.footerItems)
             }
         }
     }

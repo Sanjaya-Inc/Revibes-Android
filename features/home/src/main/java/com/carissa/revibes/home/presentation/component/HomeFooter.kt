@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -73,6 +74,7 @@ fun HomeFooter(
             GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(max = 500.dp)
                 .navigationBarsPadding(),
             contentPadding = PaddingValues(32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),

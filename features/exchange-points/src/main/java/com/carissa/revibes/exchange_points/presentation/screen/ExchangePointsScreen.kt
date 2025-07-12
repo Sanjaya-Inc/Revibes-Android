@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -50,40 +51,49 @@ private fun ExchangePointsScreenContent(
     eventReceiver: EventReceiver<ExchangePointsScreenUiEvent> = EventReceiver { }
 ) {
     val navigator = RevibesTheme.navigator
-    Column(
+    Scaffold(
         modifier = modifier
             .fillMaxSize()
             .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CommonHeader(
-            title = stringResource(R.string.exchange_points_title),
-            searchTextFieldValue = TextFieldValue(),
-            subtitle = stringResource(R.string.exchange_points_subtitle, uiState.points),
-            backgroundDrawRes = R.drawable.bg_exchange_points,
-            onBackClicked = navigator::navigateUp,
-            onProfileClicked = { eventReceiver.onEvent(ExchangePointsScreenUiEvent.NavigateToProfile) }
-        )
-        Text(
-            text = stringResource(R.string.exchange_points_description),
-            modifier = Modifier.padding(top = 24.dp, bottom = 16.dp),
-            style = RevibesTheme.typography.h3,
-            textAlign = TextAlign.Center,
-            color = RevibesTheme.colors.primary,
-        )
-        LazyColumn {
-            items(uiState.images) { image ->
-                AsyncImage(
-                    model = image,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 32.dp, vertical = 4.dp)
-                        .clickable {
-                            eventReceiver.onEvent(ExchangePointsScreenUiEvent.NavigateToDetailExchangePoint)
-                        },
-                    contentScale = ContentScale.FillWidth,
-                )
+        topBar = {
+            CommonHeader(
+                title = stringResource(R.string.exchange_points_title),
+                searchTextFieldValue = TextFieldValue(),
+                subtitle = stringResource(R.string.exchange_points_subtitle, uiState.points),
+                backgroundDrawRes = R.drawable.bg_exchange_points,
+                onBackClicked = navigator::navigateUp,
+                onProfileClicked = { eventReceiver.onEvent(ExchangePointsScreenUiEvent.NavigateToProfile) }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color.White),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(R.string.exchange_points_description),
+                modifier = Modifier.padding(top = 24.dp, bottom = 16.dp),
+                style = RevibesTheme.typography.h3,
+                textAlign = TextAlign.Center,
+                color = RevibesTheme.colors.primary,
+            )
+            LazyColumn {
+                items(uiState.images) { image ->
+                    AsyncImage(
+                        model = image,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 32.dp, vertical = 4.dp)
+                            .clickable {
+                                eventReceiver.onEvent(ExchangePointsScreenUiEvent.NavigateToDetailExchangePoint)
+                            },
+                        contentScale = ContentScale.FillWidth,
+                    )
+                }
             }
         }
     }

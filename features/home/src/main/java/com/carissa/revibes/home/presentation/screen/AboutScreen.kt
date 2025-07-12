@@ -80,26 +80,22 @@ private fun AboutScreenContent(
                 onProfileClicked = { eventReceiver.onEvent(AboutScreenUiEvent.NavigateToProfile) }
             )
         },
-        bottomBar = {
-            HomeFooter(uiState.footerItems)
-        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            AboutScreenMainContent()
+            AboutScreenMainContent(uiState)
         }
     }
 }
 
 @Composable
-private fun AboutScreenMainContent(modifier: Modifier = Modifier) {
+private fun AboutScreenMainContent(uiState: AboutScreenUiState, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -108,6 +104,7 @@ private fun AboutScreenMainContent(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
                 .padding(top = 16.dp)
+                .padding(horizontal = 16.dp)
         ) {
             AboutSection(
                 title = stringResource(R.string.our_founder),
@@ -139,6 +136,7 @@ private fun AboutScreenMainContent(modifier: Modifier = Modifier) {
             ),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 16.dp)
+                .padding(horizontal = 16.dp)
         )
 
         AboutBrandRow(
@@ -147,7 +145,9 @@ private fun AboutScreenMainContent(modifier: Modifier = Modifier) {
             imageAlignment = Alignment.Top,
             imageFirst = true,
             imageContentDescription = stringResource(R.string.re_logo_content_desc),
-            text = stringResource(R.string.re_logo_desc)
+            text = stringResource(R.string.re_logo_desc),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
         )
 
         AboutBrandRow(
@@ -158,7 +158,9 @@ private fun AboutScreenMainContent(modifier: Modifier = Modifier) {
             imageContentDescription = stringResource(R.string.vibe_logo_content_desc),
             text = stringResource(R.string.vibe_logo_desc),
             cardColor = Color(0xFF6DC2ED),
-            cardShape = RoundedCornerShape(24.dp)
+            cardShape = RoundedCornerShape(24.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
         )
 
         AboutBrandRow(
@@ -167,8 +169,12 @@ private fun AboutScreenMainContent(modifier: Modifier = Modifier) {
             imageAlignment = Alignment.CenterVertically,
             imageFirst = true,
             imageContentDescription = stringResource(R.string.s_logo_content_desc),
-            text = stringResource(R.string.s_logo_desc)
+            text = stringResource(R.string.s_logo_desc),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
         )
+
+        HomeFooter(uiState.footerItems)
     }
 }
 

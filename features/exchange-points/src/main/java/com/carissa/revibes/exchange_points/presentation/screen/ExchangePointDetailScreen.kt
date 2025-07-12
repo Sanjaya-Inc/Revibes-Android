@@ -25,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -100,53 +101,57 @@ private fun ExchangePointDetailScreenContent(
     eventReceiver: EventReceiver<ExchangePointDetailScreenUiEvent> = EventReceiver { }
 ) {
     val navigator = RevibesTheme.navigator
-
-    Column(
+    Scaffold(
+        topBar = {
+            CommonHeader(
+                title = stringResource(R.string.exchange_point_detail_title),
+                searchTextFieldValue = TextFieldValue(),
+                backgroundDrawRes = R.drawable.bg_exchange_points,
+                onBackClicked = navigator::navigateUp,
+                onProfileClicked = { eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.NavigateToProfile) }
+            )
+        },
         modifier = modifier
             .fillMaxSize()
             .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CommonHeader(
-            title = stringResource(R.string.exchange_point_detail_title),
-            searchTextFieldValue = TextFieldValue(),
-            backgroundDrawRes = R.drawable.bg_exchange_points,
-            onBackClicked = navigator::navigateUp,
-            onProfileClicked = { eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.NavigateToProfile) }
-        )
-
+    ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AsyncImage(
-                model = uiState.image,
-                contentDescription = null,
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                contentScale = ContentScale.FillWidth
-            )
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AsyncImage(
+                    model = uiState.image,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    contentScale = ContentScale.FillWidth
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
-            TimeToShopSection(
-                validUntil = uiState.validUntil,
-                description = uiState.description
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            TermsAndConditionsSection(terms = uiState.terms.toImmutableList())
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                text = stringResource(R.string.buy_it_now),
-                variant = ButtonVariant.Primary,
-                onClick = { eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.BuyCoupon) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            )
+                Spacer(modifier = Modifier.height(16.dp))
+                TimeToShopSection(
+                    validUntil = uiState.validUntil,
+                    description = uiState.description
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                TermsAndConditionsSection(terms = uiState.terms.toImmutableList())
+                Spacer(modifier = Modifier.height(32.dp))
+                Button(
+                    text = stringResource(R.string.buy_it_now),
+                    variant = ButtonVariant.Primary,
+                    onClick = { eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.BuyCoupon) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                )
+            }
         }
     }
 }

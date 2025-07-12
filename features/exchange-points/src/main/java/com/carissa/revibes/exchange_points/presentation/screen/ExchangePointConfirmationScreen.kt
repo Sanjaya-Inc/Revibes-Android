@@ -18,11 +18,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,112 +70,120 @@ private fun ExchangePointConfirmationScreenContent(
     onEvent: (ExchangePointConfirmationScreenUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    Scaffold(
         modifier = modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-            .systemBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = RevibesTheme.colors.primary,
-                    shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                )
-                .padding(vertical = 36.dp, horizontal = 16.dp),
-            contentAlignment = Alignment.Center
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(R.string.successful_order_payment),
-                    style = RevibesTheme.typography.h2,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
-                )
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier.padding(top = 8.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = RevibesTheme.colors.primary,
+                        shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                    )
+                    .padding(vertical = 36.dp, horizontal = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_coin),
-                        contentDescription = "Coin Icon",
-                        modifier = Modifier.size(24.dp),
-                        tint = Yellow900
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = uiState.totalAmount.toString(),
-                        style = RevibesTheme.typography.h1.copy(fontSize = 28.sp),
+                        text = stringResource(R.string.successful_order_payment),
+                        style = RevibesTheme.typography.h2,
                         color = Color.White,
-                        fontWeight = FontWeight.Medium
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold
                     )
+                    Row(
+                        verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier.padding(top = 8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_coin),
+                            contentDescription = "Coin Icon",
+                            modifier = Modifier.size(24.dp),
+                            tint = Yellow900
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = uiState.totalAmount.toString(),
+                            style = RevibesTheme.typography.h1.copy(fontSize = 28.sp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
-        }
-        Box(
-            modifier = Modifier
-                .offset(y = (-30).dp)
-                .size(60.dp)
-                .background(
-                    color = RevibesTheme.colors.primary,
-                    shape = RoundedCornerShape(60.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_check),
-                contentDescription = "Check Icon",
-                modifier = Modifier.size(30.dp),
-                tint = Color.White
+            Box(
+                modifier = Modifier
+                    .offset(y = (-30).dp)
+                    .size(60.dp)
+                    .background(
+                        color = RevibesTheme.colors.primary,
+                        shape = RoundedCornerShape(60.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_check),
+                    contentDescription = "Check Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
+                )
+            }
+            PaymentDetailsSection(
+                paymentDate = uiState.paymentDate,
+                paymentStatus = uiState.paymentStatus
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 16.dp),
+                thickness = 1.dp,
+                color = RevibesTheme.colors.primary
+            )
+            CouponInformationSection(
+                couponImage = uiState.couponImage,
+                couponName = uiState.couponName,
+                couponValidUntil = uiState.couponValidUntil,
+                couponPrice = uiState.couponPrice,
+                couponQuantity = uiState.couponQuantity
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 16.dp),
+                thickness = 1.dp,
+                color = RevibesTheme.colors.primary
+            )
+            PaymentAmountSection(totalAmount = uiState.totalAmount)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 48.dp),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.girl_character),
+                    contentDescription = "Girl Character",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier.heightIn(max = 250.dp)
+                )
+            }
+            Button(
+                text = stringResource(R.string.home),
+                variant = ButtonVariant.Primary,
+                onClick = { onEvent(ExchangePointConfirmationScreenUiEvent.NavigateToHome) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp)
             )
         }
-        PaymentDetailsSection(
-            paymentDate = uiState.paymentDate,
-            paymentStatus = uiState.paymentStatus
-        )
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp),
-            thickness = 1.dp,
-            color = RevibesTheme.colors.primary
-        )
-        CouponInformationSection(
-            couponImage = uiState.couponImage,
-            couponName = uiState.couponName,
-            couponValidUntil = uiState.couponValidUntil,
-            couponPrice = uiState.couponPrice,
-            couponQuantity = uiState.couponQuantity
-        )
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp),
-            thickness = 1.dp,
-            color = RevibesTheme.colors.primary
-        )
-        PaymentAmountSection(totalAmount = uiState.totalAmount)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 48.dp),
-            contentAlignment = Alignment.TopEnd
-        ) {
-            Image(
-                painter = painterResource(R.drawable.girl_character),
-                contentDescription = "Girl Character",
-                contentScale = ContentScale.FillHeight,
-                modifier = Modifier.heightIn(max = 250.dp)
-            )
-        }
-        Button(
-            text = stringResource(R.string.home),
-            variant = ButtonVariant.Primary,
-            onClick = { onEvent(ExchangePointConfirmationScreenUiEvent.NavigateToHome) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp)
-        )
     }
 }
 
