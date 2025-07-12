@@ -1,6 +1,7 @@
 package com.carissa.revibes.presentation.screen.splash.handler
 
 import com.carissa.revibes.core.data.user.local.UserDataSource
+import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.presentation.screen.splash.SplashScreenUiEvent
 import com.carissa.revibes.presentation.screen.splash.SplashScreenUiState
 import kotlinx.coroutines.delay
@@ -13,14 +14,15 @@ class SplashNavigationHandler(
     private val userDataSource: UserDataSource
 ) {
     suspend fun onSplashScreenEnter(
+        eventReceiver: EventReceiver<SplashScreenUiEvent>,
         syntax: Syntax<SplashScreenUiState, SplashScreenUiEvent>
     ) = syntax.run {
         delay(1.seconds)
         if (userDataSource.getUserValue().getOrNull() != null
         ) {
-            postSideEffect(SplashScreenUiEvent.NavigateToHome)
+            eventReceiver.onEvent(SplashScreenUiEvent.NavigateToHome)
         } else {
-            postSideEffect(SplashScreenUiEvent.NavigateToOnboarding)
+            eventReceiver.onEvent(SplashScreenUiEvent.NavigateToOnboarding)
         }
     }
 }
