@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import com.carissa.revibes.core.presentation.components.components.Surface
+import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.home.R
 import com.carissa.revibes.home.presentation.component.CtaMenu
 import com.carissa.revibes.home.presentation.component.CtaYourPoint
@@ -161,10 +163,14 @@ private fun HomeScreenContent(
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
+                        val context = LocalContext.current
                         Button(
                             variant = ButtonVariant.Secondary,
                             text = stringResource(R.string.cta_help_center),
-                            modifier = Modifier.fillMaxWidth(0.72f)
+                            modifier = Modifier.fillMaxWidth(0.72f),
+                            onClick = {
+                                context.openSupportWhatsApp()
+                            }
                         )
                         Button(
                             variant = ButtonVariant.Secondary,

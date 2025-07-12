@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.data.user.model.UserData
@@ -22,6 +23,7 @@ import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
+import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.profile.presentation.component.ProfileHeader
 import com.carissa.revibes.profile.presentation.component.ProfileMain
 import com.carissa.revibes.profile.presentation.component.ProfileOptionMenu
@@ -39,9 +41,11 @@ fun ProfileScreen(
 ) {
     val state = viewModel.collectAsState().value
     val navigator = RevibesTheme.navigator
+    val context = LocalContext.current
     viewModel.collectSideEffect {
         when (it) {
             ProfileScreenUiEvent.NavigateBack -> navigator.popBackStack()
+            ProfileScreenUiEvent.SupportCenterClicked -> context.openSupportWhatsApp()
             else -> Unit
         }
     }

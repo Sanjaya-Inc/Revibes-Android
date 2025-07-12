@@ -24,6 +24,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +33,7 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import com.carissa.revibes.core.presentation.components.components.Text
+import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.home.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -57,8 +59,7 @@ data class FooterItem(
 @Composable
 fun HomeFooter(
     items: ImmutableList<FooterItem>,
-    modifier: Modifier = Modifier,
-    onChatClicked: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -91,9 +92,12 @@ fun HomeFooter(
                 HomeFooterItem(item)
             }
             item {
+                val context = LocalContext.current
                 Button(
                     variant = ButtonVariant.SecondaryOutlined,
-                    onClick = onChatClicked
+                    onClick = {
+                        context.openSupportWhatsApp()
+                    }
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
