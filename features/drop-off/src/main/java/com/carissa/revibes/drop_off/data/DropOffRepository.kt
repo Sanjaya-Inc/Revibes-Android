@@ -92,6 +92,7 @@ internal class DropOffRepositoryImpl(
                 .url(uploadUrl)
                 .put(requestBody)
                 .addHeader("Content-Type", contentType)
+                .addHeader("X-GOOG-ACL", "public-read")
                 .build()
 
             val response = httpClient.newCall(request).execute()
