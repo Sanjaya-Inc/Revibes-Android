@@ -26,6 +26,14 @@ data class DropOffScreenUiState(
     val items: ImmutableList<DropOffItem> = persistentListOf(),
     val selectedStore: StoreData? = null,
     val name: TextFieldValue = TextFieldValue(),
+    val isFormValid: Boolean = false,
+    val validationErrors: ValidationErrors = ValidationErrors(),
+)
+
+data class ValidationErrors(
+    val nameError: String? = null,
+    val storeError: String? = null,
+    val itemsError: String? = null,
 )
 
 sealed interface DropOffScreenUiEvent : NavigationEvent {
@@ -139,10 +147,72 @@ class DropOffScreenViewModel(
 
     private fun onNameChange(value: TextFieldValue) = intent {
         reduce { state.copy(name = value) }
+        validateForm()
     }
 
     private fun onStoreSelected(storeData: StoreData) = intent {
         reduce { state.copy(selectedStore = storeData) }
+        validateForm()
+    }
+
+    private fun validateForm() {
+        intent {
+            val validationResult = validateFormWithErrors(state)
+            reduce {
+                state.copy(
+                    isFormValid = validationResult.first,
+                    validationErrors = validationResult.second
+                )
+            }
+        }
+    }
+
+    private fun validateFormWithErrors(state: DropOffScreenUiState): Pair<Boolean, ValidationErrors> {
+        val errors = ValidationErrors()
+        var isValid = true
+
+        val nameError = if (name.text.trim().isEmpty()) {
+            isValid = false
+            "Name is required"
+        } else {
+            null
+        }
+
+        val storeError = if (selectedStore == null) {
+            isValid = false
+            "Please select a drop-off location"
+        } else {
+            null
+        }
+
+        val itemsError = when {
+            state.items.isEmpty() -> {
+                isValid = false
+                "Please add at least one item"
+            }
+
+            !state.items.all { item ->
+                item.name.trim().isNotEmpty() &&
+                    item.type.isNotEmpty() &&
+                    item.weight != null &&
+                    item.photos.isNotEmpty()
+            } -> {
+                isValid = false
+                "Please complete all item details (name, type, weight, and photo)"
+            }
+
+            else -> null
+        }
+
+        return isValid to errors.copy(
+            nameError = nameError,
+            storeError = storeError,
+            itemsError = itemsError
+        )
+    }
+
+    private fun isFormValid(state: DropOffScreenUiState): Boolean {
+        return validateFormWithErrors(state).first
     }
 
     private fun loadDropOffData() {
@@ -184,6 +254,7 @@ class DropOffScreenViewModel(
                 add(DropOffItem(id = itemId))
             }.toImmutableList()
             reduce { state.copy(isLoading = false, items = newItems) }
+            validateForm()
         }
     }
 
@@ -250,11 +321,17 @@ class DropOffScreenViewModel(
                 }
                 state.copy(items = updatedItems.toImmutableList())
             }
+            validateForm()
         }
     }
 
     private fun makeOrder() {
         intent {
+            if (!isFormValid(state)) {
+                reduce { state.copy(isLoading = false) }
+                return@intent
+            }
+
             reduce { state.copy(isLoading = true) }
             val orderId = requireNotNull(
                 value = state.currentOrderId
@@ -285,6 +362,7 @@ class DropOffScreenViewModel(
                     items = state.items.toMutableList().also { it[index] = item }.toImmutableList()
                 )
             }
+            validateForm()
         }
     }
 
@@ -296,6 +374,7 @@ class DropOffScreenViewModel(
                         .toImmutableList()
                 )
             }
+            validateForm()
         }
     }
 

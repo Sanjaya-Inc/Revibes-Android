@@ -144,6 +144,8 @@ fun DropOffScreen(
                 eventReceiver = viewModel,
                 nearestStores = state.stores,
                 selectedStore = state.selectedStore,
+                isFormValid = state.isFormValid,
+                validationErrors = state.validationErrors
             )
         }
     }
@@ -158,6 +160,8 @@ fun DropOffScreenContent(
     eventReceiver: EventReceiver<DropOffScreenUiEvent> = EventReceiver { },
     nearestStores: ImmutableList<StoreData> = persistentListOf(),
     selectedStore: StoreData? = null,
+    isFormValid: Boolean = false,
+    validationErrors: ValidationErrors = ValidationErrors(),
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -188,10 +192,20 @@ fun DropOffScreenContent(
                 unfocusedContainerColor = DropOffTextFieldBg,
                 disabledContainerColor = DropOffTextFieldBg,
                 errorContainerColor = DropOffTextFieldBg,
-                unfocusedOutlineColor = DropOffTextFieldBg
+                unfocusedOutlineColor = if (validationErrors.nameError != null) Color.Red else DropOffTextFieldBg,
+                focusedOutlineColor = if (validationErrors.nameError != null) Color.Red else RevibesTheme.colors.primary
             ),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(16.dp),
+            isError = validationErrors.nameError != null
         )
+        validationErrors.nameError?.let { error ->
+            Text(
+                text = error,
+                color = Color.Red,
+                style = RevibesTheme.typography.body2,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
+        }
         Text(
             "Location Drop Off",
             color = DropOffLabelColor,
@@ -211,7 +225,16 @@ fun DropOffScreenContent(
                     unfocusedContainerColor = DropOffTextFieldBg,
                     disabledContainerColor = DropOffTextFieldBg,
                     errorContainerColor = DropOffTextFieldBg,
-                    unfocusedOutlineColor = DropOffTextFieldBg
+                    unfocusedOutlineColor = if (validationErrors.storeError != null) {
+                        Color.Red
+                    } else {
+                        DropOffTextFieldBg
+                    },
+                    focusedOutlineColor = if (validationErrors.storeError != null) {
+                        Color.Red
+                    } else {
+                        RevibesTheme.colors.primary
+                    }
                 ),
                 shape = RoundedCornerShape(16.dp),
                 trailingIcon = {
@@ -222,7 +245,8 @@ fun DropOffScreenContent(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 },
-                readOnly = true
+                readOnly = true,
+                isError = validationErrors.storeError != null
             )
             Box(
                 Modifier
@@ -232,6 +256,14 @@ fun DropOffScreenContent(
                         focusManager.clearFocus()
                     }
                     .background(Color.Transparent)
+            )
+        }
+        validationErrors.storeError?.let { error ->
+            Text(
+                text = error,
+                color = Color.Red,
+                style = RevibesTheme.typography.body2,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
         }
         if (showStoreDropdown) {
@@ -409,6 +441,14 @@ fun DropOffScreenContent(
         ) {
             Text(text = "Add Item", color = RevibesTheme.colors.primary)
         }
+        validationErrors.itemsError?.let { error ->
+            Text(
+                text = error,
+                color = Color.Red,
+                style = RevibesTheme.typography.body2,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
+        }
         Box(
             Modifier
                 .fillMaxWidth()
@@ -417,9 +457,12 @@ fun DropOffScreenContent(
         ) {
             Button(
                 onClick = { eventReceiver.onEvent(DropOffScreenUiEvent.MakeOrder) },
+                enabled = isFormValid,
                 colors = ButtonDefaults.buttonColors().copy(
-                    containerColor = RevibesTheme.colors.primary,
-                    contentColor = Color.White
+                    containerColor = if (isFormValid) RevibesTheme.colors.primary else Color.Gray,
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.Gray,
+                    disabledContentColor = Color.White
                 )
             ) {
                 Text("MAKE ORDER")
@@ -438,6 +481,10 @@ private fun ItemSection(
     onImageUpload: (Uri, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isItemNameValid = item.name.trim().isNotEmpty()
+    val isItemTypeValid = item.type.isNotEmpty()
+    val isItemWeightValid = item.weight != null
+    val isItemPhotosValid = item.photos.isNotEmpty()
     val context = LocalContext.current
     val typeOptions = listOf(
         "Organic" to "organic",
@@ -496,10 +543,20 @@ private fun ItemSection(
                     unfocusedContainerColor = DropOffTextFieldBg,
                     disabledContainerColor = DropOffTextFieldBg,
                     errorContainerColor = DropOffTextFieldBg,
-                    unfocusedOutlineColor = DropOffTextFieldBg
+                    unfocusedOutlineColor = if (!isItemNameValid) Color.Red else DropOffTextFieldBg,
+                    focusedOutlineColor = if (!isItemNameValid) Color.Red else RevibesTheme.colors.primary
                 ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                isError = !isItemNameValid
             )
+            if (!isItemNameValid) {
+                Text(
+                    text = "Item name is required",
+                    color = Color.Red,
+                    style = RevibesTheme.typography.body2,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
             Row(
                 modifier = Modifier.padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -531,9 +588,11 @@ private fun ItemSection(
                                 unfocusedContainerColor = DropOffTextFieldBg,
                                 disabledContainerColor = DropOffTextFieldBg,
                                 errorContainerColor = DropOffTextFieldBg,
-                                unfocusedOutlineColor = DropOffTextFieldBg
+                                unfocusedOutlineColor = if (!isItemTypeValid) Color.Red else DropOffTextFieldBg,
+                                focusedOutlineColor = if (!isItemTypeValid) Color.Red else RevibesTheme.colors.primary
                             ),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(16.dp),
+                            isError = !isItemTypeValid
                         )
                         ExposedDropdownMenu(
                             expanded = expanded,
@@ -576,9 +635,11 @@ private fun ItemSection(
                                 unfocusedContainerColor = DropOffTextFieldBg,
                                 disabledContainerColor = DropOffTextFieldBg,
                                 errorContainerColor = DropOffTextFieldBg,
-                                unfocusedOutlineColor = DropOffTextFieldBg
+                                unfocusedOutlineColor = if (!isItemWeightValid) Color.Red else DropOffTextFieldBg,
+                                focusedOutlineColor = if (!isItemWeightValid) Color.Red else RevibesTheme.colors.primary
                             ),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(16.dp),
+                            isError = !isItemWeightValid
                         )
                         ExposedDropdownMenu(
                             expanded = weightExpanded,
@@ -622,7 +683,6 @@ private fun ItemSection(
                 }
             }
 
-            // Upload button
             Column(
                 modifier = Modifier
                     .background(
@@ -648,6 +708,14 @@ private fun ItemSection(
                         .fillMaxWidth()
                         .padding(top = 8.dp),
                     textAlign = TextAlign.Center
+                )
+            }
+            if (!isItemPhotosValid) {
+                Text(
+                    text = "At least one photo is required",
+                    color = Color.Red,
+                    style = RevibesTheme.typography.body2,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
         }
