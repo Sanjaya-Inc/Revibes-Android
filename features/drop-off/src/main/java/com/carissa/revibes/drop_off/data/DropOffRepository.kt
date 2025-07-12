@@ -3,6 +3,8 @@ package com.carissa.revibes.drop_off.data
 import android.content.Context
 import android.net.Uri
 import com.carissa.revibes.drop_off.data.mapper.toStoreDataList
+import com.carissa.revibes.drop_off.data.model.EstimatePointItem
+import com.carissa.revibes.drop_off.data.model.EstimatePointRequest
 import com.carissa.revibes.drop_off.data.model.PresignedUrlRequest
 import com.carissa.revibes.drop_off.data.model.SubmitOrderRequest
 import com.carissa.revibes.drop_off.data.remote.DropOffRemoteApi
@@ -31,6 +33,8 @@ interface DropOffRepository {
         contentType: String
     ): Boolean
 
+    suspend fun estimatePoint(items: List<EstimatePointItemData>): Pair<Map<String, Int>, Int>
+
     suspend fun submitOrder(
         orderId: String,
         type: String,
@@ -40,6 +44,12 @@ interface DropOffRepository {
         items: List<SubmitOrderItemData>
     ): Boolean
 }
+
+data class EstimatePointItemData(
+    val name: String,
+    val type: String,
+    val weight: Int
+)
 
 data class SubmitOrderItemData(
     val id: String,
@@ -100,6 +110,20 @@ internal class DropOffRepositoryImpl(
         } catch (e: IOException) {
             false
         }
+    }
+
+    override suspend fun estimatePoint(items: List<EstimatePointItemData>): Pair<Map<String, Int>, Int> {
+        val request = EstimatePointRequest(
+            items = items.map { item ->
+                EstimatePointItem(
+                    name = item.name,
+                    type = item.type,
+                    weight = item.weight
+                )
+            }
+        )
+        val response = remoteApi.estimatePoint(request)
+        return Pair(response.data.items, response.data.total)
     }
 
     override suspend fun submitOrder(

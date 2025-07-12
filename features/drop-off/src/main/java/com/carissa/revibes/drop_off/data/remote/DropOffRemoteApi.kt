@@ -1,5 +1,7 @@
 package com.carissa.revibes.drop_off.data.remote
 
+import com.carissa.revibes.drop_off.data.model.EstimatePointRequest
+import com.carissa.revibes.drop_off.data.model.EstimatePointResponse
 import com.carissa.revibes.drop_off.data.model.LogisticOrderItemResponse
 import com.carissa.revibes.drop_off.data.model.LogisticOrderResponse
 import com.carissa.revibes.drop_off.data.model.PresignedUrlRequest
@@ -35,6 +37,9 @@ interface DropOffRemoteApi {
         @Path("itemId") itemId: String,
         @Body request: PresignedUrlRequest
     ): PresignedUrlResponse
+
+    @POST("logistic-orders/estimate-point")
+    suspend fun estimatePoint(@Body request: EstimatePointRequest): EstimatePointResponse
 
     @PATCH("logistic-orders/{id}/submit")
     suspend fun submitOrder(

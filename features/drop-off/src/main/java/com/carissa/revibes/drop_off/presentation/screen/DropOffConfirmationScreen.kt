@@ -21,12 +21,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,7 +66,6 @@ data class DropOffConfirmationScreenArguments(
     val type: String,
     val name: String,
     val store: StoreData,
-    val totalPoints: Int,
     val items: List<DropOffItem>
 )
 
@@ -78,6 +79,11 @@ fun DropOffConfirmationScreen(
     val navigator = RevibesTheme.navigator
     val state by viewModel.collectAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(arguments) {
+        viewModel.onEvent(DropOffConfirmationScreenUiEvent.InitializeScreen(arguments))
+    }
+
     viewModel.collectSideEffect { event ->
         when (event) {
             is DropOffConfirmationScreenUiEvent.OnMakeOrderFailed -> {
@@ -237,8 +243,17 @@ private fun DropOffConfirmationScreenContent(
         )
 
         arguments.items.forEachIndexed { index, item ->
-            DetailRow(context.getString(com.carissa.revibes.drop_off.R.string.item_number, index + 1), item.name)
-            DetailRow(context.getString(com.carissa.revibes.drop_off.R.string.type_label), item.type)
+            DetailRow(
+                context.getString(
+                    com.carissa.revibes.drop_off.R.string.item_number,
+                    index + 1
+                ),
+                item.name
+            )
+            DetailRow(
+                context.getString(com.carissa.revibes.drop_off.R.string.type_label),
+                item.type
+            )
             DetailRow(
                 context.getString(com.carissa.revibes.drop_off.R.string.weight_label),
                 item.weight?.first.orEmpty()
@@ -267,23 +282,47 @@ private fun DropOffConfirmationScreenContent(
             thickness = 1.dp,
             color = RevibesTheme.colors.primary
         )
-        Text(
-            text = context.getString(com.carissa.revibes.drop_off.R.string.total_points_format, arguments.totalPoints),
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(vertical = 2.dp),
-        )
-        arguments.items.forEachIndexed { index, item ->
+        if (uiState.isEstimatingPoints) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                    color = RevibesTheme.colors.primary
+                )
+                Text(
+                    text = context.getString(com.carissa.revibes.drop_off.R.string.calculating_points),
+                    style = RevibesTheme.typography.body2,
+                    color = RevibesTheme.colors.primary
+                )
+            }
+        } else {
             Text(
                 text = context.getString(
-                    com.carissa.revibes.drop_off.R.string.item_points_format,
-                    index + 1,
-                    item.point
+                    com.carissa.revibes.drop_off.R.string.total_points_format,
+                    uiState.totalPoints
                 ),
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(vertical = 2.dp),
             )
+            arguments.items.forEachIndexed { index, item ->
+                Text(
+                    text = context.getString(
+                        com.carissa.revibes.drop_off.R.string.item_points_format,
+                        index + 1,
+                        uiState.itemPoints[index.toString()] ?: 0
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(vertical = 2.dp),
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))
@@ -345,14 +384,12 @@ private fun DropOffConfirmationScreenPreview() {
                     distance = 200.3,
                     status = "success",
                 ),
-                totalPoints = 200,
                 items = listOf(
                     DropOffItem(
                         id = "1",
                         name = "Laptop",
                         type = "organic",
                         weight = "> 1 kg" to 1,
-                        point = 100,
                         photos = listOf(
                             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShZRhY" +
                                 "JuVc5eH192WQSGqveK-Qe1q-l5Fzkw&s",
@@ -366,7 +403,6 @@ private fun DropOffConfirmationScreenPreview() {
                         name = "Smartphone",
                         type = "organic",
                         weight = "> 10 kg" to 10,
-                        point = 50,
                         photos = listOf(
                             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShZRhY" +
                                 "JuVc5eH192WQSGqveK-Qe1q-l5Fzkw&s",

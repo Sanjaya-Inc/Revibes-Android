@@ -58,6 +58,7 @@
     <!-- Points display -->
     <string name="total_points_format">Total Points: %1$d Points</string>
     <string name="item_points_format">Item %1$d: %2$d Points</string>
+    <string name="calculating_points">Calculating points...</string>
     
     <!-- Disclaimer text -->
     <string name="points_disclaimer">*The points above are temporary. Points will change after the Revibe team re-checks the items regarding the type of item and weight of the item.\n*Please double check your shipping data details before submit.</string>

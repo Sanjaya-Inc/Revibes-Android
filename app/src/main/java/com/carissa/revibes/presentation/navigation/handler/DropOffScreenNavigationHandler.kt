@@ -26,7 +26,6 @@ class DropOffScreenNavigationHandler : NavigationEventHandler() {
                         type = event.arguments.type,
                         name = event.arguments.name,
                         store = event.arguments.store,
-                        totalPoints = event.arguments.totalPoints,
                         items = event.arguments.items
                     )
                 )

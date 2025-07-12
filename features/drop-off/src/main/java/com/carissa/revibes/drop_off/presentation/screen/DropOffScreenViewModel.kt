@@ -82,7 +82,6 @@ data class DropOffItem(
     val type: String = "",
     val weight: Pair<String, Int>? = null,
     val photos: List<String> = emptyList(),
-    val point: Int = 0,
 )
 
 @KoinViewModel
@@ -344,7 +343,6 @@ class DropOffScreenViewModel(
                 type = ORDER_TYPE_DROP_OFF,
                 name = state.name.text,
                 store = selectedStore,
-                totalPoints = 200, // This should be calculated based on items
                 items = state.items,
             )
             onEvent(DropOffScreenUiEvent.NavigateToConfirmOrder(arguments))
