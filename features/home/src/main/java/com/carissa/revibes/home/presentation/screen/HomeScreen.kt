@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.home.presentation.screen
 
+import android.R.attr.onClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -113,6 +113,16 @@ private fun HomeScreenContent(
                                 R.drawable.cta_pickup,
                                 modifier = Modifier.weight(1f)
                             )
+
+                            if (uiState.isAdmin) {
+                                CtaMenu(
+                                    "Admin Menu",
+                                    R.drawable.girl_character,
+                                    onClick = {
+                                        eventReceiver.onEvent(HomeScreenUiEvent.NavigateToAdminMenu)
+                                    }
+                                )
+                            }
                         }
                         Row {
                             CtaMenu(
@@ -162,7 +172,6 @@ private fun HomeScreenContent(
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
-                        val context = LocalContext.current
                         Button(
                             variant = ButtonVariant.Secondary,
                             text = stringResource(R.string.cta_help_center),

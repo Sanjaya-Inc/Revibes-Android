@@ -3,6 +3,7 @@ package com.carissa.revibes.presentation.navigation
 import com.carissa.revibes.core.presentation.navigation.RevibesHostNavigationStyle
 import com.ramcosta.composedestinations.annotation.ExternalNavGraph
 import com.ramcosta.composedestinations.annotation.NavHostGraph
+import com.ramcosta.composedestinations.generated.adminmenu.navgraphs.AdminMenuNavGraph
 import com.ramcosta.composedestinations.generated.auth.navgraphs.AuthNavGraph
 import com.ramcosta.composedestinations.generated.dropoff.navgraphs.DropOffNavGraph
 import com.ramcosta.composedestinations.generated.exchangepoints.navgraphs.ExchangePointsNavGraph
@@ -25,5 +26,6 @@ annotation class RevibesNavGraph {
     @ExternalNavGraph<ExchangePointsNavGraph>
     @ExternalNavGraph<DropOffNavGraph>
     @ExternalNavGraph<HelpCenterNavGraph>
+    @ExternalNavGraph<AdminMenuNavGraph>
     companion object Includes
 }

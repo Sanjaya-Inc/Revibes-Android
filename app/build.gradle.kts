@@ -35,4 +35,5 @@ dependencies {
     implementation(project(":features:exchange-points"))
     implementation(project(":features:drop-off"))
     implementation(project(":features:help-center"))
+    implementation(project(":features:admin-menu"))
 }

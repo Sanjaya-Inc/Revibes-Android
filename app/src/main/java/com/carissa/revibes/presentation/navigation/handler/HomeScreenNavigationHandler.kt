@@ -3,6 +3,7 @@ package com.carissa.revibes.presentation.navigation.handler
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.home.presentation.screen.HomeScreenUiEvent
 import com.carissa.revibes.profile.presentation.screen.ProfileScreenUiEvent
+import com.ramcosta.composedestinations.generated.adminmenu.destinations.AdminMenuScreenDestination
 import com.ramcosta.composedestinations.generated.app.destinations.SplashScreenDestination
 import com.ramcosta.composedestinations.generated.dropoff.destinations.DropOffScreenDestination
 import com.ramcosta.composedestinations.generated.exchangepoints.destinations.ExchangePointsScreenDestination
@@ -27,11 +28,16 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
             event is HomeScreenUiEvent.NavigateToAboutUs ||
             event is HomeScreenUiEvent.NavigateToDropOff ||
             event is HomeScreenUiEvent.NavigateToHelpCenter ||
+            event is HomeScreenUiEvent.NavigateToAdminMenu ||
             event is HomeScreenUiEvent.NavigateToLogin
     }
 
     override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
         when (event) {
+            is HomeScreenUiEvent.NavigateToAdminMenu -> navigator.navigate(
+                AdminMenuScreenDestination
+            )
+
             is HomeScreenUiEvent.NavigateToProfile -> navigator.navigate(ProfileScreenDestination)
             is ProfileScreenUiEvent.LogoutClicked -> navigator.navigate(SplashScreenDestination) {
                 popUpTo(HomeScreenDestination) { inclusive = true }
@@ -51,6 +57,7 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
             is HomeScreenUiEvent.NavigateToHelpCenter -> navigator.navigate(
                 HelpCenterScreenDestination
             )
+
             is HomeScreenUiEvent.NavigateToLogin -> navigator.navigate(SplashScreenDestination) {
                 popUpTo(HomeScreenDestination) { inclusive = true }
             }
