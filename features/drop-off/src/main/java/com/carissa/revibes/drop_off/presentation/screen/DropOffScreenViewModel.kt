@@ -23,20 +23,19 @@ data class DropOffScreenUiState(
     val currentOrderId: String? = null,
     val items: ImmutableList<DropOffItem> = persistentListOf(),
     val selectedStore: StoreData? = null,
-    val name: TextFieldValue = TextFieldValue()
+    val name: TextFieldValue = TextFieldValue(),
+    val errorMsg: String? = null
 ) {
-
     val isButtonEnabled: Boolean
         get() = currentOrderId != null && selectedStore != null && name.text.isNotBlank()
 }
 
 sealed interface DropOffScreenUiEvent : NavigationEvent {
     data object NavigateToProfile : DropOffScreenUiEvent
-
     data class NavigateToConfirmOrder(val arguments: DropOffConfirmationScreenArguments) :
         DropOffScreenUiEvent
-
     data object LoadDropOffData : DropOffScreenUiEvent
+    data class OnLoadDropOffDataFailed(override val message: String) : DropOffScreenUiEvent, Throwable(message)
     data class AddItemToOrder(val orderId: String) : DropOffScreenUiEvent
     data object MakeOrder : DropOffScreenUiEvent
     data class UpdateItem(val index: Int, val item: DropOffItem) : DropOffScreenUiEvent
@@ -44,7 +43,6 @@ sealed interface DropOffScreenUiEvent : NavigationEvent {
     data class OnNameChange(val value: TextFieldValue) : DropOffScreenUiEvent
     data class OnStoreSelected(val storeData: StoreData) : DropOffScreenUiEvent
     data class OnMakeOrderFailed(val message: String) : DropOffScreenUiEvent
-
     data class GetPresignedUrl(
         val orderId: String,
         val itemId: String,
@@ -70,6 +68,19 @@ class DropOffScreenViewModel(
     initialState = DropOffScreenUiState(),
     onCreate = {
         onEvent(DropOffScreenUiEvent.LoadDropOffData)
+    },
+    exceptionHandler = { syntax, throwable ->
+        when (throwable) {
+            is DropOffScreenUiEvent.OnLoadDropOffDataFailed -> {
+                syntax.postSideEffect(throwable)
+                syntax.reduce {
+                    state.copy(
+                        isLoading = false,
+                        errorMsg = throwable.message
+                    )
+                }
+            }
+        }
     }
 ) {
     override fun onEvent(event: DropOffScreenUiEvent) {
@@ -85,7 +96,6 @@ class DropOffScreenViewModel(
                 is DropOffScreenUiEvent.RemoveItem -> removeItem(event.index)
                 is DropOffScreenUiEvent.OnNameChange -> onNameChange(event.value)
                 is DropOffScreenUiEvent.OnStoreSelected -> onStoreSelected(event.storeData)
-
                 is DropOffScreenUiEvent.GetPresignedUrl -> getPresignedUrlForMedia(
                     event.orderId,
                     event.itemId,
@@ -93,6 +103,7 @@ class DropOffScreenViewModel(
                 )
 
                 is DropOffScreenUiEvent.OnMakeOrderFailed -> Unit
+                else -> Unit
             }
         }
     }
@@ -107,23 +118,29 @@ class DropOffScreenViewModel(
 
     private fun loadDropOffData() {
         intent {
-            reduce { state.copy(isLoading = true) }
+            reduce { state.copy(isLoading = true, errorMsg = null) }
 
             coroutineScope {
-                val storesDeferred = async {
-                    dropOffRepository.getStores(
-                        longitude = 106.8456,
-                        latitude = -6.2088
-                    )
-                }
-                val orderIdDeferred = async { dropOffRepository.createLogisticOrder() }
+                runCatching {
+                    val storesDeferred = async {
+                        dropOffRepository.getStores(
+                            longitude = 106.8456,
+                            latitude = -6.2088
+                        )
+                    }
+                    val orderIdDeferred = async { dropOffRepository.createLogisticOrder() }
 
-                val (stores, orderId) = storesDeferred.await() to orderIdDeferred.await()
-                reduce {
-                    state.copy(
-                        stores = stores.toImmutableList(),
-                        currentOrderId = orderId,
-                        isLoading = false
+                    val (stores, orderId) = storesDeferred.await() to orderIdDeferred.await()
+                    reduce {
+                        state.copy(
+                            stores = stores.toImmutableList(),
+                            currentOrderId = orderId,
+                            isLoading = false
+                        )
+                    }
+                }.onFailure {
+                    throw DropOffScreenUiEvent.OnLoadDropOffDataFailed(
+                        it.message ?: "Something went wrong!"
                     )
                 }
             }

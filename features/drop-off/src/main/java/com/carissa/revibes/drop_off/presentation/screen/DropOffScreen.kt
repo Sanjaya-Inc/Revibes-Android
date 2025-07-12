@@ -102,6 +102,9 @@ fun DropOffScreen(
             is DropOffScreenUiEvent.OnMakeOrderFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
+            is DropOffScreenUiEvent.OnLoadDropOffDataFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
 
             else -> Unit
         }
