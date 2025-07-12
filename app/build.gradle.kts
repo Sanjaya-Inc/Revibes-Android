@@ -34,4 +34,5 @@ dependencies {
     implementation(project(":features:shop"))
     implementation(project(":features:exchange-points"))
     implementation(project(":features:drop-off"))
+    implementation(project(":features:help-center"))
 }

@@ -32,7 +32,6 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import com.carissa.revibes.core.presentation.components.components.Surface
-import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.home.R
 import com.carissa.revibes.home.presentation.component.CtaMenu
 import com.carissa.revibes.home.presentation.component.CtaYourPoint
@@ -169,7 +168,7 @@ private fun HomeScreenContent(
                             text = stringResource(R.string.cta_help_center),
                             modifier = Modifier.fillMaxWidth(0.72f),
                             onClick = {
-                                context.openSupportWhatsApp()
+                                eventReceiver.onEvent(HomeScreenUiEvent.NavigateToHelpCenter)
                             }
                         )
                         Button(

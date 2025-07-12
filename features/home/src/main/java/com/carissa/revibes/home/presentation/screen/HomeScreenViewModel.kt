@@ -33,6 +33,7 @@ sealed interface HomeScreenUiEvent {
     data object NavigateToAboutUs : HomeScreenUiEvent, NavigationEvent
     data object NavigateToDropOff : HomeScreenUiEvent, NavigationEvent
     data object NavigateToLogin : HomeScreenUiEvent, NavigationEvent
+    data object NavigateToHelpCenter : HomeScreenUiEvent, NavigationEvent
     data object LoadHomeData : HomeScreenUiEvent
 }
 
@@ -55,14 +56,9 @@ class HomeScreenViewModel(
         super.onEvent(event)
         intent {
             when (event) {
-                is HomeScreenUiEvent.NavigateToProfile -> navigationEventBus.post(event)
-                is HomeScreenUiEvent.NavigateToShop -> navigationEventBus.post(event)
-                is HomeScreenUiEvent.NavigateToExchangePoints -> navigationEventBus.post(event)
-                is HomeScreenUiEvent.NavigateToTransactionHistory -> navigationEventBus.post(event)
-                is HomeScreenUiEvent.NavigateToAboutUs -> navigationEventBus.post(event)
-                is HomeScreenUiEvent.NavigateToDropOff -> navigationEventBus.post(event)
+                is NavigationEvent -> navigationEventBus.post(event)
                 is HomeScreenUiEvent.LoadHomeData -> loadHomeData()
-                is HomeScreenUiEvent.NavigateToLogin -> navigationEventBus.post(event)
+                else -> Unit
             }
         }
     }

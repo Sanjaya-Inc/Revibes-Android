@@ -6,6 +6,7 @@ import com.ramcosta.composedestinations.annotation.NavHostGraph
 import com.ramcosta.composedestinations.generated.auth.navgraphs.AuthNavGraph
 import com.ramcosta.composedestinations.generated.dropoff.navgraphs.DropOffNavGraph
 import com.ramcosta.composedestinations.generated.exchangepoints.navgraphs.ExchangePointsNavGraph
+import com.ramcosta.composedestinations.generated.helpcenter.navgraphs.HelpCenterNavGraph
 import com.ramcosta.composedestinations.generated.home.navgraphs.HomeNavGraph
 import com.ramcosta.composedestinations.generated.onboarding.navgraphs.OnboardingNavGraph
 import com.ramcosta.composedestinations.generated.profile.navgraphs.ProfileNavGraph
@@ -23,5 +24,6 @@ annotation class RevibesNavGraph {
     @ExternalNavGraph<ShopNavGraph>
     @ExternalNavGraph<ExchangePointsNavGraph>
     @ExternalNavGraph<DropOffNavGraph>
+    @ExternalNavGraph<HelpCenterNavGraph>
     companion object Includes
 }

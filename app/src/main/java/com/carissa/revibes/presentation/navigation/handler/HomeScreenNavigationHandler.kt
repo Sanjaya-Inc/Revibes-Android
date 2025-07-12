@@ -6,6 +6,7 @@ import com.carissa.revibes.profile.presentation.screen.ProfileScreenUiEvent
 import com.ramcosta.composedestinations.generated.app.destinations.SplashScreenDestination
 import com.ramcosta.composedestinations.generated.dropoff.destinations.DropOffScreenDestination
 import com.ramcosta.composedestinations.generated.exchangepoints.destinations.ExchangePointsScreenDestination
+import com.ramcosta.composedestinations.generated.helpcenter.destinations.HelpCenterScreenDestination
 import com.ramcosta.composedestinations.generated.home.destinations.AboutScreenDestination
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
@@ -25,6 +26,7 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
             event is HomeScreenUiEvent.NavigateToTransactionHistory ||
             event is HomeScreenUiEvent.NavigateToAboutUs ||
             event is HomeScreenUiEvent.NavigateToDropOff ||
+            event is HomeScreenUiEvent.NavigateToHelpCenter ||
             event is HomeScreenUiEvent.NavigateToLogin
     }
 
@@ -46,6 +48,9 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
 
             is HomeScreenUiEvent.NavigateToAboutUs -> navigator.navigate(AboutScreenDestination)
             is HomeScreenUiEvent.NavigateToDropOff -> navigator.navigate(DropOffScreenDestination)
+            is HomeScreenUiEvent.NavigateToHelpCenter -> navigator.navigate(
+                HelpCenterScreenDestination
+            )
             is HomeScreenUiEvent.NavigateToLogin -> navigator.navigate(SplashScreenDestination) {
                 popUpTo(HomeScreenDestination) { inclusive = true }
             }
