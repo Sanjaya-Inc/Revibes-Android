@@ -3,6 +3,8 @@
  */
 package com.carissa.revibes.drop_off.presentation.screen
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
@@ -24,11 +26,7 @@ data class DropOffScreenUiState(
     val items: ImmutableList<DropOffItem> = persistentListOf(),
     val selectedStore: StoreData? = null,
     val name: TextFieldValue = TextFieldValue(),
-    val errorMsg: String? = null
-) {
-    val isButtonEnabled: Boolean
-        get() = currentOrderId != null && selectedStore != null && name.text.isNotBlank()
-}
+)
 
 sealed interface DropOffScreenUiEvent : NavigationEvent {
     data object NavigateToProfile : DropOffScreenUiEvent
@@ -47,6 +45,24 @@ sealed interface DropOffScreenUiEvent : NavigationEvent {
         val orderId: String,
         val itemId: String,
         val contentType: String
+    ) : DropOffScreenUiEvent
+
+    data class UploadImage(
+        val context: Context,
+        val orderId: String,
+        val itemId: String,
+        val itemIndex: Int,
+        val imageUri: Uri,
+        val contentType: String
+    ) : DropOffScreenUiEvent
+
+    data class OnImageUploadSuccess(
+        val itemIndex: Int,
+        val imageUrl: String
+    ) : DropOffScreenUiEvent
+
+    data class OnImageUploadFailed(
+        val message: String
     ) : DropOffScreenUiEvent
 }
 
@@ -102,7 +118,22 @@ class DropOffScreenViewModel(
                     event.contentType
                 )
 
+                is DropOffScreenUiEvent.UploadImage -> uploadImage(
+                    event.context,
+                    event.orderId,
+                    event.itemId,
+                    event.itemIndex,
+                    event.imageUri,
+                    event.contentType
+                )
+
+                is DropOffScreenUiEvent.OnImageUploadSuccess -> onImageUploadSuccess(
+                    event.itemIndex,
+                    event.imageUrl
+                )
+
                 is DropOffScreenUiEvent.OnMakeOrderFailed -> Unit
+                is DropOffScreenUiEvent.OnImageUploadFailed -> Unit
                 else -> Unit
             }
         }
@@ -171,6 +202,56 @@ class DropOffScreenViewModel(
                 contentType = contentType
             )
             reduce { state.copy(isLoading = false) }
+        }
+    }
+
+    private fun uploadImage(
+        context: Context,
+        orderId: String,
+        itemId: String,
+        itemIndex: Int,
+        imageUri: Uri,
+        contentType: String
+    ) {
+        intent {
+            reduce { state.copy(isLoading = true) }
+            try {
+                val (uploadUrl, downloadUrl, _) = dropOffRepository.getPresignedUrl(
+                    orderId = orderId,
+                    itemId = itemId,
+                    contentType = contentType
+                )
+
+                val uploadSuccess = dropOffRepository.uploadImageToUrl(
+                    context = context,
+                    uploadUrl = uploadUrl,
+                    imageUri = imageUri,
+                    contentType = contentType
+                )
+
+                if (uploadSuccess) {
+                    onEvent(DropOffScreenUiEvent.OnImageUploadSuccess(itemIndex, downloadUrl))
+                } else {
+                    onEvent(DropOffScreenUiEvent.OnImageUploadFailed("Failed to upload image"))
+                }
+            } catch (e: Exception) {
+                onEvent(DropOffScreenUiEvent.OnImageUploadFailed(e.message ?: "Unknown error"))
+            }
+            reduce { state.copy(isLoading = false) }
+        }
+    }
+
+    private fun onImageUploadSuccess(itemIndex: Int, imageUrl: String) {
+        intent {
+            reduce {
+                val updatedItems = state.items.toMutableList()
+                if (itemIndex < updatedItems.size) {
+                    val currentItem = updatedItems[itemIndex]
+                    val updatedPhotos = currentItem.photos.toMutableList().apply { add(imageUrl) }
+                    updatedItems[itemIndex] = currentItem.copy(photos = updatedPhotos)
+                }
+                state.copy(items = updatedItems.toImmutableList())
+            }
         }
     }
 

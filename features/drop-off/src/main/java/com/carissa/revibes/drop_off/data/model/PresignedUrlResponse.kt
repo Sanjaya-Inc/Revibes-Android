@@ -16,6 +16,7 @@ data class PresignedUrlResponse(
 @Serializable
 data class PresignedUrlData(
     val uploadUrl: String,
+    val downloadUrl: String,
     val expiredAt: Long
 )
 

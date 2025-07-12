@@ -1,11 +1,18 @@
 package com.carissa.revibes.drop_off.data
 
+import android.content.Context
+import android.net.Uri
 import com.carissa.revibes.drop_off.data.mapper.toStoreDataList
 import com.carissa.revibes.drop_off.data.model.PresignedUrlRequest
 import com.carissa.revibes.drop_off.data.model.SubmitOrderRequest
 import com.carissa.revibes.drop_off.data.remote.DropOffRemoteApi
 import com.carissa.revibes.drop_off.domain.model.StoreData
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.annotation.Single
+import java.io.IOException
 
 interface DropOffRepository {
     suspend fun getStores(longitude: Double, latitude: Double): List<StoreData>
@@ -15,7 +22,14 @@ interface DropOffRepository {
         orderId: String,
         itemId: String,
         contentType: String
-    ): Pair<String, Long>
+    ): Triple<String, String, Long>
+
+    suspend fun uploadImageToUrl(
+        context: Context,
+        uploadUrl: String,
+        imageUri: Uri,
+        contentType: String
+    ): Boolean
 
     suspend fun submitOrder(
         orderId: String,
@@ -36,7 +50,8 @@ data class SubmitOrderItemData(
 
 @Single
 internal class DropOffRepositoryImpl(
-    private val remoteApi: DropOffRemoteApi
+    private val remoteApi: DropOffRemoteApi,
+    private val httpClient: OkHttpClient
 ) : DropOffRepository {
 
     override suspend fun getStores(longitude: Double, latitude: Double): List<StoreData> {
@@ -55,10 +70,35 @@ internal class DropOffRepositoryImpl(
         orderId: String,
         itemId: String,
         contentType: String
-    ): Pair<String, Long> {
+    ): Triple<String, String, Long> {
         val request = PresignedUrlRequest(contentType = contentType)
         val response = remoteApi.getPresignedUrl(orderId, itemId, request)
-        return Pair(response.data.uploadUrl, response.data.expiredAt)
+        return Triple(response.data.uploadUrl, response.data.downloadUrl, response.data.expiredAt)
+    }
+
+    override suspend fun uploadImageToUrl(
+        context: Context,
+        uploadUrl: String,
+        imageUri: Uri,
+        contentType: String
+    ): Boolean {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(imageUri)
+            val imageBytes = inputStream?.readBytes() ?: return false
+            inputStream.close()
+
+            val requestBody = imageBytes.toRequestBody(contentType = contentType.toMediaType())
+            val request = Request.Builder()
+                .url(uploadUrl)
+                .put(requestBody)
+                .addHeader("Content-Type", contentType)
+                .build()
+
+            val response = httpClient.newCall(request).execute()
+            response.isSuccessful
+        } catch (e: IOException) {
+            false
+        }
     }
 
     override suspend fun submitOrder(

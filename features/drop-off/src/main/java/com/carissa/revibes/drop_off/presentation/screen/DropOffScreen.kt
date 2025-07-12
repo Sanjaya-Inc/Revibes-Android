@@ -4,7 +4,10 @@
 
 package com.carissa.revibes.drop_off.presentation.screen
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,11 +55,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -66,6 +72,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.DropOffDialogBg
@@ -103,6 +110,10 @@ fun DropOffScreen(
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
             is DropOffScreenUiEvent.OnLoadDropOffDataFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is DropOffScreenUiEvent.OnImageUploadFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
@@ -153,6 +164,7 @@ fun DropOffScreenContent(
     nearestStores: ImmutableList<StoreData> = persistentListOf(),
     selectedStore: StoreData? = null,
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
     var showStoreDropdown by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -355,6 +367,18 @@ fun DropOffScreenContent(
                     )
                 },
                 onRemove = { eventReceiver.onEvent(DropOffScreenUiEvent.RemoveItem(index)) },
+                onImageUpload = { imageUri, contentType ->
+                    eventReceiver.onEvent(
+                        DropOffScreenUiEvent.UploadImage(
+                            context = context,
+                            orderId = orderId,
+                            itemId = item.id,
+                            itemIndex = index,
+                            imageUri = imageUri,
+                            contentType = contentType
+                        )
+                    )
+                },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
@@ -417,8 +441,10 @@ private fun ItemSection(
     index: Int,
     onItemChange: (DropOffItem) -> Unit,
     onRemove: () -> Unit,
+    onImageUpload: (Uri, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val typeOptions = listOf(
         "Organic" to "organic",
         "Non-Organic" to "non-organic",
@@ -434,6 +460,15 @@ private fun ItemSection(
     val selectedTypeLabel = typeOptions.find { it.second == item.type }?.first ?: ""
     var weightExpanded by remember { mutableStateOf(false) }
     val selectedWeightLabel = weightOptions.find { it.second == item.weight?.second }?.first ?: ""
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { selectedUri ->
+            val contentType = context.contentResolver.getType(selectedUri) ?: "image/jpeg"
+            onImageUpload(selectedUri, contentType)
+        }
+    }
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -574,12 +609,35 @@ private fun ItemSection(
                 color = DropOffLabelColor,
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
             )
+
+            if (item.photos.isNotEmpty()) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    items(item.photos) { photoUrl ->
+                        AsyncImage(
+                            model = photoUrl,
+                            contentDescription = "Uploaded Photo",
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+
+            // Upload button
             Column(
                 modifier = Modifier
                     .background(
                         color = DropOffTextFieldBg,
                         shape = RoundedCornerShape(16.dp)
                     )
+                    .clickable {
+                        imagePickerLauncher.launch("image/*")
+                    }
                     .padding(16.dp)
             ) {
                 Image(
@@ -590,7 +648,7 @@ private fun ItemSection(
                         .height(36.dp)
                 )
                 Text(
-                    text = "Upload Photo",
+                    text = if (item.photos.isEmpty()) "Upload Photo" else "Add More Photos",
                     color = DropOffPlaceholderColor,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -626,6 +684,7 @@ private fun ItemSectionPreview() {
             index = 0,
             onItemChange = {},
             onRemove = {},
+            onImageUpload = { _, _ -> },
             modifier = Modifier.fillMaxWidth()
         )
     }
