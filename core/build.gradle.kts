@@ -48,6 +48,9 @@ dependencies {
     api(ui.androidx.lifecycle.runtime.ktx)
     api(ui.bundles.orbit.mvi)
 
+    debugImplementation(core.chucker)
+    releaseImplementation(core.chucker.no.op)
+
     testApi(libs.junit)
     androidTestApi(libs.androidx.junit)
     androidTestApi(libs.androidx.espresso.core)

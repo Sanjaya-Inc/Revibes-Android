@@ -1,5 +1,8 @@
 package com.carissa.revibes.core.data.main.remote.okhttp
 
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import okhttp3.ConnectionPool
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -9,6 +12,7 @@ import java.util.concurrent.TimeUnit
 
 @Single
 internal class ClientCreator(
+    context: Context,
     authenticator: Authenticator,
     private val okhttpCache: CacheCreator
 ) {
@@ -29,7 +33,13 @@ internal class ClientCreator(
     }
 
     private val interceptors = listOf(
-        authenticator
+        authenticator,
+        ChuckerInterceptor.Builder(context)
+            .collector(ChuckerCollector(context))
+            .maxContentLength(250_000L)
+            .redactHeaders(emptySet())
+            .alwaysReadResponseBody(false)
+            .build()
     )
     private val networkInterceptors = listOf(
         createNetworkInterceptor()
