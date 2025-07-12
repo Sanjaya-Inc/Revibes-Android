@@ -56,13 +56,8 @@ private fun HelpCenterScreenContent(
 ) {
     Scaffold(
         modifier = modifier,
-        containerColor = Color.Transparent
-    ) { contentPadding ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(contentPadding)
-        ) {
+        containerColor = Color.Transparent,
+        topBar = {
             CommonHeader(
                 title = "HELP CENTER",
                 backgroundDrawRes = R.drawable.bg_help_center,
@@ -72,17 +67,21 @@ private fun HelpCenterScreenContent(
                     eventReceiver.onEvent(HelpCenterScreenUiEvent.NavigateToProfile)
                 },
             )
+        }
+    ) { contentPadding ->
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(contentPadding)
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
+        ) {
             uiState.filteredItems.forEachIndexed { index, data ->
                 HelpItemRoot(
                     data,
                     onChildClicked = { child ->
                         eventReceiver.onEvent(HelpCenterScreenUiEvent.OnHelpChildClicked(child))
-                    },
-                    modifier = Modifier
-                        .padding(
-                            top = if (index == 0) 16.dp else 0.dp
-                        )
-                        .padding(horizontal = 16.dp)
+                    }
                 )
             }
             val context = LocalContext.current
