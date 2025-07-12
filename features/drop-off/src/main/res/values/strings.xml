@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen titles -->
+    <string name="drop_off_title">Drop Off</string>
+    <string name="drop_off_booking_details">Drop Off Booking Details</string>
+    <string name="delivery_details">DELIVERY DETAILS</string>
+    <string name="item_details">Item Details</string>
+    
+    <!-- Form labels -->
+    <string name="name_label">Name</string>
+    <string name="location_drop_off_label">Location Drop Off</string>
+    <string name="address_label">Address</string>
+    <string name="postal_code_label">Postal Code</string>
+    <string name="item_label">ITEM</string>
+    <string name="item_number">Item %1$d</string>
+    <string name="type_number">Type %1$d</string>
+    <string name="weight_number">Weight %1$d (Estimation)</string>
+    <string name="upload_photo_number">Upload Photo or Video %1$d</string>
+    <string name="drop_off_date_label">Drop Off Date</string>
+    <string name="type_label">Type</string>
+    <string name="weight_label">Weight</string>
+    
+    <!-- Placeholders -->
+    <string name="name_placeholder">Name</string>
+    <string name="select_location_placeholder">Select location</string>
+    <string name="address_placeholder">Address</string>
+    <string name="postal_code_placeholder">Postal Code</string>
+    <string name="item_name_placeholder">Daun Kering</string>
+    <string name="organic_placeholder">Organic</string>
+    <string name="weight_placeholder">&gt; 1kg</string>
+    
+    <!-- Dropdown options -->
+    <string name="organic_option">Organic</string>
+    <string name="non_organic_option">Non-Organic</string>
+    <string name="b3_option">B3</string>
+    <string name="weight_less_1kg">&lt; 1 kg</string>
+    <string name="weight_4_6kg">&gt;4 kg - &lt;6 kg</string>
+    <string name="weight_7_9kg">&gt;7 kg - &lt;9 kg</string>
+    <string name="weight_more_10kg">&gt;10 kg</string>
+    
+    <!-- Buttons -->
+    <string name="add_item_button">Add Item</string>
+    <string name="make_order_button">MAKE ORDER</string>
+    <string name="submit_button">SUBMIT</string>
+    <string name="upload_photo_button">Upload Photo</string>
+    <string name="add_more_photos_button">Add More Photos</string>
+    
+    <!-- Dialog titles -->
+    <string name="nearest_delivery_location_title">Nearest Delivery Location</string>
+    
+    <!-- Validation errors (for UI only) -->
+    <string name="item_name_required_error">Item name is required</string>
+    <string name="photo_required_error">At least one photo is required</string>
+    
+    <!-- Distance format -->
+    <string name="distance_format">%.2f km</string>
+    
+    <!-- Points display -->
+    <string name="total_points_format">Total Points: %1$d Points</string>
+    <string name="item_points_format">Item %1$d: %2$d Points</string>
+    
+    <!-- Disclaimer text -->
+    <string name="points_disclaimer">*The points above are temporary. Points will change after the Revibe team re-checks the items regarding the type of item and weight of the item.\n*Please double check your shipping data details before submit.</string>
+    
+    <!-- Content descriptions -->
+    <string name="dropdown_icon_desc">Dropdown Icon</string>
+    <string name="location_icon_desc">Location Icon</string>
+    <string name="remove_item_desc">Remove Item</string>
+    <string name="back_desc">Back</string>
+    <string name="revibes_logo_desc">Revibes Logo</string>
+    <string name="upload_photo_desc">Upload Photo</string>
+    <string name="uploaded_photo_desc">Uploaded Photo</string>
+    
+    <!-- Constants -->
+    <string name="order_type_drop_off">drop-off</string>
+    
+    <!-- Log tags -->
+    <string name="drop_off_exception_handler_tag">DropOffExceptionHandler</string>
+    
+    <!-- Type values -->
+    <string name="organic_type_value">organic</string>
+    <string name="non_organic_type_value">non-organic</string>
+    <string name="b3_type_value">b3</string>
+    
+    <!-- Technical strings -->
+    <string name="empty_string"></string>
+    <string name="default_image_content_type">image/jpeg</string>
+    <string name="image_mime_type">image/*</string>
+    <string name="colon_separator">:</string>
+</resources>

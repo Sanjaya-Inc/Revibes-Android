@@ -105,6 +105,7 @@ private fun DropOffConfirmationWrapperScreen(
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<DropOffConfirmationScreenUiEvent> = EventReceiver { },
 ) {
+    val context = LocalContext.current
     Scaffold(
         modifier = modifier.statusBarsPadding(),
         containerColor = RevibesTheme.colors.background,
@@ -121,11 +122,11 @@ private fun DropOffConfirmationWrapperScreen(
                         painter = painterResource(R.drawable.back_cta),
                         modifier = Modifier.size(86.dp),
                         tint = Color.Unspecified,
-                        contentDescription = "Back"
+                        contentDescription = context.getString(com.carissa.revibes.drop_off.R.string.back_desc)
                     )
                 }
                 Text(
-                    text = "Drop Off Booking Details",
+                    text = context.getString(com.carissa.revibes.drop_off.R.string.drop_off_booking_details),
                     style = RevibesTheme.typography.h2,
                     color = RevibesTheme.colors.primary,
                     fontWeight = FontWeight.Medium,
@@ -181,6 +182,7 @@ private fun DropOffConfirmationScreenContent(
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<DropOffConfirmationScreenUiEvent> = EventReceiver { },
 ) {
+    val context = LocalContext.current
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -190,7 +192,7 @@ private fun DropOffConfirmationScreenContent(
     ) {
         Image(
             painter = painterResource(R.drawable.main_logo),
-            contentDescription = "Revibes Logo",
+            contentDescription = context.getString(com.carissa.revibes.drop_off.R.string.revibes_logo_desc),
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .height(36.dp)
@@ -198,7 +200,7 @@ private fun DropOffConfirmationScreenContent(
                 .align(Alignment.Start)
         )
         Text(
-            "DELIVERY DETAILS",
+            context.getString(com.carissa.revibes.drop_off.R.string.delivery_details),
             style = RevibesTheme.typography.h1,
             fontWeight = FontWeight.W500,
             color = RevibesTheme.colors.primary,
@@ -206,17 +208,17 @@ private fun DropOffConfirmationScreenContent(
         )
 
         DetailRow(
-            "Name",
+            context.getString(com.carissa.revibes.drop_off.R.string.name_label),
             arguments.name,
             Modifier.padding(top = 8.dp)
         )
         DetailRow(
-            "Location Drop Off",
+            context.getString(com.carissa.revibes.drop_off.R.string.location_drop_off_label),
             arguments.store.address,
             Modifier.padding(vertical = 2.dp)
         )
         DetailRow(
-            "Drop Off Date",
+            context.getString(com.carissa.revibes.drop_off.R.string.drop_off_date_label),
             DateUtil.getTodayDate(),
             Modifier.padding(vertical = 2.dp)
         )
@@ -226,7 +228,7 @@ private fun DropOffConfirmationScreenContent(
             color = RevibesTheme.colors.primary
         )
         Text(
-            text = "Item Details",
+            text = context.getString(com.carissa.revibes.drop_off.R.string.item_details),
             style = RevibesTheme.typography.h4,
             fontWeight = FontWeight.W500,
             modifier = Modifier
@@ -235,9 +237,12 @@ private fun DropOffConfirmationScreenContent(
         )
 
         arguments.items.forEachIndexed { index, item ->
-            DetailRow("Item ${index + 1}", item.name)
-            DetailRow("Type", item.type)
-            DetailRow("Weight", item.weight?.first.orEmpty())
+            DetailRow(context.getString(com.carissa.revibes.drop_off.R.string.item_number, index + 1), item.name)
+            DetailRow(context.getString(com.carissa.revibes.drop_off.R.string.type_label), item.type)
+            DetailRow(
+                context.getString(com.carissa.revibes.drop_off.R.string.weight_label),
+                item.weight?.first.orEmpty()
+            )
             Spacer(Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -263,14 +268,18 @@ private fun DropOffConfirmationScreenContent(
             color = RevibesTheme.colors.primary
         )
         Text(
-            text = "Total Points: ${arguments.totalPoints} Points",
+            text = context.getString(com.carissa.revibes.drop_off.R.string.total_points_format, arguments.totalPoints),
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(vertical = 2.dp),
         )
         arguments.items.forEachIndexed { index, item ->
             Text(
-                text = "Item ${index + 1}: ${item.point} Points",
+                text = context.getString(
+                    com.carissa.revibes.drop_off.R.string.item_points_format,
+                    index + 1,
+                    item.point
+                ),
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(vertical = 2.dp),
@@ -279,15 +288,13 @@ private fun DropOffConfirmationScreenContent(
 
         Spacer(Modifier.height(16.dp))
         Text(
-            "*The points above are temporary. Points will change after the Revibe team " +
-                "re-checks the items regarding the type of item and weight of the item.\n*Please" +
-                " double check your shipping data details before submit.",
+            context.getString(com.carissa.revibes.drop_off.R.string.points_disclaimer),
             style = RevibesTheme.typography.label3.copy(color = Color.Red),
             fontWeight = FontWeight.W500,
         )
 
         Button(
-            text = "SUBMIT",
+            text = context.getString(com.carissa.revibes.drop_off.R.string.submit_button),
             onClick = { eventReceiver.onEvent(event = MakeOrder(arguments = arguments)) },
             enabled = true,
             loading = uiState.isLoading,
@@ -304,12 +311,16 @@ fun DetailRow(
     value: String,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.Top
     ) {
-        Text("$label:", fontWeight = FontWeight.Bold)
+        Text(
+            "$label${context.getString(com.carissa.revibes.drop_off.R.string.colon_separator)}",
+            fontWeight = FontWeight.Bold
+        )
         Text(value)
     }
 }

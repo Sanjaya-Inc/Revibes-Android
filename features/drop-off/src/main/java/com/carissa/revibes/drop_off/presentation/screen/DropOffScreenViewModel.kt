@@ -173,14 +173,14 @@ class DropOffScreenViewModel(
 
         val nameError = if (name.text.trim().isEmpty()) {
             isValid = false
-            "Name is required"
+            NAME_REQUIRED_ERROR
         } else {
             null
         }
 
         val storeError = if (selectedStore == null) {
             isValid = false
-            "Please select a drop-off location"
+            LOCATION_REQUIRED_ERROR
         } else {
             null
         }
@@ -188,7 +188,7 @@ class DropOffScreenViewModel(
         val itemsError = when {
             state.items.isEmpty() -> {
                 isValid = false
-                "Please add at least one item"
+                ITEM_REQUIRED_ERROR
             }
 
             !state.items.all { item ->
@@ -198,7 +198,7 @@ class DropOffScreenViewModel(
                     item.photos.isNotEmpty()
             } -> {
                 isValid = false
-                "Please complete all item details (name, type, weight, and photo)"
+                ITEM_DETAILS_REQUIRED_ERROR
             }
 
             else -> null
@@ -301,10 +301,14 @@ class DropOffScreenViewModel(
                 if (uploadSuccess) {
                     onEvent(DropOffScreenUiEvent.OnImageUploadSuccess(itemIndex, downloadUrl))
                 } else {
-                    onEvent(DropOffScreenUiEvent.OnImageUploadFailed("Failed to upload image"))
+                    onEvent(DropOffScreenUiEvent.OnImageUploadFailed(UPLOAD_FAILED_MESSAGE))
                 }
             } catch (e: Exception) {
-                onEvent(DropOffScreenUiEvent.OnImageUploadFailed(e.message ?: "Unknown error"))
+                onEvent(
+                    DropOffScreenUiEvent.OnImageUploadFailed(
+                        e.message ?: UNKNOWN_ERROR_MESSAGE
+                    )
+                )
             }
             reduce { state.copy(isLoading = false) }
         }
@@ -335,13 +339,10 @@ class DropOffScreenViewModel(
             reduce { state.copy(isLoading = true) }
             val orderId = requireNotNull(
                 value = state.currentOrderId
-            ) { "Current order id should not null!" }
+            ) { DROP_OFF_SESSION_FAILED_MESSAGE }
             val selectedStore = requireNotNull(
                 value = state.selectedStore
-            ) { "Selected store should not null!" }
-            val name = requireNotNull(
-                value = state.name.text
-            ) { "Name should not null!" }
+            ) { DROP_OFF_SESSION_FAILED_MESSAGE }
             val arguments = DropOffConfirmationScreenArguments(
                 orderId = orderId,
                 type = ORDER_TYPE_DROP_OFF,
@@ -378,7 +379,16 @@ class DropOffScreenViewModel(
         }
     }
 
-    companion object {
-        private const val ORDER_TYPE_DROP_OFF = "drop-off"
+    private companion object {
+        const val ORDER_TYPE_DROP_OFF = "drop-off"
+
+        const val NAME_REQUIRED_ERROR = "Name is required"
+        const val LOCATION_REQUIRED_ERROR = "Please select a drop-off location"
+        const val ITEM_REQUIRED_ERROR = "Please add at least one item"
+        const val ITEM_DETAILS_REQUIRED_ERROR =
+            "Please complete all item details (name, type, weight, and photo)"
+        const val UPLOAD_FAILED_MESSAGE = "Failed to upload image"
+        const val UNKNOWN_ERROR_MESSAGE = "Unknown error"
+        const val DROP_OFF_SESSION_FAILED_MESSAGE = "Failed to initiate the Drop off session!"
     }
 }

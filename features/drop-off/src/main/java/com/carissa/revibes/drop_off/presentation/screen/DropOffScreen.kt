@@ -73,7 +73,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.DropOffDialogBg
 import com.carissa.revibes.core.presentation.components.DropOffDialogItemBg
@@ -85,6 +84,7 @@ import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.core.presentation.components.components.RevibesLoading
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextField
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
+import com.carissa.revibes.drop_off.R
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.navigation.DropOffGraph
 import com.ramcosta.composedestinations.annotation.Destination
@@ -93,7 +93,6 @@ import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
-import java.util.Locale
 
 @Destination<DropOffGraph>(start = true)
 @Composable
@@ -123,7 +122,7 @@ fun DropOffScreen(
         containerColor = Color.Transparent,
         topBar = {
             CommonHeader(
-                title = "Drop Off",
+                title = context.getString(R.string.drop_off_title),
                 backgroundDrawRes = R.drawable.bg_drop_off,
                 searchTextFieldValue = searchText,
                 onTextChange = { searchText = it },
@@ -174,7 +173,7 @@ fun DropOffScreenContent(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Name",
+            context.getString(R.string.name_label),
             color = DropOffLabelColor,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
@@ -182,7 +181,12 @@ fun DropOffScreenContent(
             value = name,
             singleLine = true,
             onValueChange = { eventReceiver.onEvent(DropOffScreenUiEvent.OnNameChange(it)) },
-            placeholder = { Text("Name", color = DropOffPlaceholderColor) },
+            placeholder = {
+                Text(
+                    context.getString(R.string.name_placeholder),
+                    color = DropOffPlaceholderColor
+                )
+            },
             modifier = Modifier.padding(horizontal = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
                 capitalization = KeyboardCapitalization.Words
@@ -207,7 +211,7 @@ fun DropOffScreenContent(
             )
         }
         Text(
-            "Location Drop Off",
+            context.getString(R.string.location_drop_off_label),
             color = DropOffLabelColor,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
@@ -218,7 +222,12 @@ fun DropOffScreenContent(
             OutlinedTextField(
                 value = selectedStore?.name.orEmpty(),
                 onValueChange = { },
-                placeholder = { Text("Select location", color = DropOffPlaceholderColor) },
+                placeholder = {
+                    Text(
+                        context.getString(R.string.select_location_placeholder),
+                        color = DropOffPlaceholderColor
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors().copy(
                     focusedContainerColor = DropOffTextFieldBg,
@@ -240,7 +249,7 @@ fun DropOffScreenContent(
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "Dropdown Icon",
+                        contentDescription = context.getString(R.string.dropdown_icon_desc),
                         tint = RevibesTheme.colors.primary,
                         modifier = Modifier.padding(end = 8.dp)
                     )
@@ -273,7 +282,7 @@ fun DropOffScreenContent(
                 containerColor = DropOffDialogBg,
                 title = {
                     Text(
-                        text = "Nearest Delivery Location",
+                        text = context.getString(R.string.nearest_delivery_location_title),
                         style = RevibesTheme.typography.h2,
                         color = RevibesTheme.colors.onPrimary
                     )
@@ -309,16 +318,15 @@ fun DropOffScreenContent(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(
                                             imageVector = Icons.Default.LocationOn,
-                                            contentDescription = "Location Icon",
+                                            contentDescription = context.getString(R.string.location_icon_desc),
                                             tint = RevibesTheme.colors.primary,
                                             modifier = Modifier
                                                 .size(16.dp)
                                                 .padding(end = 4.dp)
                                         )
                                         Text(
-                                            text = String.format(
-                                                Locale.getDefault(),
-                                                "%.2f km",
+                                            text = context.getString(
+                                                R.string.distance_format,
                                                 loc.distance
                                             ),
                                             style = RevibesTheme.typography.body2,
@@ -335,7 +343,12 @@ fun DropOffScreenContent(
         OutlinedTextField(
             value = selectedStore?.address.orEmpty(),
             onValueChange = {},
-            placeholder = { Text("Address", color = DropOffLabelColor) },
+            placeholder = {
+                Text(
+                    context.getString(R.string.address_placeholder),
+                    color = DropOffLabelColor
+                )
+            },
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
             singleLine = false,
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -356,7 +369,12 @@ fun DropOffScreenContent(
             value = selectedStore?.postalCode ?: "",
             onValueChange = {},
             singleLine = true,
-            placeholder = { Text("Postal Code", color = DropOffLabelColor) },
+            placeholder = {
+                Text(
+                    context.getString(R.string.postal_code_placeholder),
+                    color = DropOffLabelColor
+                )
+            },
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
@@ -373,7 +391,7 @@ fun DropOffScreenContent(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "ITEM",
+            text = context.getString(R.string.item_label),
             style = RevibesTheme.typography.h2,
             color = DropOffLabelColor,
             modifier = Modifier
@@ -439,7 +457,10 @@ fun DropOffScreenContent(
             ),
             border = null
         ) {
-            Text(text = "Add Item", color = RevibesTheme.colors.primary)
+            Text(
+                text = context.getString(R.string.add_item_button),
+                color = RevibesTheme.colors.primary
+            )
         }
         validationErrors.itemsError?.let { error ->
             Text(
@@ -465,7 +486,7 @@ fun DropOffScreenContent(
                     disabledContentColor = Color.White
                 )
             ) {
-                Text("MAKE ORDER")
+                Text(context.getString(R.string.make_order_button))
             }
         }
     }
@@ -487,26 +508,33 @@ private fun ItemSection(
     val isItemPhotosValid = item.photos.isNotEmpty()
     val context = LocalContext.current
     val typeOptions = listOf(
-        "Organic" to "organic",
-        "Non-Organic" to "non-organic",
-        "B3" to "b3"
+        context.getString(R.string.organic_option) to context.getString(R.string.organic_type_value),
+        context.getString(R.string.non_organic_option) to context.getString(R.string.non_organic_type_value),
+        context.getString(R.string.b3_option) to context.getString(R.string.b3_type_value)
     )
     var expanded by remember { mutableStateOf(false) }
     val weightOptions = listOf(
-        "< 1 kg" to 1,
-        ">4 kg - <6 kg" to 5,
-        ">7 kg - <9 kg" to 8,
-        ">10 kg" to 10
+        context.getString(R.string.weight_less_1kg) to 1,
+        context.getString(R.string.weight_4_6kg) to 5,
+        context.getString(R.string.weight_7_9kg) to 8,
+        context.getString(R.string.weight_more_10kg) to 10
     )
-    val selectedTypeLabel = typeOptions.find { it.second == item.type }?.first ?: ""
+    val selectedTypeLabel = typeOptions.find { it.second == item.type }?.first ?: context.getString(
+        R.string.empty_string
+    )
     var weightExpanded by remember { mutableStateOf(false) }
-    val selectedWeightLabel = weightOptions.find { it.second == item.weight?.second }?.first ?: ""
+    val selectedWeightLabel =
+        weightOptions.find { it.second == item.weight?.second }?.first ?: context.getString(
+            R.string.empty_string
+        )
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { selectedUri ->
-            val contentType = context.contentResolver.getType(selectedUri) ?: "image/jpeg"
+            val contentType = context.contentResolver.getType(selectedUri) ?: context.getString(
+                R.string.default_image_content_type
+            )
             onImageUpload(selectedUri, contentType)
         }
     }
@@ -520,20 +548,28 @@ private fun ItemSection(
         Column {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = "Item ${index + 1}",
+                    text = context.getString(R.string.item_number, index + 1),
                     color = DropOffLabelColor,
                     modifier = Modifier
                         .weight(1f)
                         .padding(top = 8.dp, bottom = 4.dp)
                 )
                 IconButton(onClick = onRemove) {
-                    Icon(Icons.Default.Delete, contentDescription = "Remove Item")
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = context.getString(R.string.remove_item_desc)
+                    )
                 }
             }
             OutlinedTextField(
                 value = item.name,
                 onValueChange = { onItemChange(item.copy(name = it)) },
-                placeholder = { Text("Daun Kering", color = DropOffPlaceholderColor) },
+                placeholder = {
+                    Text(
+                        context.getString(R.string.item_name_placeholder),
+                        color = DropOffPlaceholderColor
+                    )
+                },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     capitalization = KeyboardCapitalization.Words
@@ -551,7 +587,7 @@ private fun ItemSection(
             )
             if (!isItemNameValid) {
                 Text(
-                    text = "Item name is required",
+                    text = context.getString(R.string.item_name_required_error),
                     color = Color.Red,
                     style = RevibesTheme.typography.body2,
                     modifier = Modifier.padding(top = 4.dp)
@@ -563,7 +599,7 @@ private fun ItemSection(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = "Type ${index + 1}",
+                        text = context.getString(R.string.type_number, index + 1),
                         color = DropOffLabelColor,
                         modifier = Modifier
                             .padding(top = 8.dp, bottom = 4.dp)
@@ -578,7 +614,12 @@ private fun ItemSection(
                             value = selectedTypeLabel,
                             onValueChange = {},
                             readOnly = true,
-                            placeholder = { Text("Organic", color = DropOffPlaceholderColor) },
+                            placeholder = {
+                                Text(
+                                    context.getString(R.string.organic_placeholder),
+                                    color = DropOffPlaceholderColor
+                                )
+                            },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                             modifier = Modifier
                                 .menuAnchor()
@@ -612,7 +653,7 @@ private fun ItemSection(
                 }
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = "Weight ${index + 1} (Estimation)",
+                        text = context.getString(R.string.weight_number, index + 1),
                         color = DropOffLabelColor,
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                     )
@@ -625,7 +666,12 @@ private fun ItemSection(
                             value = selectedWeightLabel,
                             onValueChange = {},
                             readOnly = true,
-                            placeholder = { Text("> 1kg", color = DropOffPlaceholderColor) },
+                            placeholder = {
+                                Text(
+                                    context.getString(R.string.weight_placeholder),
+                                    color = DropOffPlaceholderColor
+                                )
+                            },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = weightExpanded) },
                             modifier = Modifier
                                 .menuAnchor()
@@ -660,7 +706,7 @@ private fun ItemSection(
                 }
             }
             Text(
-                text = "Upload Photo or Video ${index + 1}",
+                text = context.getString(R.string.upload_photo_number, index + 1),
                 color = DropOffLabelColor,
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
             )
@@ -673,7 +719,7 @@ private fun ItemSection(
                     items(item.photos) { photoUrl ->
                         AsyncImage(
                             model = photoUrl,
-                            contentDescription = "Uploaded Photo",
+                            contentDescription = context.getString(R.string.uploaded_photo_desc),
                             modifier = Modifier
                                 .size(80.dp)
                                 .clip(RoundedCornerShape(8.dp)),
@@ -690,19 +736,23 @@ private fun ItemSection(
                         shape = RoundedCornerShape(16.dp)
                     )
                     .clickable {
-                        imagePickerLauncher.launch("image/*")
+                        imagePickerLauncher.launch(context.getString(R.string.image_mime_type))
                     }
                     .padding(16.dp)
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_upload),
-                    contentDescription = "Upload Photo",
+                    contentDescription = context.getString(R.string.upload_photo_desc),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(36.dp)
                 )
                 Text(
-                    text = if (item.photos.isEmpty()) "Upload Photo" else "Add More Photos",
+                    text = if (item.photos.isEmpty()) {
+                        context.getString(R.string.upload_photo_button)
+                    } else {
+                        context.getString(R.string.add_more_photos_button)
+                    },
                     color = DropOffPlaceholderColor,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -712,7 +762,7 @@ private fun ItemSection(
             }
             if (!isItemPhotosValid) {
                 Text(
-                    text = "At least one photo is required",
+                    text = context.getString(R.string.photo_required_error),
                     color = Color.Red,
                     style = RevibesTheme.typography.body2,
                     modifier = Modifier.padding(top = 4.dp)
