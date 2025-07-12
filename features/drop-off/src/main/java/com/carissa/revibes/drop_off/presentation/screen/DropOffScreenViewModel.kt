@@ -3,9 +3,6 @@
  */
 package com.carissa.revibes.drop_off.presentation.screen
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
@@ -25,7 +22,13 @@ data class DropOffScreenUiState(
     val stores: ImmutableList<StoreData> = persistentListOf(),
     val currentOrderId: String? = null,
     val items: ImmutableList<DropOffItem> = persistentListOf(),
-)
+    val selectedStore: StoreData? = null,
+    val name: TextFieldValue = TextFieldValue()
+) {
+
+    val isButtonEnabled: Boolean
+        get() = currentOrderId != null && selectedStore != null && name.text.isNotBlank()
+}
 
 sealed interface DropOffScreenUiEvent : NavigationEvent {
     data object NavigateToProfile : DropOffScreenUiEvent
@@ -69,11 +72,6 @@ class DropOffScreenViewModel(
         onEvent(DropOffScreenUiEvent.LoadDropOffData)
     }
 ) {
-    var name by mutableStateOf(TextFieldValue(""))
-        private set
-    var selectedStore by mutableStateOf<StoreData?>(null)
-        private set
-
     override fun onEvent(event: DropOffScreenUiEvent) {
         super.onEvent(event)
         intent {
@@ -99,12 +97,12 @@ class DropOffScreenViewModel(
         }
     }
 
-    private fun onNameChange(value: TextFieldValue) {
-        name = value
+    private fun onNameChange(value: TextFieldValue) = intent {
+        reduce { state.copy(name = value) }
     }
 
-    private fun onStoreSelected(storeData: StoreData) {
-        selectedStore = storeData
+    private fun onStoreSelected(storeData: StoreData) = intent {
+        reduce { state.copy(selectedStore = storeData) }
     }
 
     private fun loadDropOffData() {
@@ -164,14 +162,17 @@ class DropOffScreenViewModel(
             reduce { state.copy(isLoading = true) }
             val orderId = requireNotNull(
                 value = state.currentOrderId
-            ) { "Failed to initiate the Drop off session!" }
+            ) { "Current order id should not null!" }
             val selectedStore = requireNotNull(
-                value = selectedStore
-            ) { "Failed to initiate the Drop off session!" }
+                value = state.selectedStore
+            ) { "Selected store should not null!" }
+            val name = requireNotNull(
+                value = state.name.text
+            ) { "Name should not null!" }
             val arguments = DropOffConfirmationScreenArguments(
                 orderId = orderId,
                 type = ORDER_TYPE_DROP_OFF,
-                name = name.text,
+                name = name,
                 store = selectedStore,
                 totalPoints = 200, // This should be calculated based on items
                 items = state.items,

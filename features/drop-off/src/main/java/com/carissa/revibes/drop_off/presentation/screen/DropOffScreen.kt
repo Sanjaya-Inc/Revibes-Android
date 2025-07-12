@@ -129,10 +129,11 @@ fun DropOffScreen(
                     .background(RevibesTheme.colors.background),
                 orderId = state.currentOrderId.orEmpty(),
                 items = state.items,
-                name = viewModel.name,
+                name = state.name,
                 eventReceiver = viewModel,
                 nearestStores = state.stores,
-                selectedStore = viewModel.selectedStore
+                selectedStore = state.selectedStore,
+                isButtonEnabled = state.isButtonEnabled
             )
         }
     }
@@ -142,6 +143,7 @@ fun DropOffScreen(
 fun DropOffScreenContent(
     modifier: Modifier = Modifier,
     orderId: String = "",
+    isButtonEnabled: Boolean = true,
     items: ImmutableList<DropOffItem> = persistentListOf(),
     name: TextFieldValue = TextFieldValue(""),
     eventReceiver: EventReceiver<DropOffScreenUiEvent> = EventReceiver { },
@@ -396,7 +398,8 @@ fun DropOffScreenContent(
                 colors = ButtonDefaults.buttonColors().copy(
                     containerColor = RevibesTheme.colors.primary,
                     contentColor = Color.White
-                )
+                ),
+                enabled = isButtonEnabled
             ) {
                 Text("MAKE ORDER")
             }
