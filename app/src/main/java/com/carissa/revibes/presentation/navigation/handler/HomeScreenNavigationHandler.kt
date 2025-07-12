@@ -21,7 +21,7 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
 
     override fun canHandle(event: NavigationEvent): Boolean {
         return event is HomeScreenUiEvent.NavigateToProfile ||
-            event is ProfileScreenUiEvent.LogoutClicked ||
+            event is ProfileScreenUiEvent.NavigateToLogin ||
             event is HomeScreenUiEvent.NavigateToShop ||
             event is HomeScreenUiEvent.NavigateToExchangePoints ||
             event is HomeScreenUiEvent.NavigateToTransactionHistory ||
@@ -39,7 +39,7 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
             )
 
             is HomeScreenUiEvent.NavigateToProfile -> navigator.navigate(ProfileScreenDestination)
-            is ProfileScreenUiEvent.LogoutClicked -> navigator.navigate(SplashScreenDestination) {
+            is ProfileScreenUiEvent.NavigateToLogin -> navigator.navigate(SplashScreenDestination) {
                 popUpTo(HomeScreenDestination) { inclusive = true }
             }
 

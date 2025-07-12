@@ -8,7 +8,6 @@ import android.net.Uri
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.drop_off.data.DropOffRepository
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import kotlinx.collections.immutable.ImmutableList
@@ -36,10 +35,10 @@ data class ValidationErrors(
     val itemsError: String? = null,
 )
 
-sealed interface DropOffScreenUiEvent : NavigationEvent {
-    data object NavigateToProfile : DropOffScreenUiEvent
+sealed interface DropOffScreenUiEvent {
+    data object NavigateToProfile : DropOffScreenUiEvent, NavigationEvent
     data class NavigateToConfirmOrder(val arguments: DropOffConfirmationScreenArguments) :
-        DropOffScreenUiEvent
+        DropOffScreenUiEvent, NavigationEvent
 
     data object LoadDropOffData : DropOffScreenUiEvent
     data class OnLoadDropOffDataFailed(override val message: String) : DropOffScreenUiEvent,
@@ -88,7 +87,6 @@ data class DropOffItem(
 
 @KoinViewModel
 class DropOffScreenViewModel(
-    private val navigationEventBus: NavigationEventBus,
     private val dropOffRepository: DropOffRepository,
 ) : BaseViewModel<DropOffScreenUiState, DropOffScreenUiEvent>(
     initialState = DropOffScreenUiState(),
@@ -110,8 +108,6 @@ class DropOffScreenViewModel(
         super.onEvent(event)
         intent {
             when (event) {
-                is DropOffScreenUiEvent.NavigateToProfile -> navigationEventBus.post(event)
-                is DropOffScreenUiEvent.NavigateToConfirmOrder -> navigationEventBus.post(event)
                 is DropOffScreenUiEvent.LoadDropOffData -> loadDropOffData()
                 is DropOffScreenUiEvent.AddItemToOrder -> addItemToOrder(event.orderId)
                 is DropOffScreenUiEvent.MakeOrder -> makeOrder()

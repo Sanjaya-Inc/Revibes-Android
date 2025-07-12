@@ -12,7 +12,7 @@ class ExchangePointDetailScreenNavigationHandler : NavigationEventHandler() {
 
     override fun canHandle(event: NavigationEvent): Boolean {
         return event is ExchangePointDetailScreenUiEvent.NavigateToProfile ||
-            event is ExchangePointDetailScreenUiEvent.ConfirmPurchase
+            event is ExchangePointDetailScreenUiEvent.NavigateToConfirmation
     }
 
     override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
@@ -21,7 +21,7 @@ class ExchangePointDetailScreenNavigationHandler : NavigationEventHandler() {
                 ProfileScreenDestination
             )
 
-            is ExchangePointDetailScreenUiEvent.ConfirmPurchase -> {
+            is ExchangePointDetailScreenUiEvent.NavigateToConfirmation -> {
                 println("ketai: ExchangePointDetailScreenNavigationHandler")
                 navigator.navigate(ExchangePointConfirmationScreenDestination)
             }

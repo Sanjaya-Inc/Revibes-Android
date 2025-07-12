@@ -5,7 +5,6 @@ package com.carissa.revibes.drop_off.presentation.screen
 
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.drop_off.data.DropOffRepository
 import com.carissa.revibes.drop_off.data.SubmitOrderItemData
 import com.carissa.revibes.drop_off.domain.model.StoreData
@@ -16,8 +15,8 @@ data class DropOffConfirmationScreenUiState(
     val isLoading: Boolean = false,
 )
 
-sealed interface DropOffConfirmationScreenUiEvent : NavigationEvent {
-    data object NavigateToHome : DropOffConfirmationScreenUiEvent
+sealed interface DropOffConfirmationScreenUiEvent {
+    data object NavigateToHome : DropOffConfirmationScreenUiEvent, NavigationEvent
 
     data class MakeOrder(val arguments: DropOffConfirmationScreenArguments) : DropOffConfirmationScreenUiEvent
 
@@ -26,7 +25,6 @@ sealed interface DropOffConfirmationScreenUiEvent : NavigationEvent {
 
 @KoinViewModel
 class DropOffConfirmationScreenViewModel(
-    private val navigationEventBus: NavigationEventBus,
     private val dropOffRepository: DropOffRepository,
     private val dropOffExceptionHandler: DropOffExceptionHandler,
 ) : BaseViewModel<DropOffConfirmationScreenUiState, DropOffConfirmationScreenUiEvent>(
@@ -57,8 +55,8 @@ class DropOffConfirmationScreenViewModel(
                     )
                 }
 
-                is DropOffConfirmationScreenUiEvent.NavigateToHome -> navigationEventBus.post(event)
                 is DropOffConfirmationScreenUiEvent.OnMakeOrderFailed -> Unit
+                else -> Unit
             }
         }
     }
@@ -81,7 +79,7 @@ class DropOffConfirmationScreenViewModel(
                 items = items
             )
             reduce { state.copy(isLoading = false) }
-            navigationEventBus.post(DropOffConfirmationScreenUiEvent.NavigateToHome)
+            onEvent(DropOffConfirmationScreenUiEvent.NavigateToHome)
         }
     }
 }

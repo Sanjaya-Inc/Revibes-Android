@@ -6,18 +6,18 @@ import com.carissa.revibes.auth.presentation.screen.login.LoginScreenUiEvent
 import com.carissa.revibes.auth.presentation.screen.login.LoginScreenUiState
 import com.carissa.revibes.core.data.auth.local.AuthTokenDataSource
 import com.carissa.revibes.core.data.user.local.UserDataSource
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
+import com.carissa.revibes.core.presentation.EventReceiver
 import org.koin.core.annotation.Factory
 import org.orbitmvi.orbit.syntax.Syntax
 
 @Factory
 class LoginSubmitHandler(
     private val authRepo: AuthRepository,
-    private val navigationEventBus: NavigationEventBus,
     private val userDataSource: UserDataSource,
     private val authTokenDataSource: AuthTokenDataSource,
 ) {
     suspend fun doLogin(
+        eventReceiver: EventReceiver<LoginScreenUiEvent>,
         syntax: Syntax<LoginScreenUiState, LoginScreenUiEvent>,
     ) {
         syntax.reduce {
@@ -37,6 +37,6 @@ class LoginSubmitHandler(
         val userData = loginResult.user.toUserData(email)
         userDataSource.setUserValue(userData)
 
-        navigationEventBus.post(LoginScreenUiEvent.NavigateToHome)
+        eventReceiver.onEvent(LoginScreenUiEvent.NavigateToHome)
     }
 }

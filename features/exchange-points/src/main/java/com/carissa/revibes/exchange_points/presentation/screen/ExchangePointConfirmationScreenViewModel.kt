@@ -5,7 +5,6 @@ package com.carissa.revibes.exchange_points.presentation.screen
 
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import org.koin.android.annotation.KoinViewModel
 
 data class ExchangePointConfirmationScreenUiState(
@@ -26,18 +25,7 @@ sealed interface ExchangePointConfirmationScreenUiEvent {
 }
 
 @KoinViewModel
-class ExchangePointConfirmationScreenViewModel(
-    private val navigationEventBus: NavigationEventBus
-) :
+class ExchangePointConfirmationScreenViewModel :
     BaseViewModel<ExchangePointConfirmationScreenUiState, ExchangePointConfirmationScreenUiEvent>(
         ExchangePointConfirmationScreenUiState()
-    ) {
-
-    fun handleEvent(event: ExchangePointConfirmationScreenUiEvent) {
-        when (event) {
-            is ExchangePointConfirmationScreenUiEvent.NavigateToHome -> {
-                navigationEventBus.post(event)
-            }
-        }
-    }
-}
+    )

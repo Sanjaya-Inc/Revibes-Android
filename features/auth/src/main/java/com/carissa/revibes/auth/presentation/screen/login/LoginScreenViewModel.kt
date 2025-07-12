@@ -49,6 +49,7 @@ class LoginScreenViewModel(
 ) {
 
     override fun onEvent(event: LoginScreenUiEvent) {
+        super.onEvent(event)
         intent {
             super.onEvent(event)
             when (event) {
@@ -60,7 +61,10 @@ class LoginScreenViewModel(
                     this.state.copy(password = event.password)
                 }
 
-                LoginScreenUiEvent.SubmitLogin -> loginSubmitHandler.doLogin(this)
+                LoginScreenUiEvent.SubmitLogin -> loginSubmitHandler.doLogin(
+                    this@LoginScreenViewModel,
+                    this
+                )
 
                 else -> postSideEffect(event)
             }

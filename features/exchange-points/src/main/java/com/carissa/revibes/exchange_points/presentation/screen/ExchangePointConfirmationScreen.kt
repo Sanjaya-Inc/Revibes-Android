@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.Yellow900
 import com.carissa.revibes.core.presentation.components.components.Button
@@ -59,16 +60,16 @@ fun ExchangePointConfirmationScreen(
     val state = viewModel.collectAsState().value
     ExchangePointConfirmationScreenContent(
         uiState = state,
-        onEvent = viewModel::handleEvent,
-        modifier = modifier
+        modifier = modifier,
+        eventReceiver = viewModel
     )
 }
 
 @Composable
 private fun ExchangePointConfirmationScreenContent(
     uiState: ExchangePointConfirmationScreenUiState,
-    onEvent: (ExchangePointConfirmationScreenUiEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    eventReceiver: EventReceiver<ExchangePointConfirmationScreenUiEvent> = EventReceiver {},
 ) {
     Scaffold(
         modifier = modifier
@@ -178,7 +179,7 @@ private fun ExchangePointConfirmationScreenContent(
             Button(
                 text = stringResource(R.string.home),
                 variant = ButtonVariant.Primary,
-                onClick = { onEvent(ExchangePointConfirmationScreenUiEvent.NavigateToHome) },
+                onClick = { eventReceiver.onEvent(ExchangePointConfirmationScreenUiEvent.NavigateToHome) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 4.dp)
@@ -334,8 +335,7 @@ private fun ExchangePointConfirmationScreenPreview() {
                 paymentStatus = "SUCCESS", // Preview default
                 couponName = "Shopee Coupon 70% off", // Preview default
                 couponValidUntil = "Valid until 31 December 2024" // Preview default
-            ),
-            onEvent = {}
+            )
         )
     }
 }

@@ -2,7 +2,10 @@ package com.carissa.revibes.core.presentation
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
+import com.carissa.revibes.core.presentation.navigation.NavigationEvent
+import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import kotlinx.coroutines.CoroutineExceptionHandler
+import org.koin.java.KoinJavaComponent
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.Syntax
@@ -15,6 +18,7 @@ fun interface EventReceiver<Event : Any> {
 
 abstract class BaseViewModel<State : Any, Event : Any>(
     initialState: State,
+    private val navigationEventBus: NavigationEventBus = KoinJavaComponent.get(NavigationEventBus::class.java),
     exceptionHandler: (suspend EventReceiver<Event>.(Syntax<State, Event>, Throwable) -> Unit)? = null,
     onCreate: (suspend EventReceiver<Event>.(Syntax<State, Event>) -> Unit)? = null
 ) : ContainerHost<State, Event>, EventReceiver<Event>, ViewModel() {
@@ -34,5 +38,7 @@ abstract class BaseViewModel<State : Any, Event : Any>(
             }
         )
 
-    override fun onEvent(event: Event) = Unit
+    override fun onEvent(event: Event) {
+        if (event is NavigationEvent) navigationEventBus.post(event)
+    }
 }

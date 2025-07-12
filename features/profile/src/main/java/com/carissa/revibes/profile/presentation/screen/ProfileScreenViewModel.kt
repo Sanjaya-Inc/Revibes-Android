@@ -60,7 +60,8 @@ data class ProfileScreenUiState(
 
 sealed interface ProfileScreenUiEvent {
     data object NavigateBack : ProfileScreenUiEvent
-    data object LogoutClicked : ProfileScreenUiEvent, NavigationEvent
+    data object NavigateToLogin : ProfileScreenUiEvent, NavigationEvent
+    data object LogoutClicked : ProfileScreenUiEvent
     data object YourPofileClicked : ProfileScreenUiEvent
     data object SupportCenterClicked : ProfileScreenUiEvent
     data object SettingsClicked : ProfileScreenUiEvent
@@ -76,17 +77,21 @@ class ProfileScreenViewModel(
 ) : BaseViewModel<ProfileScreenUiState, ProfileScreenUiEvent>(
     initialState = ProfileScreenUiState(userData = userDataSource.getUserValue().getOrThrow()),
     exceptionHandler = { syntax, _ ->
-        logoutHandler.onLogout(syntax)
+        logoutHandler.onLogout(this, syntax)
     }
 ) {
     override fun onEvent(event: ProfileScreenUiEvent) {
+        super.onEvent(event)
         intent {
             when (event) {
                 is ProfileScreenUiEvent.SearchTextChanged -> reduce {
                     state.copy(searchValue = event.text)
                 }
 
-                is ProfileScreenUiEvent.LogoutClicked -> logoutHandler.onLogout(this)
+                is ProfileScreenUiEvent.LogoutClicked -> logoutHandler.onLogout(
+                    this@ProfileScreenViewModel,
+                    this
+                )
 
                 else -> postSideEffect(event)
             }

@@ -67,6 +67,7 @@ class RegisterScreenViewModel(
     ) {
 
     override fun onEvent(event: RegisterScreenUiEvent) {
+        super.onEvent(event)
         intent {
             super.onEvent(event)
             when (event) {

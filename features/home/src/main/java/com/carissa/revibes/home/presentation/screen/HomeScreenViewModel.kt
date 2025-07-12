@@ -6,7 +6,6 @@ package com.carissa.revibes.home.presentation.screen
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.home.data.HomeRepository
 import com.carissa.revibes.home.data.model.HomeBannerData
 import com.carissa.revibes.home.presentation.component.FooterItem
@@ -41,7 +40,6 @@ sealed interface HomeScreenUiEvent {
 
 @KoinViewModel
 class HomeScreenViewModel(
-    private val navigationEventBus: NavigationEventBus,
     private val homeRepository: HomeRepository,
     private val homeExceptionHandler: HomeExceptionHandler,
 ) : BaseViewModel<HomeScreenUiState, HomeScreenUiEvent>(
@@ -58,7 +56,6 @@ class HomeScreenViewModel(
         super.onEvent(event)
         intent {
             when (event) {
-                is NavigationEvent -> navigationEventBus.post(event)
                 is HomeScreenUiEvent.LoadHomeData -> loadHomeData()
                 else -> Unit
             }

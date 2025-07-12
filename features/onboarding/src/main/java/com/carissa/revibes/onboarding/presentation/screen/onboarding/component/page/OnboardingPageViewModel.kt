@@ -8,7 +8,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.onboarding.R
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
@@ -26,8 +25,7 @@ sealed interface OnboardingPageUiEvent {
 
 @KoinViewModel
 class OnboardingPageViewModel(
-    @InjectedParam page: Int,
-    private val navigationEventBus: NavigationEventBus
+    @InjectedParam page: Int
 ) : BaseViewModel<OnboardingPageUiState, OnboardingPageUiEvent>(
     when (page) {
         0 -> R.string.title_onboarding_page_1 to R.drawable.illus_step_1
@@ -40,12 +38,4 @@ class OnboardingPageViewModel(
             isShowLoginRegister = page == 2
         )
     }
-) {
-    override fun onEvent(event: OnboardingPageUiEvent) {
-        super.onEvent(event)
-        when (event) {
-            is OnboardingPageUiEvent.NavigateToLogin -> navigationEventBus.post(event)
-            is OnboardingPageUiEvent.NavigateToRegister -> navigationEventBus.post(event)
-        }
-    }
-}
+)

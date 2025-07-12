@@ -6,7 +6,6 @@ package com.carissa.revibes.help_center.presentation.screen
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.help_center.presentation.model.HelpCenterChildData
 import com.carissa.revibes.help_center.presentation.model.HelpCenterRootData
 import kotlinx.collections.immutable.PersistentList
@@ -48,9 +47,7 @@ sealed interface HelpCenterScreenUiEvent {
 }
 
 @KoinViewModel
-class HelpCenterScreenViewModel(
-    private val navigationEventBus: NavigationEventBus,
-) :
+class HelpCenterScreenViewModel :
     BaseViewModel<HelpCenterScreenUiState, HelpCenterScreenUiEvent>(HelpCenterScreenUiState()) {
 
     override fun onEvent(event: HelpCenterScreenUiEvent) {
@@ -61,7 +58,6 @@ class HelpCenterScreenViewModel(
                     state.copy(searchValue = event.query)
                 }
 
-                is HelpCenterScreenUiEvent.NavigateToProfile -> navigationEventBus.post(event)
                 is HelpCenterScreenUiEvent.ChatSupport -> postSideEffect(event)
                 is HelpCenterScreenUiEvent.OnHelpChildClicked -> reduce {
                     val updatedItems = state.items.map { root ->
