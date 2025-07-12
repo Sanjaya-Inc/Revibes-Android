@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.drop_off.presentation.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,15 +45,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.R
+import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.util.DateUtil
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.navigation.DropOffGraph
+import com.carissa.revibes.drop_off.presentation.screen.DropOffConfirmationScreenUiEvent.MakeOrder
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Serializable
 data class DropOffConfirmationScreenArguments(
@@ -72,13 +77,23 @@ fun DropOffConfirmationScreen(
 ) {
     val navigator = RevibesTheme.navigator
     val state by viewModel.collectAsState()
+    val context = LocalContext.current
+    viewModel.collectSideEffect { event ->
+        when (event) {
+            is DropOffConfirmationScreenUiEvent.OnMakeOrderFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            else -> Unit
+        }
+    }
 
     DropOffConfirmationWrapperScreen(
         arguments = arguments,
         onBackClick = navigator::navigateUp,
         uiState = state,
-        onSubmit = {},
-        modifier = modifier
+        modifier = modifier,
+        eventReceiver = viewModel
     )
 }
 
@@ -87,8 +102,8 @@ private fun DropOffConfirmationWrapperScreen(
     arguments: DropOffConfirmationScreenArguments,
     uiState: DropOffConfirmationScreenUiState,
     onBackClick: () -> Unit,
-    onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
+    eventReceiver: EventReceiver<DropOffConfirmationScreenUiEvent> = EventReceiver { },
 ) {
     Scaffold(
         modifier = modifier.statusBarsPadding(),
@@ -152,7 +167,7 @@ private fun DropOffConfirmationWrapperScreen(
                 DropOffConfirmationScreenContent(
                     arguments = arguments,
                     uiState = uiState,
-                    onSubmit = onSubmit,
+                    eventReceiver = eventReceiver,
                 )
             }
         }
@@ -163,8 +178,8 @@ private fun DropOffConfirmationWrapperScreen(
 private fun DropOffConfirmationScreenContent(
     arguments: DropOffConfirmationScreenArguments,
     uiState: DropOffConfirmationScreenUiState,
-    onSubmit: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    eventReceiver: EventReceiver<DropOffConfirmationScreenUiEvent> = EventReceiver { },
 ) {
     Column(
         modifier = modifier
@@ -273,7 +288,7 @@ private fun DropOffConfirmationScreenContent(
 
         Button(
             text = "SUBMIT",
-            onClick = onSubmit,
+            onClick = { eventReceiver.onEvent(event = MakeOrder(arguments = arguments)) },
             enabled = true,
             loading = uiState.isLoading,
             modifier = Modifier
@@ -353,7 +368,6 @@ private fun DropOffConfirmationScreenPreview() {
             ),
             modifier = Modifier.background(Color.White),
             onBackClick = {},
-            onSubmit = {},
             uiState = DropOffConfirmationScreenUiState(isLoading = false)
         )
     }

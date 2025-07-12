@@ -40,7 +40,6 @@ sealed interface DropOffScreenUiEvent : NavigationEvent {
     data class RemoveItem(val index: Int) : DropOffScreenUiEvent
     data class OnNameChange(val value: TextFieldValue) : DropOffScreenUiEvent
     data class OnStoreSelected(val storeData: StoreData) : DropOffScreenUiEvent
-    data class OnMakeOrderFailed(val message: String) : DropOffScreenUiEvent
     data class GetPresignedUrl(
         val orderId: String,
         val itemId: String,
@@ -132,7 +131,6 @@ class DropOffScreenViewModel(
                     event.imageUrl
                 )
 
-                is DropOffScreenUiEvent.OnMakeOrderFailed -> Unit
                 is DropOffScreenUiEvent.OnImageUploadFailed -> Unit
                 else -> Unit
             }

@@ -106,9 +106,6 @@ fun DropOffScreen(
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     viewModel.collectSideEffect { event ->
         when (event) {
-            is DropOffScreenUiEvent.OnMakeOrderFailed -> {
-                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-            }
             is DropOffScreenUiEvent.OnLoadDropOffDataFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
@@ -147,7 +144,6 @@ fun DropOffScreen(
                 eventReceiver = viewModel,
                 nearestStores = state.stores,
                 selectedStore = state.selectedStore,
-                isButtonEnabled = state.isButtonEnabled
             )
         }
     }
@@ -157,7 +153,6 @@ fun DropOffScreen(
 fun DropOffScreenContent(
     modifier: Modifier = Modifier,
     orderId: String = "",
-    isButtonEnabled: Boolean = true,
     items: ImmutableList<DropOffItem> = persistentListOf(),
     name: TextFieldValue = TextFieldValue(""),
     eventReceiver: EventReceiver<DropOffScreenUiEvent> = EventReceiver { },
@@ -425,8 +420,7 @@ fun DropOffScreenContent(
                 colors = ButtonDefaults.buttonColors().copy(
                     containerColor = RevibesTheme.colors.primary,
                     contentColor = Color.White
-                ),
-                enabled = isButtonEnabled
+                )
             ) {
                 Text("MAKE ORDER")
             }
