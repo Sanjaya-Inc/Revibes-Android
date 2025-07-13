@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 data class DailyRewardResponse(
     val code: Int,
     val message: String,
-    val data: List<DailyReward>,
+    val data: List<DailyRewardData>,
     val status: String
 )
 
 @Keep
 @Serializable
-data class DailyReward(
+data class DailyRewardData(
     val id: String,
     val index: Int,
     val amount: Int,

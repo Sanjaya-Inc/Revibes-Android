@@ -1,18 +1,17 @@
 package com.carissa.revibes.point.data.mapper
 
-import com.carissa.revibes.point.data.model.DailyReward
-import com.carissa.revibes.point.domain.model.DailyRewardData
+import com.carissa.revibes.point.data.model.DailyRewardData
+import com.carissa.revibes.point.presentation.screen.DailyReward
 
-fun List<DailyReward>.toDailyRewardDataList(): List<DailyRewardData> {
-    return map { it.toDailyRewardData() }
+fun List<DailyRewardData>.toDailyRewardDataList(): List<DailyReward> {
+    return map { it.toDailyPoint() }
 }
 
-fun DailyReward.toDailyRewardData(): DailyRewardData {
-    return DailyRewardData(
+fun DailyRewardData.toDailyPoint(): DailyReward {
+    return DailyReward(
         id = id,
-        index = index,
+        dayIndex = index,
         amount = amount,
-        createdAt = createdAt,
         claimedAt = claimedAt
     )
 }

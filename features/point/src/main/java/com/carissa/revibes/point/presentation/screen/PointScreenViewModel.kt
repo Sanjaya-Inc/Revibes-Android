@@ -4,7 +4,6 @@ import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.point.data.PointRepository
 import com.carissa.revibes.point.presentation.handler.PointExceptionHandler
-import com.carissa.revibes.point.presentation.mapper.toDailyPointList
 import org.koin.android.annotation.KoinViewModel
 
 data class PointScreenUiState(
@@ -57,7 +56,7 @@ class PointScreenViewModel(
             reduce {
                 state.copy(
                     isLoading = false,
-                    dailyRewards = dailyRewards.toDailyPointList()
+                    dailyRewards = dailyRewards
                 )
             }
         }
@@ -71,7 +70,7 @@ class PointScreenViewModel(
             reduce {
                 state.copy(
                     isClaimingReward = false,
-                    dailyRewards = updatedDailyRewards.toDailyPointList()
+                    dailyRewards = updatedDailyRewards
                 )
             }
         }
