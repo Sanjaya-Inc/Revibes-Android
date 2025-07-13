@@ -13,8 +13,8 @@ import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 
 data class OnboardingPageUiState(
-    @StringRes val text: Int = -1,
-    @DrawableRes val image: Int = -1,
+    @param:StringRes val text: Int = -1,
+    @param:DrawableRes val image: Int = -1,
     val isShowLoginRegister: Boolean = false
 )
 

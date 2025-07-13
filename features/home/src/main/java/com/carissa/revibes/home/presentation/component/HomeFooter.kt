@@ -41,7 +41,7 @@ import kotlinx.collections.immutable.persistentListOf
 @Stable
 @Keep
 data class FooterItem(
-    @DrawableRes val icon: Int,
+    @param:DrawableRes val icon: Int,
     val value: String,
     val color: Color? = null
 ) {

@@ -23,7 +23,7 @@ data class ProfileScreenUiState(
 ) {
     data class Menu(
         val name: String,
-        @DrawableRes val icon: Int,
+        @param:DrawableRes val icon: Int,
         val event: ProfileScreenUiEvent
     ) {
         companion object {
