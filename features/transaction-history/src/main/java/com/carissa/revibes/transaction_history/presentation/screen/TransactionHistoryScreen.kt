@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.transaction_history.R
@@ -38,13 +39,18 @@ fun TransactionHistoryScreen(
     viewModel: TransactionHistoryScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
-    TransactionHistoryScreenContent(uiState = state, modifier = modifier)
+    TransactionHistoryScreenContent(
+        uiState = state,
+        modifier = modifier,
+        eventReceiver = viewModel
+    )
 }
 
 @Composable
 private fun TransactionHistoryScreenContent(
     uiState: TransactionHistoryScreenUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    eventReceiver: EventReceiver<TransactionHistoryScreenUiEvent> = EventReceiver { }
 ) {
     Scaffold(modifier, topBar = {
         CommonHeader(
@@ -86,7 +92,17 @@ private fun TransactionHistoryScreenContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(10) { index ->
-                        TransactionHistoryItem(TransactionHistoryData.dummy())
+                        val dummyData = TransactionHistoryData.dummy()
+                        TransactionHistoryItem(
+                            data = dummyData,
+                            onClick = {
+                                eventReceiver.onEvent(
+                                    TransactionHistoryScreenUiEvent.NavigateToTransactionDetail(
+                                        transactionId = dummyData.id
+                                    )
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -100,7 +116,8 @@ private fun TransactionHistoryScreenPreview() {
     RevibesTheme {
         TransactionHistoryScreenContent(
             modifier = Modifier.background(Color.White),
-            uiState = TransactionHistoryScreenUiState()
+            uiState = TransactionHistoryScreenUiState(),
+            eventReceiver = EventReceiver { }
         )
     }
 }

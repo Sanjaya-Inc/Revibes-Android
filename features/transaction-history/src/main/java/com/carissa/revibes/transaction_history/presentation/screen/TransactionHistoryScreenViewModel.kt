@@ -5,6 +5,7 @@ package com.carissa.revibes.transaction_history.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
+import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import org.koin.android.annotation.KoinViewModel
 
 data class TransactionHistoryScreenUiState(
@@ -12,7 +13,9 @@ data class TransactionHistoryScreenUiState(
     val searchValue: TextFieldValue = TextFieldValue(),
 )
 
-sealed interface TransactionHistoryScreenUiEvent
+sealed interface TransactionHistoryScreenUiEvent : NavigationEvent {
+    data class NavigateToTransactionDetail(val transactionId: String) : TransactionHistoryScreenUiEvent
+}
 
 @KoinViewModel
 class TransactionHistoryScreenViewModel :

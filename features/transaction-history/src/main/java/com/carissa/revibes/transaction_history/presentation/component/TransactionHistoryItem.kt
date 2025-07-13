@@ -30,9 +30,15 @@ import java.util.Locale
 fun TransactionHistoryItem(
     data: TransactionHistoryData,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     val contentScope = remember { TransactionHistoryContentScope() }
-    Surface(modifier, color = RevibesTheme.colors.tertiary, shape = RoundedCornerShape(16.dp)) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        color = RevibesTheme.colors.tertiary,
+        shape = RoundedCornerShape(16.dp)
+    ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
