@@ -1,7 +1,7 @@
 plugins {
-    id("com.sanjaya.buildlogic.app")
-    id("com.sanjaya.buildlogic.compose")
-    id("com.sanjaya.buildlogic.firebase")
+    alias(libs.plugins.sjy.app)
+    alias(libs.plugins.sjy.compose)
+    alias(libs.plugins.sjy.firebase)
 }
 
 android {

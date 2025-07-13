@@ -23,3 +23,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+sjy-detekt = { id = "com.sanjaya.buildlogic.detekt" }
+sjy-lib = { id = "com.sanjaya.buildlogic.lib" }
+sjy-compose = { id = "com.sanjaya.buildlogic.compose" }
+sjy-app = { id = "com.sanjaya.buildlogic.app" }
+sjy-firebase = { id = "com.sanjaya.buildlogic.firebase" }

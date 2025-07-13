@@ -1,6 +1,6 @@
 plugins {
-    id("com.sanjaya.buildlogic.lib")
-    id("com.sanjaya.buildlogic.compose")
+    alias(libs.plugins.sjy.lib)
+    alias(libs.plugins.sjy.compose)
 }
 
 android {
