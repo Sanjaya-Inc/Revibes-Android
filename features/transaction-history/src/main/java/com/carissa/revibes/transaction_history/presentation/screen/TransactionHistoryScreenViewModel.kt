@@ -9,7 +9,7 @@ import org.koin.android.annotation.KoinViewModel
 
 data class TransactionHistoryScreenUiState(
     val isLoading: Boolean = false,
-    val searchValue: TextFieldValue = TextFieldValue()
+    val searchValue: TextFieldValue = TextFieldValue(),
 )
 
 sealed interface TransactionHistoryScreenUiEvent

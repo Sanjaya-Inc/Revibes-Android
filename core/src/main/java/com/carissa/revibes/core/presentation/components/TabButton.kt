@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Sanjaya Inc. All rights reserved.
  */
 
-package com.carissa.revibes.transaction_history.presentation.component
+package com.carissa.revibes.core.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -11,12 +11,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 
 @Composable
-fun TransactionHistoryTab(
+fun TabButton(
     text: String,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
@@ -37,8 +36,8 @@ fun TransactionHistoryTab(
 private fun TransactionHistoryTabPreview() {
     RevibesTheme {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TransactionHistoryTab("Process", false, modifier = Modifier.weight(1f))
-            TransactionHistoryTab("Transaction Complete", true, modifier = Modifier.weight(1f))
+            TabButton("Process", false, modifier = Modifier.weight(1f))
+            TabButton("Transaction Complete", true, modifier = Modifier.weight(1f))
         }
     }
 }
