@@ -111,7 +111,10 @@ private fun HomeScreenContent(
                             CtaMenu(
                                 stringResource(R.string.cta_pick_up),
                                 R.drawable.cta_pickup,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    eventReceiver.onEvent(HomeScreenUiEvent.NavigateToPickUp)
+                                }
                             )
 
                             if (uiState.isAdmin) {

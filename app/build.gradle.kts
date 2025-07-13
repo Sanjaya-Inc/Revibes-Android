@@ -36,4 +36,5 @@ dependencies {
     implementation(project(":features:drop-off"))
     implementation(project(":features:help-center"))
     implementation(project(":features:admin-menu"))
+    implementation(project(":features:pick-up"))
 }

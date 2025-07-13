@@ -32,6 +32,7 @@ sealed interface HomeScreenUiEvent {
     data object NavigateToTransactionHistory : HomeScreenUiEvent, NavigationEvent
     data object NavigateToAboutUs : HomeScreenUiEvent, NavigationEvent
     data object NavigateToDropOff : HomeScreenUiEvent, NavigationEvent
+    data object NavigateToPickUp : HomeScreenUiEvent, NavigationEvent
     data object NavigateToLogin : HomeScreenUiEvent, NavigationEvent
     data object NavigateToHelpCenter : HomeScreenUiEvent, NavigationEvent
     data object NavigateToAdminMenu : HomeScreenUiEvent, NavigationEvent
