@@ -144,7 +144,6 @@ private fun DropOffConfirmationWrapperScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            val context = LocalContext.current
             TransactionDetailsContent(
                 customerName = arguments.name,
                 locationAddress = arguments.store.address,
@@ -158,7 +157,6 @@ private fun DropOffConfirmationWrapperScreen(
                 calculatingPointsText = context.getString(com.carissa.revibes.drop_off.R.string.calculating_points),
                 totalPointsFormat = context.getString(com.carissa.revibes.drop_off.R.string.total_points_format),
                 itemPointsFormat = context.getString(com.carissa.revibes.drop_off.R.string.item_points_format),
-                pointsDisclaimer = context.getString(com.carissa.revibes.drop_off.R.string.points_disclaimer),
                 nameLabel = context.getString(com.carissa.revibes.drop_off.R.string.name_label),
                 locationLabel = context.getString(com.carissa.revibes.drop_off.R.string.location_drop_off_label),
                 actionButton = {

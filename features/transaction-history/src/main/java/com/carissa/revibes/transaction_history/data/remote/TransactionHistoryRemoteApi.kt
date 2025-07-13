@@ -1,0 +1,22 @@
+package com.carissa.revibes.transaction_history.data.remote
+
+import com.carissa.revibes.transaction_history.data.model.TransactionHistoryResponse
+import de.jensklingenberg.ktorfit.Ktorfit
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Query
+import org.koin.core.annotation.Single
+
+interface TransactionHistoryRemoteApi {
+    @GET("logistic-orders")
+    suspend fun getTransactionHistory(
+        @Query("limit") limit: Int = 10,
+//        @Query("sortBy") sortBy: String = "createdAt", // Uncomment after backend fixed
+//        @Query("sortOrder") sortOrder: String = "desc",
+//        @Query("lastDocId") lastDocId: String? = null,
+//        @Query("direction") direction: String = "next"
+    ): TransactionHistoryResponse
+}
+
+@Single
+internal class TransactionHistoryRemoteApiImpl(ktorfit: Ktorfit) :
+    TransactionHistoryRemoteApi by ktorfit.createTransactionHistoryRemoteApi()

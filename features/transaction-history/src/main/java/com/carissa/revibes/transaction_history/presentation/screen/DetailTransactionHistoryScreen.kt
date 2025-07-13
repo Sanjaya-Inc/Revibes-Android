@@ -27,10 +27,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.DashedBorderContainer
 import com.carissa.revibes.core.presentation.components.components.TransactionDetailsContent
 import com.carissa.revibes.core.presentation.components.components.TransactionItem
 import com.carissa.revibes.core.presentation.util.DateUtil
+import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.transaction_history.presentation.navigation.TransactionHistoryGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.collections.immutable.persistentListOf
@@ -141,10 +143,19 @@ private fun DetailTransactionHistoryScreenContent(
         calculatingPointsText = "Calculating points...",
         totalPointsFormat = "Total Points: %d Points",
         itemPointsFormat = "Item %d: %d Points",
-        pointsDisclaimer = "*Points shown are final and have been verified by the Revibe team.",
         nameLabel = "Customer Name",
         locationLabel = "Location",
-        modifier = modifier
+        modifier = modifier,
+        actionButton = {
+            Button(
+                text = "Chat Revibes Team",
+                onClick = { context.openSupportWhatsApp() },
+                enabled = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 8.dp),
+            )
+        }
     )
 }
 

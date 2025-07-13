@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -43,11 +44,11 @@ fun TransactionDetailsContent(
     calculatingPointsText: String,
     totalPointsFormat: String,
     itemPointsFormat: String,
-    pointsDisclaimer: String,
     nameLabel: String,
     locationLabel: String,
     modifier: Modifier = Modifier,
     status: String? = null,
+    pointsDisclaimer: String = stringResource(R.string.points_disclaimer),
     isEstimatingPoints: Boolean = false,
     totalPoints: Int = 0,
     itemPoints: ImmutableMap<String, Int> = persistentMapOf(),
@@ -198,7 +199,8 @@ fun TransactionDetailsContent(
         Spacer(Modifier.height(16.dp))
         Text(
             text = pointsDisclaimer,
-            style = RevibesTheme.typography.label3.copy(color = Color.Red),
+            style = RevibesTheme.typography.label3,
+            color = Color.Red,
             fontWeight = FontWeight.W500,
         )
 

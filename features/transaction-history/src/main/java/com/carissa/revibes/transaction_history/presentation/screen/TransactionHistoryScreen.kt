@@ -4,33 +4,51 @@
 
 package com.carissa.revibes.transaction_history.presentation.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.components.TabButton
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.GeneralError
+import com.carissa.revibes.core.presentation.components.components.RevibesLoading
 import com.carissa.revibes.transaction_history.R
 import com.carissa.revibes.transaction_history.data.model.TransactionHistoryData
 import com.carissa.revibes.transaction_history.presentation.component.TransactionHistoryItem
-import com.carissa.revibes.core.presentation.components.TabButton
 import com.carissa.revibes.transaction_history.presentation.navigation.TransactionHistoryGraph
 import com.ramcosta.composedestinations.annotation.Destination
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Destination<TransactionHistoryGraph>(start = true)
 @Composable
@@ -39,6 +57,17 @@ fun TransactionHistoryScreen(
     viewModel: TransactionHistoryScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
+    val context = LocalContext.current
+
+    viewModel.collectSideEffect { event ->
+        when (event) {
+            is TransactionHistoryScreenUiEvent.OnLoadTransactionHistoryFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            else -> Unit
+        }
+    }
     TransactionHistoryScreenContent(
         uiState = state,
         modifier = modifier,
@@ -56,15 +85,21 @@ private fun TransactionHistoryScreenContent(
         CommonHeader(
             "MY TRANSACTION HISTORY",
             backgroundDrawRes = R.drawable.bg_transaction_history,
-            searchTextFieldValue = uiState.searchValue
+            searchTextFieldValue = uiState.searchValue,
+            onTextChange = { searchValue ->
+                eventReceiver.onEvent(TransactionHistoryScreenUiEvent.SearchValueChanged(searchValue))
+            }
         )
     }) { contentPadding ->
         Column(
-            modifier = Modifier.padding(contentPadding).padding(16.dp),
+            modifier = Modifier
+                .padding(contentPadding)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             val pagerState = rememberPagerState { 2 }
             val scope = rememberCoroutineScope()
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TabButton(
                     "Process",
@@ -87,18 +122,52 @@ private fun TransactionHistoryScreenContent(
                     }
                 )
             }
-            HorizontalPager(pagerState, modifier = Modifier.weight(1f)) {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(10) { index ->
-                        val dummyData = TransactionHistoryData.dummy()
-                        TransactionHistoryItem(
-                            data = dummyData,
-                            onClick = {
+
+            when {
+                uiState.isLoading && uiState.transactions.isEmpty() -> {
+                    RevibesLoading()
+                }
+
+                uiState.error != null && uiState.transactions.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        GeneralError(
+                            message = uiState.error,
+                            onRetry = {
+                                eventReceiver.onEvent(TransactionHistoryScreenUiEvent.Refresh)
+                            }
+                        )
+                    }
+                }
+
+                else -> {
+                    HorizontalPager(pagerState, modifier = Modifier.weight(1f)) { page ->
+                        val filteredTransactions = when (page) {
+                            0 -> uiState.filteredTransactions.filter {
+                                it.status == TransactionHistoryData.Status.PROCESS
+                            }
+
+                            1 -> uiState.filteredTransactions.filter {
+                                it.status == TransactionHistoryData.Status.COMPLETED ||
+                                    it.status == TransactionHistoryData.Status.SUCCESS
+                            }
+
+                            else -> emptyList()
+                        }
+
+                        TransactionList(
+                            transactions = filteredTransactions.toImmutableList(),
+                            isLoadingMore = uiState.isLoadingMore,
+                            hasMoreData = uiState.pagination?.hasMoreNext ?: false,
+                            onLoadMore = {
+                                eventReceiver.onEvent(TransactionHistoryScreenUiEvent.LoadMore)
+                            },
+                            onTransactionClick = { transaction ->
                                 eventReceiver.onEvent(
                                     TransactionHistoryScreenUiEvent.NavigateToTransactionDetail(
-                                        transactionId = dummyData.id
+                                        transactionId = transaction.id
                                     )
                                 )
                             }
@@ -111,12 +180,67 @@ private fun TransactionHistoryScreenContent(
 }
 
 @Composable
+private fun TransactionList(
+    transactions: ImmutableList<TransactionHistoryData>,
+    isLoadingMore: Boolean,
+    hasMoreData: Boolean,
+    onLoadMore: () -> Unit,
+    onTransactionClick: (TransactionHistoryData) -> Unit
+) {
+    val listState = rememberLazyListState()
+
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItemsNumber = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
+
+            lastVisibleItemIndex > (totalItemsNumber - 3) && hasMoreData && !isLoadingMore
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
+            onLoadMore()
+        }
+    }
+
+    LazyColumn(
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(transactions) { transaction ->
+            TransactionHistoryItem(
+                data = transaction,
+                onClick = { onTransactionClick(transaction) }
+            )
+        }
+
+        if (isLoadingMore) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun TransactionHistoryScreenPreview() {
     RevibesTheme {
         TransactionHistoryScreenContent(
             modifier = Modifier.background(Color.White),
-            uiState = TransactionHistoryScreenUiState(),
+            uiState = TransactionHistoryScreenUiState(
+                transactions = persistentListOf(TransactionHistoryData.dummy()),
+                filteredTransactions = persistentListOf(TransactionHistoryData.dummy())
+            ),
             eventReceiver = EventReceiver { }
         )
     }
