@@ -4,8 +4,8 @@ import java.util.Properties
 plugins {
     id("com.sanjaya.buildlogic.lib")
     id("com.sanjaya.buildlogic.compose")
-    kotlin("plugin.serialization") version core.versions.kotlin.core.get()
-    alias(ui.plugins.lumo)
+    kotlin("plugin.serialization") version sjy.versions.kotlin.core.get()
+    alias(sjy.plugins.lumo)
 }
 
 val localProperties = Properties().apply {
@@ -45,11 +45,11 @@ android {
 }
 
 dependencies {
-    api(ui.androidx.lifecycle.runtime.ktx)
-    api(ui.bundles.orbit.mvi)
+    api(sjy.androidx.lifecycle.runtime.ktx)
+    api(sjy.bundles.orbit.mvi)
 
-    debugImplementation(core.chucker)
-    releaseImplementation(core.chucker.no.op)
+    debugImplementation(sjy.chucker)
+    releaseImplementation(sjy.chucker.no.op)
 
     testApi(libs.junit)
     androidTestApi(libs.androidx.junit)

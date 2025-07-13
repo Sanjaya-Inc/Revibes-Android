@@ -1,14 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    alias(core.plugins.android.application) apply false
-    alias(libs.plugins.android.library) apply false
-    alias(core.plugins.kotlin.android) apply false
-    alias(core.plugins.kotlin.compose) apply false
-    alias(core.plugins.ksp) apply false
-    alias(core.plugins.detekt) apply true
-    alias(core.plugins.ktorfit) apply false
-    alias(essentials.plugins.gms.services) apply false
-    alias(essentials.plugins.crashlytics) apply false
-    alias(ui.plugins.lumo) apply false
+    alias(sjy.plugins.android.application) apply false
+    alias(sjy.plugins.android.library) apply false
+    alias(sjy.plugins.kotlin.android) apply false
+    alias(sjy.plugins.kotlin.compose) apply false
+    alias(sjy.plugins.ksp) apply false
+    alias(sjy.plugins.detekt) apply true
+    alias(sjy.plugins.ktorfit) apply false
+    alias(sjy.plugins.gms.services) apply false
+    alias(sjy.plugins.crashlytics) apply false
+    alias(sjy.plugins.lumo) apply false
     id("com.sanjaya.buildlogic.detekt") apply true
 }
