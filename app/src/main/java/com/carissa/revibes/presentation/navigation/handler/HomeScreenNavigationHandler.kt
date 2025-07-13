@@ -11,6 +11,7 @@ import com.ramcosta.composedestinations.generated.helpcenter.destinations.HelpCe
 import com.ramcosta.composedestinations.generated.home.destinations.AboutScreenDestination
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.pickup.destinations.PickUpScreenDestination
+import com.ramcosta.composedestinations.generated.point.destinations.PointScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.generated.shop.destinations.ShopScreenDestination
 import com.ramcosta.composedestinations.generated.transactionhistory.destinations.TransactionHistoryScreenDestination
@@ -29,6 +30,7 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
             event is HomeScreenUiEvent.NavigateToAboutUs ||
             event is HomeScreenUiEvent.NavigateToDropOff ||
             event is HomeScreenUiEvent.NavigateToPickUp ||
+            event is HomeScreenUiEvent.NavigateToPoint ||
             event is HomeScreenUiEvent.NavigateToHelpCenter ||
             event is HomeScreenUiEvent.NavigateToAdminMenu ||
             event is HomeScreenUiEvent.NavigateToLogin
@@ -57,6 +59,7 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
             is HomeScreenUiEvent.NavigateToAboutUs -> navigator.navigate(AboutScreenDestination)
             is HomeScreenUiEvent.NavigateToDropOff -> navigator.navigate(DropOffScreenDestination)
             is HomeScreenUiEvent.NavigateToPickUp -> navigator.navigate(PickUpScreenDestination)
+            is HomeScreenUiEvent.NavigateToPoint -> navigator.navigate(PointScreenDestination)
             is HomeScreenUiEvent.NavigateToHelpCenter -> navigator.navigate(
                 HelpCenterScreenDestination
             )

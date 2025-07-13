@@ -63,6 +63,8 @@ val DropOffLabelColor = Color(0xFF42665F)
 val DropOffPlaceholderColor = Color(0xFF999999)
 val DropOffDialogBg = Color(0xFFBACABC)
 val DropOffDialogItemBg = Color(0xFFE5F3E6)
+val PointModalBg = Color(0xFFA1CBC2)
+val PointGoldBg = Color(0xFFFDD711)
 
 @Immutable
 data class Colors(

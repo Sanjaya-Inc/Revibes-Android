@@ -11,6 +11,7 @@ import com.ramcosta.composedestinations.generated.helpcenter.navgraphs.HelpCente
 import com.ramcosta.composedestinations.generated.home.navgraphs.HomeNavGraph
 import com.ramcosta.composedestinations.generated.onboarding.navgraphs.OnboardingNavGraph
 import com.ramcosta.composedestinations.generated.pickup.navgraphs.PickUpNavGraph
+import com.ramcosta.composedestinations.generated.point.navgraphs.PointNavGraph
 import com.ramcosta.composedestinations.generated.profile.navgraphs.ProfileNavGraph
 import com.ramcosta.composedestinations.generated.transactionhistory.navgraphs.TransactionHistoryNavGraph
 import com.ramcosta.composedestinations.generated.shop.navgraphs.ShopNavGraph
@@ -29,5 +30,6 @@ annotation class RevibesNavGraph {
     @ExternalNavGraph<HelpCenterNavGraph>
     @ExternalNavGraph<AdminMenuNavGraph>
     @ExternalNavGraph<PickUpNavGraph>
+    @ExternalNavGraph<PointNavGraph>
     companion object Includes
 }

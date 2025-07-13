@@ -96,7 +96,10 @@ private fun HomeScreenContent(
                     CtaYourPoint(
                         uiState.userPoints,
                         modifier = Modifier
-                            .height(250.dp)
+                            .height(250.dp),
+                        onClick = {
+                            eventReceiver.onEvent(HomeScreenUiEvent.NavigateToPoint)
+                        }
                     )
                     Column {
                         Row {

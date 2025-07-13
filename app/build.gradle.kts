@@ -37,4 +37,5 @@ dependencies {
     implementation(project(":features:help-center"))
     implementation(project(":features:admin-menu"))
     implementation(project(":features:pick-up"))
+    implementation(project(":features:point"))
 }
