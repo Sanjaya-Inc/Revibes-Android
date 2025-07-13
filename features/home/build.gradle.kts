@@ -23,4 +23,5 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(sjy.accompanist.permissions)
 }

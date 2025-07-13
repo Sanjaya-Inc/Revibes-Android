@@ -23,4 +23,6 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(platform(sjy.firebase.bom))
+    implementation(sjy.firebase.messaging)
 }

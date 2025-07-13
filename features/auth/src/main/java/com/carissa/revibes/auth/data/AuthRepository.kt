@@ -1,6 +1,7 @@
 package com.carissa.revibes.auth.data
 
 import com.carissa.revibes.auth.data.mapper.toDomain
+import com.carissa.revibes.auth.data.model.DeviceRegistrationRequest
 import com.carissa.revibes.auth.data.remote.AuthRemoteApi
 import com.carissa.revibes.auth.domain.model.LoginResult
 import org.koin.core.annotation.Single
@@ -13,6 +14,8 @@ interface AuthRepository {
         phoneNumber: String,
         password: String
     )
+
+    suspend fun registerDevice(deviceToken: String, fcmToken: String)
 }
 
 @Single
@@ -32,6 +35,15 @@ internal class AuthRepositoryImpl(private val remoteApi: AuthRemoteApi) : AuthRe
             displayName = displayName,
             phoneNumber = phoneNumber,
             password = password
+        )
+    }
+
+    override suspend fun registerDevice(deviceToken: String, fcmToken: String) {
+        remoteApi.registerDevice(
+            request = DeviceRegistrationRequest(
+                deviceToken = deviceToken,
+                fcmToken = fcmToken
+            )
         )
     }
 }

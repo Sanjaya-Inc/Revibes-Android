@@ -4,7 +4,9 @@
 
 package com.carissa.revibes.home.presentation.screen
 
+import android.Manifest
 import android.R.attr.onClick
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,10 +42,14 @@ import com.carissa.revibes.home.presentation.component.HomeBanner
 import com.carissa.revibes.home.presentation.component.HomeFooter
 import com.carissa.revibes.home.presentation.component.HomeHeader
 import com.carissa.revibes.home.presentation.navigation.HomeGraph
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Destination<HomeGraph>(start = true)
 @Composable
 fun HomeScreen(
@@ -50,6 +57,19 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val notificationPermissionState = rememberPermissionState(
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+
+        LaunchedEffect(Unit) {
+            if (!notificationPermissionState.status.isGranted) {
+                notificationPermissionState.launchPermissionRequest()
+            }
+        }
+    }
+
     HomeScreenContent(uiState = state, modifier = modifier, eventReceiver = viewModel)
 }
 
