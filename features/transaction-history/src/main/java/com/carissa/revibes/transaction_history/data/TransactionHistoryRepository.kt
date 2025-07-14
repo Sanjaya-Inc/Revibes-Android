@@ -1,9 +1,11 @@
 package com.carissa.revibes.transaction_history.data
 
+import com.carissa.revibes.transaction_history.data.mapper.toTransactionDetailDomain
 import com.carissa.revibes.transaction_history.data.mapper.toTransactionHistoryDataList
 import com.carissa.revibes.transaction_history.data.model.PaginationData
 import com.carissa.revibes.transaction_history.data.model.TransactionHistoryData
 import com.carissa.revibes.transaction_history.data.remote.TransactionHistoryRemoteApi
+import com.carissa.revibes.transaction_history.domain.model.TransactionDetailDomain
 import org.koin.core.annotation.Single
 
 data class TransactionHistoryResult(
@@ -19,6 +21,8 @@ interface TransactionHistoryRepository {
         lastDocId: String? = null,
         direction: String = "next"
     ): TransactionHistoryResult
+
+    suspend fun getTransactionDetail(id: String): TransactionDetailDomain
 }
 
 @Single
@@ -45,5 +49,10 @@ internal class TransactionHistoryRepositoryImpl(
             items = response.data.items.toTransactionHistoryDataList(),
             pagination = response.data.pagination
         )
+    }
+
+    override suspend fun getTransactionDetail(id: String): TransactionDetailDomain {
+        val response = remoteApi.getTransactionDetail(id)
+        return response.data.toTransactionDetailDomain()
     }
 }

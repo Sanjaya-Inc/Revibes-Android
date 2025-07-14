@@ -17,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,14 +30,13 @@ import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.DashedBorderContainer
+import com.carissa.revibes.core.presentation.components.components.GeneralError
+import com.carissa.revibes.core.presentation.components.components.RevibesLoading
 import com.carissa.revibes.core.presentation.components.components.TransactionDetailsContent
-import com.carissa.revibes.core.presentation.components.components.TransactionItem
-import com.carissa.revibes.core.presentation.util.DateUtil
 import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.transaction_history.presentation.navigation.TransactionHistoryGraph
+import com.carissa.revibes.transaction_history.presentation.screen.DetailTransactionHistoryScreenUiEvent.LoadTransactionDetail
 import com.ramcosta.composedestinations.annotation.Destination
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 
@@ -49,6 +49,10 @@ fun DetailTransactionHistoryScreen(
 ) {
     val navigator = RevibesTheme.navigator
     val state = viewModel.collectAsState().value
+
+    LaunchedEffect(transactionId) {
+        viewModel.onEvent(LoadTransactionDetail(transactionId))
+    }
 
     DetailTransactionHistoryWrapperScreen(
         transactionId = transactionId,
@@ -102,7 +106,6 @@ private fun DetailTransactionHistoryWrapperScreen(
                 .padding(16.dp)
         ) {
             DetailTransactionHistoryScreenContent(
-                transactionId = transactionId,
                 uiState = uiState
             )
         }
@@ -111,52 +114,56 @@ private fun DetailTransactionHistoryWrapperScreen(
 
 @Composable
 private fun DetailTransactionHistoryScreenContent(
-    transactionId: String,
     uiState: DetailTransactionHistoryScreenUiState,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
-    val sampleItems = persistentListOf(
-        TransactionItem(
-            id = "1",
-            name = "Transaction Item for ID: $transactionId",
-            type = "organic",
-            weight = "> 1 kg",
-            photos = listOf(
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShZRhYJuVc5eH192WQSGqveK-Qe1q-l5Fzkw&s"
-            )
-        )
-    )
+    when {
+        uiState.isLoading -> {
+            RevibesLoading(modifier = modifier.fillMaxSize())
+        }
 
-    TransactionDetailsContent(
-        customerName = "John Doe",
-        locationAddress = "123 Tech Lane, Silicon Valley, CA",
-        dateLabel = "Transaction Date",
-        date = DateUtil.getTodayDate(),
-        itemDetailsTitle = "TRANSACTION DETAILS",
-        status = "Checking",
-        items = sampleItems,
-        isEstimatingPoints = false,
-        totalPoints = 100,
-        itemPoints = persistentMapOf("0" to 100),
-        calculatingPointsText = "Calculating points...",
-        totalPointsFormat = "Total Points: %d Points",
-        itemPointsFormat = "Item %d: %d Points",
-        nameLabel = "Customer Name",
-        locationLabel = "Location",
-        modifier = modifier,
-        actionButton = {
-            Button(
-                text = "Chat Revibes Team",
-                onClick = { context.openSupportWhatsApp() },
-                enabled = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 8.dp),
+        uiState.error != null -> {
+            GeneralError(
+                message = uiState.error,
+                modifier = modifier.fillMaxSize()
             )
         }
-    )
+
+        uiState.transactionDetail != null -> {
+            val detail = uiState.transactionDetail
+
+            TransactionDetailsContent(
+                customerName = detail.name,
+                locationAddress = detail.locationAddress,
+                dateLabel = "Transaction Date",
+                date = detail.formattedDate,
+                itemDetailsTitle = "TRANSACTION DETAILS",
+                status = detail.formattedStatus,
+                items = detail.items,
+                isEstimatingPoints = false,
+                totalPoints = detail.totalPoint,
+                itemPoints = detail.itemPoints,
+                calculatingPointsText = "Calculating points...",
+                totalPointsFormat = "Total Points: %d Points",
+                itemPointsFormat = "Item %d: %d Points",
+                nameLabel = "Customer Name",
+                locationLabel = "Location",
+                modifier = modifier,
+                actionButton = {
+                    Button(
+                        text = "Chat Revibes Team",
+                        onClick = { context.openSupportWhatsApp() },
+                        enabled = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 8.dp),
+                    )
+                }
+            )
+        }
+    }
 }
 
 @Composable
