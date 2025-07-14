@@ -19,7 +19,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
@@ -157,21 +160,25 @@ private fun TransactionHistoryScreenContent(
                             else -> emptyList()
                         }
 
-                        TransactionList(
-                            transactions = filteredTransactions.toImmutableList(),
-                            isLoadingMore = uiState.isLoadingMore,
-                            hasMoreData = uiState.pagination?.hasMoreNext ?: false,
-                            onLoadMore = {
-                                eventReceiver.onEvent(TransactionHistoryScreenUiEvent.LoadMore)
-                            },
-                            onTransactionClick = { transaction ->
-                                eventReceiver.onEvent(
-                                    TransactionHistoryScreenUiEvent.NavigateToTransactionDetail(
-                                        transactionId = transaction.id
+                        if (filteredTransactions.isEmpty()) {
+                            TransactionEmptyState()
+                        } else {
+                            TransactionList(
+                                transactions = filteredTransactions.toImmutableList(),
+                                isLoadingMore = uiState.isLoadingMore,
+                                hasMoreData = uiState.pagination?.hasMoreNext ?: false,
+                                onLoadMore = {
+                                    eventReceiver.onEvent(TransactionHistoryScreenUiEvent.LoadMore)
+                                },
+                                onTransactionClick = { transaction ->
+                                    eventReceiver.onEvent(
+                                        TransactionHistoryScreenUiEvent.NavigateToTransactionDetail(
+                                            transactionId = transaction.id
+                                        )
                                     )
-                                )
-                            }
-                        )
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -227,6 +234,32 @@ private fun TransactionList(
                     CircularProgressIndicator()
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TransactionEmptyState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "No Transactions Found",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "You don't have any transactions yet.\nStart using Revibes to see your " +
+                    "transaction history here.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
