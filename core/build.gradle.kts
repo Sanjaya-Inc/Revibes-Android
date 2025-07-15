@@ -20,14 +20,8 @@ android {
 
         buildConfigField(
             "String",
-            "MOCK_BASE_URL",
-            "${localProperties.getProperty("MOCK_BASE_URL")}"
-        )
-
-        buildConfigField(
-            "String",
-            "PROD_BASE_URL",
-            "${localProperties.getProperty("PROD_BASE_URL")}"
+            "BASE_URL",
+            "${localProperties.getProperty("BASE_URL")}"
         )
     }
     buildFeatures {

@@ -6,10 +6,6 @@ import org.koin.core.annotation.Single
 @Single
 internal class BaseUrlProvider {
     fun getBaseUrl(): String {
-        return if (BuildConfig.DEBUG) {
-            BuildConfig.MOCK_BASE_URL
-        } else {
-            BuildConfig.PROD_BASE_URL
-        }
+        return BuildConfig.BASE_URL
     }
 }
