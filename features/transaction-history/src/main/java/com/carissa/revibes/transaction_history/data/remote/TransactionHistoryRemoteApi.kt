@@ -12,10 +12,11 @@ interface TransactionHistoryRemoteApi {
     @GET("logistic-orders")
     suspend fun getTransactionHistory(
         @Query("limit") limit: Int = 10,
-//        @Query("sortBy") sortBy: String = "createdAt", // Uncomment after backend fixed
-//        @Query("sortOrder") sortOrder: String = "desc",
-//        @Query("lastDocId") lastDocId: String? = null,
-//        @Query("direction") direction: String = "next"
+        @Query("sortBy") sortBy: String = "createdAt",
+        @Query("sortOrder") sortOrder: String = "desc",
+        @Query("lastDocId") lastDocId: String? = null,
+        @Query("direction") direction: String = "next",
+        @Query("statuses") statuses: List<String>? = null
     ): TransactionHistoryResponse
 
     @GET("logistic-orders/{id}")

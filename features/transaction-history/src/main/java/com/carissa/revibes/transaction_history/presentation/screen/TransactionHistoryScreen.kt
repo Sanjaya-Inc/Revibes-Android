@@ -47,7 +47,6 @@ import com.carissa.revibes.transaction_history.presentation.navigation.Transacti
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -103,6 +102,10 @@ private fun TransactionHistoryScreenContent(
             val pagerState = rememberPagerState { 2 }
             val scope = rememberCoroutineScope()
 
+            LaunchedEffect(pagerState.currentPage) {
+                eventReceiver.onEvent(TransactionHistoryScreenUiEvent.TabChanged(pagerState.currentPage))
+            }
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TabButton(
                     "Process",
@@ -147,24 +150,11 @@ private fun TransactionHistoryScreenContent(
 
                 else -> {
                     HorizontalPager(pagerState, modifier = Modifier.weight(1f)) { page ->
-                        val filteredTransactions = when (page) {
-                            0 -> uiState.filteredTransactions.filter {
-                                it.status == TransactionHistoryData.Status.PROCESS
-                            }
-
-                            1 -> uiState.filteredTransactions.filter {
-                                it.status == TransactionHistoryData.Status.COMPLETED ||
-                                    it.status == TransactionHistoryData.Status.SUCCESS
-                            }
-
-                            else -> emptyList()
-                        }
-
-                        if (filteredTransactions.isEmpty()) {
+                        if (uiState.filteredTransactions.isEmpty()) {
                             TransactionEmptyState()
                         } else {
                             TransactionList(
-                                transactions = filteredTransactions.toImmutableList(),
+                                transactions = uiState.filteredTransactions,
                                 isLoadingMore = uiState.isLoadingMore,
                                 hasMoreData = uiState.pagination?.hasMoreNext ?: false,
                                 onLoadMore = {
@@ -214,7 +204,8 @@ private fun TransactionList(
 
     LazyColumn(
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxSize(),
     ) {
         items(transactions) { transaction ->
             TransactionHistoryItem(

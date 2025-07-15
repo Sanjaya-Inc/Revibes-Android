@@ -22,7 +22,8 @@ data class TransactionHistoryScreenUiState(
     val transactions: PersistentList<TransactionHistoryData> = persistentListOf(),
     val filteredTransactions: PersistentList<TransactionHistoryData> = persistentListOf(),
     val pagination: PaginationData? = null,
-    val error: String? = null
+    val error: String? = null,
+    val currentTab: Int = 0,
 )
 
 sealed interface TransactionHistoryScreenUiEvent : NavigationEvent {
@@ -34,6 +35,7 @@ sealed interface TransactionHistoryScreenUiEvent : NavigationEvent {
     data object Refresh : TransactionHistoryScreenUiEvent
     data class OnLoadTransactionHistoryFailed(val message: String) : TransactionHistoryScreenUiEvent
     data class SearchValueChanged(val searchValue: TextFieldValue) : TransactionHistoryScreenUiEvent
+    data class TabChanged(val tabIndex: Int) : TransactionHistoryScreenUiEvent
 }
 
 @KoinViewModel
@@ -55,6 +57,7 @@ class TransactionHistoryScreenViewModel(
             TransactionHistoryScreenUiEvent.LoadMore -> loadMoreTransactions()
             TransactionHistoryScreenUiEvent.Refresh -> onRefresh()
             is TransactionHistoryScreenUiEvent.SearchValueChanged -> onSearchValueChanged(event.searchValue)
+            is TransactionHistoryScreenUiEvent.TabChanged -> onTabChanged(event.tabIndex)
             else -> Unit
         }
     }
@@ -69,9 +72,12 @@ class TransactionHistoryScreenViewModel(
         }
 
         val lastDocId = if (refresh) null else state.pagination?.lastDocId
+        val statuses = getStatusesForCurrentTab(state.currentTab)
+
         val result = repository.getTransactionHistory(
             lastDocId = lastDocId,
-            direction = "next"
+            direction = "next",
+            statuses = statuses
         )
 
         val newTransactions = if (refresh) {
@@ -110,6 +116,28 @@ class TransactionHistoryScreenViewModel(
 
     private fun onRefresh() {
         loadTransactionHistory(refresh = true)
+    }
+
+    private fun onTabChanged(tabIndex: Int) = intent {
+        if (state.currentTab != tabIndex) {
+            reduce {
+                state.copy(
+                    currentTab = tabIndex,
+                    transactions = persistentListOf(),
+                    filteredTransactions = persistentListOf(),
+                    pagination = null
+                )
+            }
+            loadTransactionHistory(refresh = true)
+        }
+    }
+
+    private fun getStatusesForCurrentTab(tabIndex: Int): List<String>? {
+        return when (tabIndex) {
+            0 -> listOf("submitted")
+            1 -> listOf("completed", "rejected")
+            else -> null
+        }
     }
 
     private fun filterTransactions(

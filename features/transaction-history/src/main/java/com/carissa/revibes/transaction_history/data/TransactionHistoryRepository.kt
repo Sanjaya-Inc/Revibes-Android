@@ -19,7 +19,8 @@ interface TransactionHistoryRepository {
         sortBy: String = "createdAt",
         sortOrder: String = "desc",
         lastDocId: String? = null,
-        direction: String = "next"
+        direction: String = "next",
+        statuses: List<String>? = null
     ): TransactionHistoryResult
 
     suspend fun getTransactionDetail(id: String): TransactionDetailDomain
@@ -35,14 +36,16 @@ internal class TransactionHistoryRepositoryImpl(
         sortBy: String,
         sortOrder: String,
         lastDocId: String?,
-        direction: String
+        direction: String,
+        statuses: List<String>?
     ): TransactionHistoryResult {
         val response = remoteApi.getTransactionHistory(
             limit = limit,
-//            sortBy = sortBy, // Uncomment after backend fixed
-//            sortOrder = sortOrder,
-//            lastDocId = lastDocId,
-//            direction = direction
+            sortBy = sortBy,
+            sortOrder = sortOrder,
+            lastDocId = lastDocId,
+            direction = direction,
+            statuses = statuses
         )
 
         return TransactionHistoryResult(
