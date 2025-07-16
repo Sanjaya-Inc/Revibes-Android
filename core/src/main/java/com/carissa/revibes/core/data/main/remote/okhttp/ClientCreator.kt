@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit
 internal class ClientCreator(
     context: Context,
     authenticator: Authenticator,
-    private val okhttpCache: CacheCreator
+//    private val okhttpCache: CacheCreator
 ) {
 
     fun create(): OkHttpClient {
         return OkHttpClient.Builder().apply {
-            cache(okhttpCache.create())
+//            cache(okhttpCache.create())
             retryOnConnectionFailure(false)
             interceptors.forEach {
                 addInterceptor(it)
