@@ -39,7 +39,7 @@ data class RegisterScreenUiState(
     val isButtonEnabled: Boolean
         get() = fullNameError == null && emailError == null &&
             phoneError == null && passwordError == null &&
-            confirmPasswordError == null
+            confirmPasswordError == null  && !isLoading
 }
 
 sealed interface RegisterScreenUiEvent {
