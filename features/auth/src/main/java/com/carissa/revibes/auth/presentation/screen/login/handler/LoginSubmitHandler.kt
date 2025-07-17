@@ -46,6 +46,10 @@ class LoginSubmitHandler(
 
         authRepo.registerDevice(deviceId, fcmToken)
 
-        eventReceiver.onEvent(LoginScreenUiEvent.NavigateToHome)
+        if (userData.role == "admin") {
+            eventReceiver.onEvent(LoginScreenUiEvent.NavigateToAdminHome)
+        } else {
+            eventReceiver.onEvent(LoginScreenUiEvent.NavigateToHome)
+        }
     }
 }

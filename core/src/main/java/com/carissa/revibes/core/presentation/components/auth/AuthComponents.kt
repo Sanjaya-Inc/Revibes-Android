@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Sanjaya Inc. All rights reserved.
  */
 
-package com.carissa.revibes.auth.presentation.components
+package com.carissa.revibes.core.presentation.components.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

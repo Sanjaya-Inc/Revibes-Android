@@ -31,6 +31,7 @@ sealed interface LoginScreenUiEvent {
     data object NavigateBack : LoginScreenUiEvent
     data object NavigateToRegister : LoginScreenUiEvent
     data object NavigateToHome : LoginScreenUiEvent, NavigationEvent
+    data object NavigateToAdminHome : LoginScreenUiEvent, NavigationEvent
     data class EmailChanged(val email: TextFieldValue) : LoginScreenUiEvent
     data class PasswordChanged(val password: TextFieldValue) : LoginScreenUiEvent
     data object SubmitLogin : LoginScreenUiEvent

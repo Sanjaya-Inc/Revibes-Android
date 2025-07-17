@@ -4,6 +4,7 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.presentation.screen.splash.SplashScreenUiEvent
 import com.ramcosta.composedestinations.generated.app.navgraphs.RevibesGraph
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
+import com.ramcosta.composedestinations.generated.homeadmin.destinations.HomeAdminScreenDestination
 import com.ramcosta.composedestinations.generated.onboarding.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.core.annotation.Factory
@@ -12,7 +13,9 @@ import org.koin.core.annotation.Factory
 class SplashScreenNavigationHandler : NavigationEventHandler() {
 
     override fun canHandle(event: NavigationEvent): Boolean {
-        return event is SplashScreenUiEvent.NavigateToOnboarding || event is SplashScreenUiEvent.NavigateToHome
+        return event is SplashScreenUiEvent.NavigateToOnboarding ||
+            event is SplashScreenUiEvent.NavigateToHome ||
+            event is SplashScreenUiEvent.NavigateToAdminHome
     }
 
     override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
@@ -26,6 +29,12 @@ class SplashScreenNavigationHandler : NavigationEventHandler() {
             }
 
             is SplashScreenUiEvent.NavigateToHome -> navigator.navigate(HomeScreenDestination) {
+                popUpTo(RevibesGraph.startRoute) {
+                    inclusive = true
+                }
+            }
+
+            is SplashScreenUiEvent.NavigateToAdminHome -> navigator.navigate(HomeAdminScreenDestination) {
                 popUpTo(RevibesGraph.startRoute) {
                     inclusive = true
                 }

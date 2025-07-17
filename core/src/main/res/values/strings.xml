@@ -3,4 +3,7 @@
     <string name="cta_register">REGISTER</string>
     <string name="cta_login">LOGIN</string>
     <string name="points_disclaimer">*The points above are temporary. Points will change after the Revibe team re-checks the items regarding the type of item and weight of the item.\n*Please double check your shipping data details before submit.</string>
+    <string name="empty_data">No data available</string>
+    <string name="error_message">An error occurred. Please try again.</string>
+    <string name="retry">Retry</string>
 </resources>

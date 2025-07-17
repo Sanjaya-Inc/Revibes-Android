@@ -9,6 +9,10 @@ import com.ramcosta.composedestinations.generated.dropoff.navgraphs.DropOffNavGr
 import com.ramcosta.composedestinations.generated.exchangepoints.navgraphs.ExchangePointsNavGraph
 import com.ramcosta.composedestinations.generated.helpcenter.navgraphs.HelpCenterNavGraph
 import com.ramcosta.composedestinations.generated.home.navgraphs.HomeNavGraph
+import com.ramcosta.composedestinations.generated.homeadmin.navgraphs.HomeAdminNavGraph
+import com.ramcosta.composedestinations.generated.manageusers.navgraphs.ManageUsersNavGraph
+import com.ramcosta.composedestinations.generated.managetransaction.navgraphs.ManageTransactionNavGraph
+import com.ramcosta.composedestinations.generated.managevoucher.navgraphs.ManageVoucherNavGraph
 import com.ramcosta.composedestinations.generated.onboarding.navgraphs.OnboardingNavGraph
 import com.ramcosta.composedestinations.generated.pickup.navgraphs.PickUpNavGraph
 import com.ramcosta.composedestinations.generated.point.navgraphs.PointNavGraph
@@ -29,6 +33,10 @@ annotation class RevibesNavGraph {
     @ExternalNavGraph<DropOffNavGraph>
     @ExternalNavGraph<HelpCenterNavGraph>
     @ExternalNavGraph<AdminMenuNavGraph>
+    @ExternalNavGraph<HomeAdminNavGraph>
+    @ExternalNavGraph<ManageUsersNavGraph>
+    @ExternalNavGraph<ManageTransactionNavGraph>
+    @ExternalNavGraph<ManageVoucherNavGraph>
     @ExternalNavGraph<PickUpNavGraph>
     @ExternalNavGraph<PointNavGraph>
     companion object Includes

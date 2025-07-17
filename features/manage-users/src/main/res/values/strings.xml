@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manage_users">Manage Users</string>
+    <string name="manage_users_placeholder">User Management</string>
+    <string name="coming_soon">Coming Soon</string>
+    
+    <!-- User List Screen -->
+    <string name="search_users">Search users...</string>
+    <string name="add_user">Add User</string>
+    <string name="no_users_found">No users found</string>
+    <string name="load_more">Load More</string>
+    <string name="refresh">Refresh</string>
+    <string name="points">Points</string>
+    <string name="role">Role</string>
+    <string name="active">Active</string>
+    <string name="inactive">Inactive</string>
+    
+    <!-- Add User Screen -->
+    <string name="add_new_user">Add New User</string>
+    <string name="full_name">Full Name</string>
+    <string name="email_address">Email Address</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="user_role">User Role</string>
+    <string name="password">Password</string>
+    <string name="address">Address</string>
+    <string name="create_user">Create User</string>
+    <string name="cancel">Cancel</string>
+    <string name="required_field">This field is required</string>
+    <string name="invalid_email">Please enter a valid email address</string>
+    <string name="invalid_phone">Please enter a valid phone number</string>
+    <string name="password_too_short">Password must be at least 6 characters</string>
+    
+    <!-- Edit User Screen -->
+    <string name="edit_user">Edit User</string>
+    <string name="user_details">User Details</string>
+    <string name="add_points">Add Points</string>
+    <string name="points_to_add">Points to Add</string>
+    <string name="reason_optional">Reason (Optional)</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="confirm_add_points">Confirm Add Points</string>
+    <string name="add_points_confirmation">Are you sure you want to add %d points to %s?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    
+    <!-- User Roles -->
+    <string name="role_admin">Admin</string>
+    <string name="role_user">User</string>
+    <string name="role_moderator">Moderator</string>
+    
+    <!-- Success Messages -->
+    <string name="user_created_successfully">User created successfully</string>
+    <string name="user_updated_successfully">User updated successfully</string>
+    <string name="points_added_successfully">Points added successfully</string>
+    
+    <!-- Error Messages -->
+    <string name="error_loading_users">Error loading users</string>
+    <string name="error_creating_user">Error creating user</string>
+    <string name="error_updating_user">Error updating user</string>
+    <string name="error_adding_points">Error adding points</string>
+    <string name="network_error">Network connection error</string>
+    <string name="unknown_error">An unknown error occurred</string>
+</resources>

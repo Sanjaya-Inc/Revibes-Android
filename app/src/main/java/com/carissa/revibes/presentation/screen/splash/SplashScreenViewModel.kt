@@ -10,6 +10,7 @@ data class SplashScreenUiState(val isLoading: Boolean = false)
 sealed interface SplashScreenUiEvent {
     data object NavigateToOnboarding : SplashScreenUiEvent, NavigationEvent
     data object NavigateToHome : SplashScreenUiEvent, NavigationEvent
+    data object NavigateToAdminHome : SplashScreenUiEvent, NavigationEvent
 }
 
 @KoinViewModel

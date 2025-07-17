@@ -36,6 +36,10 @@ dependencies {
     implementation(project(":features:drop-off"))
     implementation(project(":features:help-center"))
     implementation(project(":features:admin-menu"))
+    implementation(project(":features:home-admin"))
+    implementation(project(":features:manage-users"))
+    implementation(project(":features:manage-transaction"))
+    implementation(project(":features:manage-voucher"))
     implementation(project(":features:pick-up"))
     implementation(project(":features:point"))
 }

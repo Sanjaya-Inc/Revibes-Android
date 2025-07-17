@@ -18,9 +18,13 @@ class SplashNavigationHandler(
         syntax: Syntax<SplashScreenUiState, SplashScreenUiEvent>
     ) = syntax.run {
         delay(1.seconds)
-        if (userDataSource.getUserValue().getOrNull() != null
-        ) {
-            eventReceiver.onEvent(SplashScreenUiEvent.NavigateToHome)
+        val userData = userDataSource.getUserValue().getOrNull()
+        if (userData != null) {
+            if (userData.role == "admin") {
+                eventReceiver.onEvent(SplashScreenUiEvent.NavigateToAdminHome)
+            } else {
+                eventReceiver.onEvent(SplashScreenUiEvent.NavigateToHome)
+            }
         } else {
             eventReceiver.onEvent(SplashScreenUiEvent.NavigateToOnboarding)
         }

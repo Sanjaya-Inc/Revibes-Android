@@ -6,6 +6,7 @@ import com.carissa.revibes.onboarding.presentation.screen.onboarding.component.p
 import com.ramcosta.composedestinations.generated.auth.destinations.LoginScreenDestination
 import com.ramcosta.composedestinations.generated.auth.destinations.RegisterScreenDestination
 import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
+import com.ramcosta.composedestinations.generated.homeadmin.destinations.HomeAdminScreenDestination
 import com.ramcosta.composedestinations.generated.onboarding.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.core.annotation.Factory
@@ -16,7 +17,8 @@ class AuthScreenNavigationHandler : NavigationEventHandler() {
     override fun canHandle(event: NavigationEvent): Boolean {
         return event is OnboardingPageUiEvent.NavigateToLogin ||
             event is OnboardingPageUiEvent.NavigateToRegister ||
-            event is LoginScreenUiEvent.NavigateToHome
+            event is LoginScreenUiEvent.NavigateToHome ||
+            event is LoginScreenUiEvent.NavigateToAdminHome
     }
 
     override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
@@ -24,6 +26,9 @@ class AuthScreenNavigationHandler : NavigationEventHandler() {
             is OnboardingPageUiEvent.NavigateToLogin -> navigator.navigate(LoginScreenDestination)
             is OnboardingPageUiEvent.NavigateToRegister -> navigator.navigate(RegisterScreenDestination)
             is LoginScreenUiEvent.NavigateToHome -> navigator.navigate(HomeScreenDestination) {
+                popUpTo(OnboardingScreenDestination) { inclusive = true }
+            }
+            is LoginScreenUiEvent.NavigateToAdminHome -> navigator.navigate(HomeAdminScreenDestination) {
                 popUpTo(OnboardingScreenDestination) { inclusive = true }
             }
         }
