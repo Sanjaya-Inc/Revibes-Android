@@ -21,13 +21,10 @@ data class TransactionDetailData(
     val updatedAt: String,
     val name: String,
     val country: String,
-    val address: String,
-    val addressDetail: String?,
-    val postalCode: String,
-    val storeLocation: String,
     val items: List<TransactionDetailItemData>,
     val status: String,
-    val totalPoint: Int
+    val totalPoint: Int,
+    val store: StoreData
 )
 
 @Keep
@@ -45,6 +42,26 @@ data class TransactionDetailItemData(
 @Serializable
 data class TransactionDetailMediaData(
     val uploadUrl: String,
-    val downloadUri: String,
-    val expiredAt: Long
+    val downloadUri: String
+)
+
+@Keep
+@Serializable
+data class StoreData(
+    val id: String,
+    val createdAt: String,
+    val updatedAt: String,
+    val name: String,
+    val country: String,
+    val address: String,
+    val postalCode: String,
+    val position: PositionData,
+    val status: String
+)
+
+@Keep
+@Serializable
+data class PositionData(
+    val latitude: Double,
+    val longitude: Double
 )

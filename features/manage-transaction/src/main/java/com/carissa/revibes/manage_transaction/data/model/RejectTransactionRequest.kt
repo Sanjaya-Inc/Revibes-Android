@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Keep
 @Serializable
 data class RejectTransactionRequest(
-    val reason: String? = null
+    val reason: String
 )

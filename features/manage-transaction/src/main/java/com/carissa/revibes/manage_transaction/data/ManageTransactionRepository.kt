@@ -31,8 +31,8 @@ internal class ManageTransactionRepository(
         return remoteApi.getTransactionDetail(id).data.toDomain()
     }
 
-    suspend fun rejectTransaction(id: String, reason: String?) {
-        remoteApi.rejectTransaction(id, RejectTransactionRequest(reason))
+    suspend fun rejectTransaction(id: String, reason: String) {
+        remoteApi.rejectTransaction(id, request = RejectTransactionRequest(reason))
     }
 
     suspend fun completeTransaction(id: String) {

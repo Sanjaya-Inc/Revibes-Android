@@ -34,9 +34,12 @@ import com.carissa.revibes.core.presentation.components.components.GeneralError
 import com.carissa.revibes.core.presentation.components.components.RevibesLoading
 import com.carissa.revibes.core.presentation.components.components.TransactionDetailsContent
 import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
+import com.carissa.revibes.transaction_history.data.mapper.toItemPoints
+import com.carissa.revibes.transaction_history.data.mapper.toTransactionItem
 import com.carissa.revibes.transaction_history.presentation.navigation.TransactionHistoryGraph
 import com.carissa.revibes.transaction_history.presentation.screen.DetailTransactionHistoryScreenUiEvent.LoadTransactionDetail
 import com.ramcosta.composedestinations.annotation.Destination
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 
@@ -136,15 +139,15 @@ private fun DetailTransactionHistoryScreenContent(
 
             TransactionDetailsContent(
                 customerName = detail.name,
-                locationAddress = detail.locationAddress,
+                locationAddress = detail.store.address,
                 dateLabel = "Transaction Date",
-                date = detail.formattedDate,
+                date = detail.createdAt,
                 itemDetailsTitle = "TRANSACTION DETAILS",
-                status = detail.formattedStatus,
-                items = detail.items,
+                status = detail.status,
+                items = detail.items.map { it.toTransactionItem() }.toImmutableList(),
                 isEstimatingPoints = false,
                 totalPoints = detail.totalPoint,
-                itemPoints = detail.itemPoints,
+                itemPoints = detail.items.toItemPoints(),
                 calculatingPointsText = "Calculating points...",
                 totalPointsFormat = "Total Points: %d Points",
                 itemPointsFormat = "Item %d: %d Points",

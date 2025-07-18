@@ -59,10 +59,9 @@ fun TransactionDetailData.toDomain(): TransactionDetailDomain {
         updatedAt = updatedAt,
         name = name,
         country = country,
-        address = address,
-        addressDetail = addressDetail,
-        postalCode = postalCode,
-        storeLocation = storeLocation,
+        address = store.address,
+        postalCode = store.postalCode,
+        storeName = store.name,
         items = items.map { it.toDomain() },
         status = TransactionStatus.fromString(status),
         totalPoint = totalPoint
@@ -84,6 +83,5 @@ fun TransactionDetailMediaData.toDomain(): TransactionDetailMediaDomain {
     return TransactionDetailMediaDomain(
         uploadUrl = uploadUrl,
         downloadUri = downloadUri,
-        expiredAt = expiredAt
     )
 }

@@ -32,12 +32,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.manage_transaction.R
 import com.carissa.revibes.manage_transaction.presentation.component.TransactionItem
 import com.carissa.revibes.manage_transaction.presentation.navigation.ManageTransactionGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.managetransaction.destinations.TransactionDetailScreenDestination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -46,12 +46,12 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Destination<ManageTransactionGraph>(start = true)
 @Composable
 fun ManageTransactionScreen(
-    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: ManageTransactionScreenViewModel = koinViewModel()
 ) {
     val uiState by viewModel.collectAsState()
     val context = LocalContext.current
+    val navigator = RevibesTheme.navigator
 
     viewModel.collectSideEffect { event ->
         when (event) {

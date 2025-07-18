@@ -39,9 +39,8 @@ data class TransactionDetailDomain(
     val name: String,
     val country: String,
     val address: String,
-    val addressDetail: String?,
     val postalCode: String,
-    val storeLocation: String,
+    val storeName: String,
     val items: List<TransactionDetailItemDomain>,
     val status: TransactionStatus,
     val totalPoint: Int
@@ -59,5 +58,4 @@ data class TransactionDetailItemDomain(
 data class TransactionDetailMediaDomain(
     val uploadUrl: String,
     val downloadUri: String,
-    val expiredAt: Long
 )

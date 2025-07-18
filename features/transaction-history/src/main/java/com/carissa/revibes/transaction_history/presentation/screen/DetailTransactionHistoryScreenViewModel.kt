@@ -5,13 +5,13 @@ package com.carissa.revibes.transaction_history.presentation.screen
 
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.transaction_history.data.TransactionHistoryRepository
-import com.carissa.revibes.transaction_history.domain.model.TransactionDetailDomain
+import com.carissa.revibes.transaction_history.domain.model.TransactionDetail
 import com.carissa.revibes.transaction_history.presentation.handler.DetailTransactionHistoryExceptionHandler
 import org.koin.android.annotation.KoinViewModel
 
 data class DetailTransactionHistoryScreenUiState(
     val isLoading: Boolean = false,
-    val transactionDetail: TransactionDetailDomain? = null,
+    val transactionDetail: TransactionDetail? = null,
     val error: String? = null
 )
 

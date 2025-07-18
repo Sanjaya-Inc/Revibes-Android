@@ -1,11 +1,11 @@
 package com.carissa.revibes.transaction_history.data
 
-import com.carissa.revibes.transaction_history.data.mapper.toTransactionDetailDomain
+import com.carissa.revibes.transaction_history.data.mapper.toDomain
 import com.carissa.revibes.transaction_history.data.mapper.toTransactionHistoryDataList
 import com.carissa.revibes.transaction_history.data.model.PaginationData
 import com.carissa.revibes.transaction_history.data.model.TransactionHistoryData
 import com.carissa.revibes.transaction_history.data.remote.TransactionHistoryRemoteApi
-import com.carissa.revibes.transaction_history.domain.model.TransactionDetailDomain
+import com.carissa.revibes.transaction_history.domain.model.TransactionDetail
 import org.koin.core.annotation.Single
 
 data class TransactionHistoryResult(
@@ -23,7 +23,7 @@ interface TransactionHistoryRepository {
         statuses: List<String>? = null
     ): TransactionHistoryResult
 
-    suspend fun getTransactionDetail(id: String): TransactionDetailDomain
+    suspend fun getTransactionDetail(id: String): TransactionDetail
 }
 
 @Single
@@ -54,8 +54,8 @@ internal class TransactionHistoryRepositoryImpl(
         )
     }
 
-    override suspend fun getTransactionDetail(id: String): TransactionDetailDomain {
+    override suspend fun getTransactionDetail(id: String): TransactionDetail {
         val response = remoteApi.getTransactionDetail(id)
-        return response.data.toTransactionDetailDomain()
+        return response.data.toDomain()
     }
 }

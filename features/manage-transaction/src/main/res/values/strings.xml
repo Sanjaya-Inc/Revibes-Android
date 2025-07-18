@@ -11,9 +11,9 @@
     
     <!-- Transaction List -->
     <string name="no_pending_transactions">No pending transactions found</string>
-    <string name="transaction_id">ID: %1$s</string>
+    <string name="transaction_id">ID</string>
     <string name="items_count">%1$d items</string>
-    <string name="total_points">%1$d points</string>
+    <string name="total_points">Total points</string>
     
     <!-- Transaction Status -->
     <string name="status_pending">Pending</string>
@@ -26,7 +26,7 @@
     <string name="customer_name">Customer Name</string>
     <string name="address">Address</string>
     <string name="postal_code">Postal Code</string>
-    <string name="store_location">Store Location</string>
+    <string name="store_name">Store Name</string>
     <string name="status">Status</string>
     <string name="type">Type</string>
     <string name="weight">Weight</string>
@@ -45,7 +45,7 @@
     <string name="accept_transaction_message">Are you sure you want to accept this transaction? This action cannot be undone.</string>
     <string name="reject_transaction_title">Reject Transaction</string>
     <string name="reject_transaction_message">Are you sure you want to reject this transaction? You can optionally provide a reason below.</string>
-    <string name="rejection_reason_optional">Rejection reason (optional)</string>
+    <string name="rejection_reason_optional">Rejection reason</string>
     
     <!-- Success Messages -->
     <string name="transaction_accepted">Transaction accepted successfully</string>

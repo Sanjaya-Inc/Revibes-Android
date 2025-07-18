@@ -8,7 +8,7 @@ import org.koin.android.annotation.KoinViewModel
 
 sealed interface TransactionDetailScreenUiEvent {
     data class LoadTransactionDetail(val transactionId: String) : TransactionDetailScreenUiEvent
-    data class RejectTransaction(val reason: String?) : TransactionDetailScreenUiEvent
+    data class RejectTransaction(val reason: String) : TransactionDetailScreenUiEvent
     data object CompleteTransaction : TransactionDetailScreenUiEvent
     data class OnTransactionActionFailed(val message: String) : TransactionDetailScreenUiEvent
 }
@@ -17,6 +17,7 @@ data class TransactionDetailScreenUiState(
     val transactionDetail: TransactionDetailDomain? = null,
     val isLoading: Boolean = false,
     val isProcessing: Boolean = false,
+    val isRejecting: Boolean = false,
     val actionCompleted: Boolean = false,
     val actionMessage: String? = null,
     val error: String? = null
@@ -45,14 +46,14 @@ class TransactionDetailScreenViewModel internal constructor(
         }
     }
 
-    private fun rejectTransaction(reason: String?) = intent {
-        reduce { state.copy(isProcessing = true) }
+    private fun rejectTransaction(reason: String) = intent {
+        reduce { state.copy(isRejecting = true) }
 
         repository.rejectTransaction(state.transactionDetail!!.id, reason)
 
         reduce {
             state.copy(
-                isProcessing = false,
+                isRejecting = false,
                 actionCompleted = true,
                 actionMessage = "Transaction rejected successfully"
             )

@@ -7,6 +7,7 @@ import com.carissa.revibes.transaction_history.data.model.TransactionHistoryResp
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Header
 import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
@@ -31,6 +32,7 @@ interface ManageTransactionRemoteApi {
     @PATCH("logistic-orders/{id}/reject")
     suspend fun rejectTransaction(
         @Path("id") id: String,
+        @Header("Content-Type") contentType: String = "application/json",
         @Body request: RejectTransactionRequest
     ): TransactionActionResponse
 

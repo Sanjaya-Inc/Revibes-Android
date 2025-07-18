@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import com.carissa.revibes.core.presentation.components.components.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,10 +39,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.carissa.revibes.core.presentation.components.components.Button
+import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import com.carissa.revibes.manage_transaction.R
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailItemDomain
@@ -129,6 +136,7 @@ fun TransactionDetailScreen(
                         transaction = uiState.transactionDetail!!,
                         onAccept = { showCompleteDialog = true },
                         onReject = { showRejectDialog = true },
+                        isRejecting = uiState.isRejecting,
                         isProcessing = uiState.isProcessing
                     )
                 }
@@ -175,6 +183,7 @@ private fun TransactionDetailContent(
     transaction: TransactionDetailDomain,
     onAccept: () -> Unit,
     onReject: () -> Unit,
+    isRejecting: Boolean,
     isProcessing: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -210,7 +219,8 @@ private fun TransactionDetailContent(
                     Button(
                         text = stringResource(R.string.reject_transaction),
                         onClick = onReject,
-                        enabled = !isProcessing,
+                        enabled = !isProcessing && !isRejecting,
+                        loading = isRejecting,
                         modifier = Modifier.weight(1f),
                         variant = ButtonVariant.SecondaryOutlined
                     )
@@ -218,7 +228,7 @@ private fun TransactionDetailContent(
                     Button(
                         text = stringResource(R.string.accept_transaction),
                         onClick = onAccept,
-                        enabled = !isProcessing,
+                        enabled = !isProcessing && !isRejecting,
                         loading = isProcessing,
                         modifier = Modifier.weight(1f)
                     )
@@ -260,18 +270,18 @@ private fun TransactionInfoCard(
             )
 
             InfoRow(
+                label = stringResource(R.string.store_name),
+                value = transaction.storeName
+            )
+
+            InfoRow(
                 label = stringResource(R.string.address),
-                value = "${transaction.address}${transaction.addressDetail?.let { ", $it" } ?: ""}"
+                value = transaction.address
             )
 
             InfoRow(
                 label = stringResource(R.string.postal_code),
                 value = transaction.postalCode
-            )
-
-            InfoRow(
-                label = stringResource(R.string.store_location),
-                value = transaction.storeLocation
             )
 
             InfoRow(
@@ -326,6 +336,19 @@ private fun TransactionItemCard(
                 label = stringResource(R.string.points),
                 value = item.point.toString()
             )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(item.media) { imageUrl ->
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        placeholder = painterResource(R.drawable.image_placeholder)
+                    )
+                }
+            }
         }
     }
 }
@@ -357,7 +380,7 @@ private fun InfoRow(
 
 @Composable
 private fun RejectTransactionDialog(
-    onConfirm: (String?) -> Unit,
+    onConfirm: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     var reason by remember { mutableStateOf("") }
@@ -381,10 +404,12 @@ private fun RejectTransactionDialog(
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = { onConfirm(reason.takeIf { it.isNotBlank() }) }
-            ) {
-                Text(stringResource(R.string.reject))
+            if (reason.isNotBlank()) {
+                TextButton(
+                    onClick = { onConfirm(reason) }
+                ) {
+                    Text(stringResource(R.string.reject))
+                }
             }
         },
         dismissButton = {
