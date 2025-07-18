@@ -1,22 +1,21 @@
 package com.carissa.revibes.manage_voucher.data.remote
 
-import com.carissa.revibes.manage_voucher.data.model.CreateVoucherRequest
-import com.carissa.revibes.manage_voucher.data.model.UpdateVoucherRequest
+import com.carissa.revibes.manage_voucher.data.model.BaseResponse
 import com.carissa.revibes.manage_voucher.data.model.VoucherDetailResponse
 import com.carissa.revibes.manage_voucher.data.model.VoucherListResponse
 import de.jensklingenberg.ktorfit.Ktorfit
-import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Multipart
 import de.jensklingenberg.ktorfit.http.POST
-import de.jensklingenberg.ktorfit.http.PUT
+import de.jensklingenberg.ktorfit.http.Part
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 import org.koin.core.annotation.Single
 
 interface ManageVoucherRemoteApi {
 
-    @GET("admin/vouchers")
+    @GET("vouchers")
     suspend fun getVoucherList(
         @Query("limit") limit: Int = 10,
         @Query("sortBy") sortBy: String = "createdAt",
@@ -25,26 +24,30 @@ interface ManageVoucherRemoteApi {
         @Query("direction") direction: String = "next"
     ): VoucherListResponse
 
-    @GET("admin/vouchers/{id}")
+    @GET("vouchers/{id}")
     suspend fun getVoucherDetail(
         @Path("id") id: String
     ): VoucherDetailResponse
 
-    @POST("admin/vouchers")
+    @POST("vouchers")
+    @Multipart
     suspend fun createVoucher(
-        @Body request: CreateVoucherRequest
+        @Part("code") code: String,
+        @Part("name") name: String,
+        @Part("description") description: String,
+        @Part("type") type: String,
+        @Part("amount") amount: String,
+        @Part("conditions") conditions: String,
+        @Part("claimPeriodStart") claimPeriodStart: String,
+        @Part("claimPeriodEnd") claimPeriodEnd: String,
+//        @Part("currency") currency: String,
+//        @Part("image") image: ByteArray? = null,
     ): VoucherDetailResponse
 
-    @PUT("admin/vouchers/{id}")
-    suspend fun updateVoucher(
-        @Path("id") id: String,
-        @Body request: UpdateVoucherRequest
-    ): VoucherDetailResponse
-
-    @DELETE("admin/vouchers/{id}")
+    @DELETE("vouchers/{id}")
     suspend fun deleteVoucher(
         @Path("id") id: String
-    ): VoucherDetailResponse
+    ): BaseResponse
 }
 
 @Single

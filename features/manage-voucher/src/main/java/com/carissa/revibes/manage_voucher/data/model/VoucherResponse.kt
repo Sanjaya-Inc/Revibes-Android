@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Keep
 data class VoucherListResponse(
-    val success: Boolean,
+    val code: Int,
+    val status: String,
     val message: String,
     val data: VoucherListData
 )
@@ -14,7 +15,7 @@ data class VoucherListResponse(
 @Serializable
 @Keep
 data class VoucherListData(
-    val items: List<VoucherData>,
+    val items: List<VoucherItemData>,
     val pagination: PaginationData
 )
 
@@ -47,21 +48,44 @@ data class VoucherData(
 
 @Serializable
 @Keep
+data class VoucherItemData(
+    val id: String,
+    val code: String,
+    val name: String,
+    val value: VoucherValue,
+    val imageUri: String,
+    val claimPeriodStart: String,
+    val claimPeriodEnd: String,
+    val createdAt: String,
+    val updatedAt: String
+)
+
+@Serializable
+@Keep
+data class VoucherValue(
+    val type: String,
+    val amount: Long,
+)
+
+@Serializable
+@Keep
 data class VoucherConditionsData(
     val maxClaim: Int,
     val maxUsage: Int,
     val minOrderItem: Int,
-    val minOrderAmount: Double,
-    val maxDiscountAmount: Double
+    val minOrderAmount: Long,
+    val maxDiscountAmount: Long,
 )
 
 @Serializable
 @Keep
 data class PaginationData(
-    val currentPage: Int,
-    val totalPages: Int,
-    val totalItems: Int,
+    val limit: Int,
+    val sortBy: String,
+    val sortOrder: String,
+    val lastDocId: String? = null,
+    val firstDocId: String? = null,
+    val direction: String,
     val hasMoreNext: Boolean,
-    val hasMorePrev: Boolean,
-    val lastDocId: String?
+    val hasMorePrev: Boolean
 )

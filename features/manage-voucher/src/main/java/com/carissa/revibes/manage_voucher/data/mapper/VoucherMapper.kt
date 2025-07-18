@@ -2,68 +2,73 @@ package com.carissa.revibes.manage_voucher.data.mapper
 
 import com.carissa.revibes.manage_voucher.data.model.VoucherConditionsData
 import com.carissa.revibes.manage_voucher.data.model.VoucherData
+import com.carissa.revibes.manage_voucher.data.model.VoucherItemData
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.toPersistentList
 
-fun VoucherData.toVoucherDomain(): VoucherDomain {
+fun VoucherData.toDomain(): VoucherDomain {
     return VoucherDomain(
-        id = id,
-        code = code,
-        name = name,
-        description = description,
-        type = when (type.lowercase()) {
-            "percent-off" -> VoucherDomain.VoucherType.PERCENT_OFF
-            "fixed-amount" -> VoucherDomain.VoucherType.FIXED_AMOUNT
-            else -> VoucherDomain.VoucherType.PERCENT_OFF
-        },
-        amount = amount,
-        currency = when (currency.uppercase()) {
-            "IDR" -> VoucherDomain.Currency.IDR
-            "USD" -> VoucherDomain.Currency.USD
-            "EUR" -> VoucherDomain.Currency.EUR
-            "GBP" -> VoucherDomain.Currency.GBP
-            "JPY" -> VoucherDomain.Currency.JPY
-            else -> VoucherDomain.Currency.IDR
-        },
-        conditions = conditions.toVoucherConditions(),
-        claimPeriodStart = claimPeriodStart,
-        claimPeriodEnd = claimPeriodEnd,
-        imageUrl = imageUrl,
-        isActive = isActive,
-        createdAt = createdAt,
-        updatedAt = updatedAt
+        id = this.id,
+        code = this.code,
+        name = this.name,
+        description = this.description,
+        type = this.type.toVoucherType(),
+        amount = this.amount,
+//        currency = this.currency.toCurrency(),
+        conditions = this.conditions.toDomain(),
+        claimPeriodStart = this.claimPeriodStart,
+        claimPeriodEnd = this.claimPeriodEnd,
+        imageUrl = this.imageUrl,
+        isActive = true,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
     )
 }
 
-fun VoucherConditionsData.toVoucherConditions(): VoucherConditions {
+fun VoucherConditionsData.toDomain(): VoucherConditions {
     return VoucherConditions(
-        maxClaim = maxClaim,
-        maxUsage = maxUsage,
-        minOrderItem = minOrderItem,
-        minOrderAmount = minOrderAmount,
-        maxDiscountAmount = maxDiscountAmount
+        maxClaim = this.maxClaim,
+        maxUsage = this.maxUsage,
+        minOrderItem = this.minOrderItem,
+        minOrderAmount = this.minOrderAmount,
+        maxDiscountAmount = this.maxDiscountAmount
     )
 }
 
-fun List<VoucherData>.toVoucherDomainList(): PersistentList<VoucherDomain> {
-    return map { it.toVoucherDomain() }.toPersistentList()
-}
-
-fun VoucherDomain.VoucherType.toApiString(): String {
+fun String.toVoucherType(): VoucherDomain.VoucherType {
     return when (this) {
-        VoucherDomain.VoucherType.PERCENT_OFF -> "percent-off"
-        VoucherDomain.VoucherType.FIXED_AMOUNT -> "fixed-amount"
+        "percent-off" -> VoucherDomain.VoucherType.PERCENT_OFF
+        "fixed-amount" -> VoucherDomain.VoucherType.FIXED_AMOUNT
+        else -> throw IllegalArgumentException("Unknown voucher type: $this")
     }
 }
 
-fun VoucherDomain.Currency.toApiString(): String {
-    return when (this) {
-        VoucherDomain.Currency.IDR -> "idr"
-        VoucherDomain.Currency.USD -> "usd"
-        VoucherDomain.Currency.EUR -> "eur"
-        VoucherDomain.Currency.GBP -> "gbp"
-        VoucherDomain.Currency.JPY -> "jpy"
-    }
+fun VoucherItemData.toDomain(): VoucherDomain {
+    return VoucherDomain(
+        id = this.id,
+        code = this.code,
+        name = this.name,
+        description = "",
+        type = this.value.type.toVoucherType(),
+        amount = this.value.amount.toDouble(),
+//        currency = this.currency.toCurrency(),
+        conditions = null,
+        claimPeriodStart = this.claimPeriodStart,
+        claimPeriodEnd = this.claimPeriodEnd,
+        imageUrl = this.imageUri,
+        isActive = true,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
+    )
 }
+
+// fun String.toCurrency(): VoucherDomain.Currency {
+//    return when (this) {
+//        "IDR" -> VoucherDomain.Currency.IDR
+//        "USD" -> VoucherDomain.Currency.USD
+//        "EUR" -> VoucherDomain.Currency.EUR
+//        "GBP" -> VoucherDomain.Currency.GBP
+//        "JPY" -> VoucherDomain.Currency.JPY
+//        else -> throw IllegalArgumentException("Unknown currency: $this")
+//    }
+// }

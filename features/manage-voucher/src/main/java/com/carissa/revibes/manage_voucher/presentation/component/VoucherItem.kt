@@ -1,7 +1,7 @@
 package com.carissa.revibes.manage_voucher.presentation.component
 
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,16 +44,15 @@ import java.util.Locale
 @Composable
 fun VoucherItem(
     voucher: VoucherDomain,
-    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDropdown by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .clickable { onEditClick() },
+            .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -148,7 +148,11 @@ fun VoucherItem(
                             text = { Text("Edit") },
                             onClick = {
                                 showDropdown = false
-                                onEditClick()
+                                Toast.makeText(
+                                    context,
+                                    "Edit feature is coming soon!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             },
                             leadingIcon = {
                                 Icon(
@@ -224,7 +228,7 @@ fun VoucherItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = voucher.conditions.maxClaim.toString(),
+                        text = voucher.conditions?.maxClaim.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium
                     )

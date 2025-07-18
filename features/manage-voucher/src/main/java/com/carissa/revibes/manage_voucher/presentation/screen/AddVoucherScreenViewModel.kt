@@ -16,7 +16,7 @@ data class AddVoucherScreenUiState(
     val description: TextFieldValue = TextFieldValue(),
     val type: VoucherDomain.VoucherType = VoucherDomain.VoucherType.PERCENT_OFF,
     val amount: TextFieldValue = TextFieldValue(),
-    val currency: VoucherDomain.Currency = VoucherDomain.Currency.IDR,
+//    val currency: VoucherDomain.Currency = VoucherDomain.Currency.IDR,
     val maxClaim: TextFieldValue = TextFieldValue(),
     val maxUsage: TextFieldValue = TextFieldValue(),
     val minOrderItem: TextFieldValue = TextFieldValue(),
@@ -47,7 +47,8 @@ sealed interface AddVoucherScreenUiEvent : NavigationEvent {
     data class DescriptionChanged(val description: TextFieldValue) : AddVoucherScreenUiEvent
     data class TypeChanged(val type: VoucherDomain.VoucherType) : AddVoucherScreenUiEvent
     data class AmountChanged(val amount: TextFieldValue) : AddVoucherScreenUiEvent
-    data class CurrencyChanged(val currency: VoucherDomain.Currency) : AddVoucherScreenUiEvent
+
+    //    data class CurrencyChanged(val currency: VoucherDomain.Currency) : AddVoucherScreenUiEvent
     data class MaxClaimChanged(val maxClaim: TextFieldValue) : AddVoucherScreenUiEvent
     data class MaxUsageChanged(val maxUsage: TextFieldValue) : AddVoucherScreenUiEvent
     data class MinOrderItemChanged(val minOrderItem: TextFieldValue) : AddVoucherScreenUiEvent
@@ -82,7 +83,7 @@ class AddVoucherScreenViewModel(
             is AddVoucherScreenUiEvent.DescriptionChanged -> updateDescription(event.description)
             is AddVoucherScreenUiEvent.TypeChanged -> updateType(event.type)
             is AddVoucherScreenUiEvent.AmountChanged -> updateAmount(event.amount)
-            is AddVoucherScreenUiEvent.CurrencyChanged -> updateCurrency(event.currency)
+//            is AddVoucherScreenUiEvent.CurrencyChanged -> updateCurrency(event.currency)
             is AddVoucherScreenUiEvent.MaxClaimChanged -> updateMaxClaim(event.maxClaim)
             is AddVoucherScreenUiEvent.MaxUsageChanged -> updateMaxUsage(event.maxUsage)
             is AddVoucherScreenUiEvent.MinOrderItemChanged -> updateMinOrderItem(event.minOrderItem)
@@ -136,15 +137,24 @@ class AddVoucherScreenViewModel(
         }
     }
 
-    private fun updateCurrency(currency: VoucherDomain.Currency) = intent {
-        reduce { state.copy(currency = currency) }
-    }
+//    private fun updateCurrency(currency: VoucherDomain.Currency) = intent {
+//        reduce { state.copy(currency = currency) }
+//    }
 
     private fun updateMaxClaim(maxClaim: TextFieldValue) = intent {
         reduce {
             state.copy(
                 maxClaim = maxClaim,
                 maxClaimError = null
+            )
+        }
+    }
+
+    private fun updateMaxDiscountAmount(maxDiscountAmount: TextFieldValue) = intent {
+        reduce {
+            state.copy(
+                maxDiscountAmount = maxDiscountAmount,
+                maxDiscountAmountError = null
             )
         }
     }
@@ -172,15 +182,6 @@ class AddVoucherScreenViewModel(
             state.copy(
                 minOrderAmount = minOrderAmount,
                 minOrderAmountError = null
-            )
-        }
-    }
-
-    private fun updateMaxDiscountAmount(maxDiscountAmount: TextFieldValue) = intent {
-        reduce {
-            state.copy(
-                maxDiscountAmount = maxDiscountAmount,
-                maxDiscountAmountError = null
             )
         }
     }
@@ -216,13 +217,23 @@ class AddVoucherScreenViewModel(
 
         reduce { state.copy(isLoading = true) }
 
-        val conditions = VoucherConditions(
-            maxClaim = state.maxClaim.text.toIntOrNull() ?: 0,
-            maxUsage = state.maxUsage.text.toIntOrNull() ?: 0,
-            minOrderItem = state.minOrderItem.text.toIntOrNull() ?: 0,
-            minOrderAmount = state.minOrderAmount.text.toDoubleOrNull() ?: 0.0,
-            maxDiscountAmount = state.maxDiscountAmount.text.toDoubleOrNull() ?: 0.0
-        )
+        val conditions = if (state.showConditionsSection) {
+            VoucherConditions(
+                maxClaim = state.maxClaim.text.toIntOrNull() ?: 0,
+                maxUsage = state.maxUsage.text.toIntOrNull() ?: 0,
+                minOrderItem = state.minOrderItem.text.toIntOrNull() ?: 0,
+                minOrderAmount = state.minOrderAmount.text.toLongOrNull() ?: 0L,
+                maxDiscountAmount = state.maxDiscountAmount.text.toLongOrNull() ?: 0L
+            )
+        } else {
+            VoucherConditions(
+                maxClaim = 0,
+                maxUsage = 0,
+                minOrderItem = 0,
+                minOrderAmount = 0L,
+                maxDiscountAmount = 0L
+            )
+        }
 
         repository.createVoucher(
             code = state.code.text,
@@ -230,7 +241,7 @@ class AddVoucherScreenViewModel(
             description = state.description.text,
             type = state.type,
             amount = state.amount.text.toDoubleOrNull() ?: 0.0,
-            currency = state.currency,
+//            currency = state.currency,
             conditions = conditions,
             claimPeriodStart = state.claimPeriodStart,
             claimPeriodEnd = state.claimPeriodEnd,
@@ -278,27 +289,47 @@ class AddVoucherScreenViewModel(
                 newState.copy(amountError = "Valid amount is required")
             }
 
-            state.maxClaim.text.isBlank() || state.maxClaim.text.toIntOrNull() == null -> {
+            state.showConditionsSection &&
+                (
+                    state.maxClaim.text.isBlank() ||
+                        state.maxClaim.text.toIntOrNull() == null
+                    ) -> {
                 hasError = true
                 newState.copy(maxClaimError = "Valid max claim is required")
             }
 
-            state.maxUsage.text.isBlank() || state.maxUsage.text.toIntOrNull() == null -> {
+            state.showConditionsSection &&
+                (
+                    state.maxUsage.text.isBlank() ||
+                        state.maxUsage.text.toIntOrNull() == null
+                    ) -> {
                 hasError = true
                 newState.copy(maxUsageError = "Valid max usage is required")
             }
 
-            state.minOrderItem.text.isBlank() || state.minOrderItem.text.toIntOrNull() == null -> {
+            state.showConditionsSection &&
+                (
+                    state.minOrderItem.text.isBlank() ||
+                        state.minOrderItem.text.toIntOrNull() == null
+                    ) -> {
                 hasError = true
                 newState.copy(minOrderItemError = "Valid min order item is required")
             }
 
-            state.minOrderAmount.text.isBlank() || state.minOrderAmount.text.toDoubleOrNull() == null -> {
+            state.showConditionsSection &&
+                (
+                    state.minOrderAmount.text.isBlank() ||
+                        state.minOrderAmount.text.toLongOrNull() == null
+                    ) -> {
                 hasError = true
                 newState.copy(minOrderAmountError = "Valid min order amount is required")
             }
 
-            state.maxDiscountAmount.text.isBlank() || state.maxDiscountAmount.text.toDoubleOrNull() == null -> {
+            state.showConditionsSection &&
+                (
+                    state.maxDiscountAmount.text.isBlank() ||
+                        state.maxDiscountAmount.text.toLongOrNull() == null
+                    ) -> {
                 hasError = true
                 newState.copy(maxDiscountAmountError = "Valid max discount amount is required")
             }
@@ -315,6 +346,7 @@ class AddVoucherScreenViewModel(
 
             else -> newState
         }
+        intent { reduce { updatedState } }
 
         return !hasError
     }

@@ -236,7 +236,7 @@ fun AddVoucherScreen(
                                 singleLine = true
                             )
 
-                            if (state.type == VoucherDomain.VoucherType.FIXED_AMOUNT) {
+                            /*if (state.type == VoucherDomain.VoucherType.FIXED_AMOUNT) {
                                 var currencyExpanded by remember { mutableStateOf(false) }
                                 ExposedDropdownMenuBox(
                                     expanded = currencyExpanded,
@@ -270,7 +270,7 @@ fun AddVoucherScreen(
                                         }
                                     }
                                 }
-                            }
+                            }*/
                         }
                     }
                 }
@@ -317,43 +317,38 @@ fun AddVoucherScreen(
                             ) {
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                Row(
+                                OutlinedTextField(
+                                    value = state.maxClaim,
+                                    onValueChange = {
+                                        viewModel.onEvent(AddVoucherScreenUiEvent.MaxClaimChanged(it))
+                                    },
+                                    label = { Text("Max Claims") },
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    OutlinedTextField(
-                                        value = state.maxClaim,
-                                        onValueChange = {
-                                            viewModel.onEvent(AddVoucherScreenUiEvent.MaxClaimChanged(it))
-                                        },
-                                        label = { Text("Max Claims") },
-                                        modifier = Modifier.weight(1f),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        isError = state.maxClaimError != null,
-                                        supportingText = state.maxClaimError?.let { { Text(it) } },
-                                        singleLine = true
-                                    )
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    isError = state.maxClaimError != null,
+                                    supportingText = state.maxClaimError?.let { { Text(it) } },
+                                    singleLine = true
+                                )
 
-                                    OutlinedTextField(
-                                        value = state.maxUsage,
-                                        onValueChange = {
-                                            viewModel.onEvent(AddVoucherScreenUiEvent.MaxUsageChanged(it))
-                                        },
-                                        label = { Text("Max Usage") },
-                                        modifier = Modifier.weight(1f),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        isError = state.maxUsageError != null,
-                                        supportingText = state.maxUsageError?.let { { Text(it) } },
-                                        singleLine = true
-                                    )
-                                }
+                                OutlinedTextField(
+                                    value = state.maxUsage,
+                                    onValueChange = {
+                                        viewModel.onEvent(AddVoucherScreenUiEvent.MaxUsageChanged(it))
+                                    },
+                                    label = { Text("Max Usage per User") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    isError = state.maxUsageError != null,
+                                    supportingText = state.maxUsageError?.let { { Text(it) } },
+                                    singleLine = true
+                                )
 
                                 OutlinedTextField(
                                     value = state.minOrderItem,
                                     onValueChange = {
                                         viewModel.onEvent(AddVoucherScreenUiEvent.MinOrderItemChanged(it))
                                     },
-                                    label = { Text("Min Order Items") },
+                                    label = { Text("Min Order Item") },
                                     modifier = Modifier.fillMaxWidth(),
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     isError = state.minOrderItemError != null,

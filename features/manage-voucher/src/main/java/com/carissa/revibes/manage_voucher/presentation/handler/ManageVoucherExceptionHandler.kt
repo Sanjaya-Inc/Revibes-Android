@@ -3,8 +3,6 @@ package com.carissa.revibes.manage_voucher.presentation.handler
 import android.util.Log
 import com.carissa.revibes.manage_voucher.presentation.screen.AddVoucherScreenUiEvent
 import com.carissa.revibes.manage_voucher.presentation.screen.AddVoucherScreenUiState
-import com.carissa.revibes.manage_voucher.presentation.screen.EditVoucherScreenUiEvent
-import com.carissa.revibes.manage_voucher.presentation.screen.EditVoucherScreenUiState
 import com.carissa.revibes.manage_voucher.presentation.screen.ManageVoucherScreenUiEvent
 import com.carissa.revibes.manage_voucher.presentation.screen.ManageVoucherScreenUiState
 import org.koin.core.annotation.Factory
@@ -34,15 +32,6 @@ class ManageVoucherExceptionHandler {
         reduce { state.copy(isLoading = false) }
         postSideEffect(AddVoucherScreenUiEvent.OnCreateVoucherFailed(throwable.message.orEmpty()))
         Log.e(TAG, "onAddVoucherError: ${throwable.message}", throwable)
-    }
-
-    suspend fun onEditVoucherError(
-        syntax: Syntax<EditVoucherScreenUiState, EditVoucherScreenUiEvent>,
-        throwable: Throwable
-    ) = syntax.run {
-        reduce { state.copy(isLoading = false) }
-        postSideEffect(EditVoucherScreenUiEvent.OnUpdateVoucherFailed(throwable.message.orEmpty()))
-        Log.e(TAG, "onEditVoucherError: ${throwable.message}", throwable)
     }
 
     companion object {

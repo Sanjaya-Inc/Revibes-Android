@@ -242,11 +242,6 @@ fun ManageVoucherScreen(
                             ) { voucher ->
                                 VoucherItem(
                                     voucher = voucher,
-                                    onEditClick = {
-                                        viewModel.onEvent(
-                                            ManageVoucherScreenUiEvent.NavigateToEditVoucher(voucher.id)
-                                        )
-                                    },
                                     onDeleteClick = {
                                         viewModel.onEvent(
                                             ManageVoucherScreenUiEvent.ShowDeleteDialog(voucher)
