@@ -9,7 +9,7 @@ data class ManageTransactionDomain(
     val country: String,
     val address: String,
     val postalCode: String,
-    val storeLocation: String?,
+    val storeName: String,
     val status: TransactionStatus,
     val maker: String,
     val items: List<TransactionItemDomain>,

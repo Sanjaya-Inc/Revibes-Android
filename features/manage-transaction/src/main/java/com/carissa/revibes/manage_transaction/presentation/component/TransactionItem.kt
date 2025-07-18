@@ -38,9 +38,6 @@ internal fun TransactionItem(
             .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
     ) {
         Column(
             modifier = Modifier
@@ -86,7 +83,7 @@ internal fun TransactionItem(
                 )
 
                 Text(
-                    text = stringResource(R.string.total_points, transaction.totalPoint),
+                    text = stringResource(R.string.total_points_value, transaction.totalPoint),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary

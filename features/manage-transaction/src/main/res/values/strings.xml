@@ -14,7 +14,8 @@
     <string name="transaction_id">ID</string>
     <string name="items_count">%1$d items</string>
     <string name="total_points">Total points</string>
-    
+    <string name="total_points_value">Total %1$d points</string>
+
     <!-- Transaction Status -->
     <string name="status_pending">Pending</string>
     <string name="status_completed">Completed</string>
