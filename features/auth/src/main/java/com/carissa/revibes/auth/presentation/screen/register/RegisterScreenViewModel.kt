@@ -7,6 +7,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.auth.presentation.screen.register.handler.RegisterExceptionHandler
 import com.carissa.revibes.auth.presentation.screen.register.handler.RegisterSubmitHandler
 import com.carissa.revibes.core.presentation.BaseViewModel
+import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.util.EmailValidator
 import com.carissa.revibes.core.presentation.util.FullNameValidator
 import com.carissa.revibes.core.presentation.util.PasswordValidator
@@ -43,8 +44,8 @@ data class RegisterScreenUiState(
 }
 
 sealed interface RegisterScreenUiEvent {
-    data object NavigateBack : RegisterScreenUiEvent
-    data object NavigateToLogin : RegisterScreenUiEvent
+    data object NavigateBack : NavigationEvent, RegisterScreenUiEvent
+    data object NavigateToLogin : NavigationEvent, RegisterScreenUiEvent
     data class FullNameChanged(val fullName: TextFieldValue) : RegisterScreenUiEvent
     data class EmailChanged(val email: TextFieldValue) : RegisterScreenUiEvent
     data class PhoneChanged(val phone: TextFieldValue) : RegisterScreenUiEvent

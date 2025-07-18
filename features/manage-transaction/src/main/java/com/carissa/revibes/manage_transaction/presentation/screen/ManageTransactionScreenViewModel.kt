@@ -10,11 +10,14 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.android.annotation.KoinViewModel
 
-sealed interface ManageTransactionScreenUiEvent : NavigationEvent {
+sealed interface ManageTransactionScreenUiEvent {
     data class OnSearchQueryChanged(val query: String) : ManageTransactionScreenUiEvent
     data object RefreshTransactions : ManageTransactionScreenUiEvent
     data object LoadTransactions : ManageTransactionScreenUiEvent
-    data class NavigateToDetail(val transactionId: String) : ManageTransactionScreenUiEvent
+    data class NavigateToDetail(val transactionId: String) :
+        NavigationEvent,
+        ManageTransactionScreenUiEvent
+
     data class OnLoadTransactionsFailed(val message: String) : ManageTransactionScreenUiEvent
 }
 
@@ -45,6 +48,7 @@ class ManageTransactionScreenViewModel internal constructor(
             is ManageTransactionScreenUiEvent.OnSearchQueryChanged -> onSearchQueryChanged(event.query)
             is ManageTransactionScreenUiEvent.RefreshTransactions,
             is ManageTransactionScreenUiEvent.LoadTransactions -> loadTransactions()
+
             else -> super.onEvent(event)
         }
     }

@@ -1,13 +1,12 @@
 package com.carissa.revibes.manage_transaction.presentation.screen
 
 import com.carissa.revibes.core.presentation.BaseViewModel
-import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.manage_transaction.data.ManageTransactionRepository
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
 import com.carissa.revibes.manage_transaction.presentation.handler.ManageTransactionExceptionHandler
 import org.koin.android.annotation.KoinViewModel
 
-sealed interface TransactionDetailScreenUiEvent : NavigationEvent {
+sealed interface TransactionDetailScreenUiEvent {
     data class LoadTransactionDetail(val transactionId: String) : TransactionDetailScreenUiEvent
     data class RejectTransaction(val reason: String?) : TransactionDetailScreenUiEvent
     data object CompleteTransaction : TransactionDetailScreenUiEvent

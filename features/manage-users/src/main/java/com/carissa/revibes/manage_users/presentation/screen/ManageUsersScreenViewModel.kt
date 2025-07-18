@@ -22,9 +22,9 @@ data class ManageUsersScreenUiState(
     val error: String? = null
 )
 
-sealed interface ManageUsersScreenUiEvent : NavigationEvent {
-    data class NavigateToEditUser(val userId: String) : ManageUsersScreenUiEvent
-    data object NavigateToAddUser : ManageUsersScreenUiEvent
+sealed interface ManageUsersScreenUiEvent {
+    data class NavigateToEditUser(val userId: String) : NavigationEvent, ManageUsersScreenUiEvent
+    data object NavigateToAddUser : NavigationEvent, ManageUsersScreenUiEvent
     data object Initialize : ManageUsersScreenUiEvent
     data object LoadMore : ManageUsersScreenUiEvent
     data object Refresh : ManageUsersScreenUiEvent

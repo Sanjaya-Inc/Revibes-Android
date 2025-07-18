@@ -9,7 +9,7 @@ import org.koin.android.annotation.KoinViewModel
 
 data class ShopScreenUiState(val isLoading: Boolean = false)
 
-sealed interface ShopScreenUiEvent : NavigationEvent {
+sealed interface ShopScreenUiEvent {
     data object NavigateToProfile : ShopScreenUiEvent, NavigationEvent
 }
 

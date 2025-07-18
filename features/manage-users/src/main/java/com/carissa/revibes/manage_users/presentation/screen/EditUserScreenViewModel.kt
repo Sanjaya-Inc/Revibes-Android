@@ -2,7 +2,6 @@ package com.carissa.revibes.manage_users.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
-import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.manage_users.data.ManageUsersRepository
 import com.carissa.revibes.manage_users.domain.model.UserDomain
 import com.carissa.revibes.manage_users.presentation.handler.ManageUsersExceptionHandler
@@ -19,8 +18,7 @@ data class EditUserScreenUiState(
     val isSuccess: Boolean = false
 )
 
-sealed interface EditUserScreenUiEvent : NavigationEvent {
-    data object NavigateBack : EditUserScreenUiEvent
+sealed interface EditUserScreenUiEvent {
     data class SetUserId(val userId: String) : EditUserScreenUiEvent
     data object LoadUserDetail : EditUserScreenUiEvent
     data object ShowAddPointsDialog : EditUserScreenUiEvent

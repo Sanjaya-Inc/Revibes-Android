@@ -1,5 +1,6 @@
 package com.carissa.revibes.manage_voucher.presentation.screen
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,11 +17,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import com.carissa.revibes.core.presentation.components.components.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -37,21 +36,26 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
 import com.carissa.revibes.manage_voucher.presentation.navigation.ManageVoucherGraph
+import com.carissa.revibes.manage_voucher.presentation.screen.components.DatePicker
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<ManageVoucherGraph>
@@ -61,9 +65,48 @@ fun AddVoucherScreen(
     modifier: Modifier = Modifier,
     viewModel: AddVoucherScreenViewModel = koinViewModel()
 ) {
-    val state by viewModel.container.stateFlow.collectAsState()
-    val scrollState = rememberScrollState()
+    val state by viewModel.collectAsState()
+    val context = LocalContext.current
 
+    viewModel.collectSideEffect {
+        when (it) {
+            is AddVoucherScreenUiEvent.OnCreateVoucherFailed -> {
+                Toast.makeText(
+                    context,
+                    "Failed to create voucher: ${it.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            is AddVoucherScreenUiEvent.OnVoucherAddedSuccessfully -> {
+                Toast.makeText(
+                    context,
+                    "Voucher created successfully",
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigator.navigateUp()
+            }
+
+            else -> Unit
+        }
+    }
+
+    AddVoucherContent(
+        state = state,
+        onBackClick = { navigator.navigateUp() },
+        modifier = modifier,
+        eventReceiver = viewModel
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddVoucherContent(
+    state: AddVoucherScreenUiState,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    eventReceiver: EventReceiver<AddVoucherScreenUiEvent> = EventReceiver {}
+) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -76,7 +119,7 @@ fun AddVoucherScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navigator.navigateUp() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -98,7 +141,7 @@ fun AddVoucherScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(scrollState)
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -119,7 +162,7 @@ fun AddVoucherScreen(
                         OutlinedTextField(
                             value = state.code,
                             onValueChange = {
-                                viewModel.onEvent(AddVoucherScreenUiEvent.CodeChanged(it))
+                                eventReceiver.onEvent(AddVoucherScreenUiEvent.CodeChanged(it))
                             },
                             label = { Text("Voucher Code") },
                             modifier = Modifier.fillMaxWidth(),
@@ -131,7 +174,7 @@ fun AddVoucherScreen(
                         OutlinedTextField(
                             value = state.name,
                             onValueChange = {
-                                viewModel.onEvent(AddVoucherScreenUiEvent.NameChanged(it))
+                                eventReceiver.onEvent(AddVoucherScreenUiEvent.NameChanged(it))
                             },
                             label = { Text("Voucher Name") },
                             modifier = Modifier.fillMaxWidth(),
@@ -143,7 +186,7 @@ fun AddVoucherScreen(
                         OutlinedTextField(
                             value = state.description,
                             onValueChange = {
-                                viewModel.onEvent(AddVoucherScreenUiEvent.DescriptionChanged(it))
+                                eventReceiver.onEvent(AddVoucherScreenUiEvent.DescriptionChanged(it))
                             },
                             label = { Text("Description") },
                             modifier = Modifier.fillMaxWidth(),
@@ -194,7 +237,7 @@ fun AddVoucherScreen(
                                 DropdownMenuItem(
                                     text = { Text("Percentage Off") },
                                     onClick = {
-                                        viewModel.onEvent(
+                                        eventReceiver.onEvent(
                                             AddVoucherScreenUiEvent.TypeChanged(VoucherDomain.VoucherType.PERCENT_OFF)
                                         )
                                         typeExpanded = false
@@ -203,7 +246,7 @@ fun AddVoucherScreen(
                                 DropdownMenuItem(
                                     text = { Text("Fixed Amount") },
                                     onClick = {
-                                        viewModel.onEvent(
+                                        eventReceiver.onEvent(
                                             AddVoucherScreenUiEvent.TypeChanged(VoucherDomain.VoucherType.FIXED_AMOUNT)
                                         )
                                         typeExpanded = false
@@ -219,7 +262,7 @@ fun AddVoucherScreen(
                             OutlinedTextField(
                                 value = state.amount,
                                 onValueChange = {
-                                    viewModel.onEvent(AddVoucherScreenUiEvent.AmountChanged(it))
+                                    eventReceiver.onEvent(AddVoucherScreenUiEvent.AmountChanged(it))
                                 },
                                 label = {
                                     Text(
@@ -235,42 +278,6 @@ fun AddVoucherScreen(
                                 supportingText = state.amountError?.let { { Text(it) } },
                                 singleLine = true
                             )
-
-                            /*if (state.type == VoucherDomain.VoucherType.FIXED_AMOUNT) {
-                                var currencyExpanded by remember { mutableStateOf(false) }
-                                ExposedDropdownMenuBox(
-                                    expanded = currencyExpanded,
-                                    onExpandedChange = { currencyExpanded = !currencyExpanded },
-                                    modifier = Modifier.weight(0.6f)
-                                ) {
-                                    OutlinedTextField(
-                                        value = state.currency.name,
-                                        onValueChange = {},
-                                        readOnly = true,
-                                        label = { Text("Currency") },
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = currencyExpanded
-                                            )
-                                        },
-                                        modifier = Modifier.menuAnchor()
-                                    )
-                                    ExposedDropdownMenu(
-                                        expanded = currencyExpanded,
-                                        onDismissRequest = { currencyExpanded = false }
-                                    ) {
-                                        VoucherDomain.Currency.values().forEach { currency ->
-                                            DropdownMenuItem(
-                                                text = { Text(currency.name) },
-                                                onClick = {
-                                                    viewModel.onEvent(AddVoucherScreenUiEvent.CurrencyChanged(currency))
-                                                    currencyExpanded = false
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            }*/
                         }
                     }
                 }
@@ -295,7 +302,7 @@ fun AddVoucherScreen(
 
                             TextButton(
                                 onClick = {
-                                    viewModel.onEvent(AddVoucherScreenUiEvent.ToggleConditionsSection)
+                                    eventReceiver.onEvent(AddVoucherScreenUiEvent.ToggleConditionsSection)
                                 }
                             ) {
                                 Text(if (state.showConditionsSection) "Hide" else "Show")
@@ -320,7 +327,11 @@ fun AddVoucherScreen(
                                 OutlinedTextField(
                                     value = state.maxClaim,
                                     onValueChange = {
-                                        viewModel.onEvent(AddVoucherScreenUiEvent.MaxClaimChanged(it))
+                                        eventReceiver.onEvent(
+                                            AddVoucherScreenUiEvent.MaxClaimChanged(
+                                                it
+                                            )
+                                        )
                                     },
                                     label = { Text("Max Claims") },
                                     modifier = Modifier.fillMaxWidth(),
@@ -333,7 +344,11 @@ fun AddVoucherScreen(
                                 OutlinedTextField(
                                     value = state.maxUsage,
                                     onValueChange = {
-                                        viewModel.onEvent(AddVoucherScreenUiEvent.MaxUsageChanged(it))
+                                        eventReceiver.onEvent(
+                                            AddVoucherScreenUiEvent.MaxUsageChanged(
+                                                it
+                                            )
+                                        )
                                     },
                                     label = { Text("Max Usage per User") },
                                     modifier = Modifier.fillMaxWidth(),
@@ -346,7 +361,11 @@ fun AddVoucherScreen(
                                 OutlinedTextField(
                                     value = state.minOrderItem,
                                     onValueChange = {
-                                        viewModel.onEvent(AddVoucherScreenUiEvent.MinOrderItemChanged(it))
+                                        eventReceiver.onEvent(
+                                            AddVoucherScreenUiEvent.MinOrderItemChanged(
+                                                it
+                                            )
+                                        )
                                     },
                                     label = { Text("Min Order Item") },
                                     modifier = Modifier.fillMaxWidth(),
@@ -359,7 +378,11 @@ fun AddVoucherScreen(
                                 OutlinedTextField(
                                     value = state.minOrderAmount,
                                     onValueChange = {
-                                        viewModel.onEvent(AddVoucherScreenUiEvent.MinOrderAmountChanged(it))
+                                        eventReceiver.onEvent(
+                                            AddVoucherScreenUiEvent.MinOrderAmountChanged(
+                                                it
+                                            )
+                                        )
                                     },
                                     label = { Text("Min Order Amount") },
                                     modifier = Modifier.fillMaxWidth(),
@@ -372,7 +395,11 @@ fun AddVoucherScreen(
                                 OutlinedTextField(
                                     value = state.maxDiscountAmount,
                                     onValueChange = {
-                                        viewModel.onEvent(AddVoucherScreenUiEvent.MaxDiscountAmountChanged(it))
+                                        eventReceiver.onEvent(
+                                            AddVoucherScreenUiEvent.MaxDiscountAmountChanged(
+                                                it
+                                            )
+                                        )
                                     },
                                     label = { Text("Max Discount Amount") },
                                     modifier = Modifier.fillMaxWidth(),
@@ -382,6 +409,21 @@ fun AddVoucherScreen(
                                     singleLine = true
                                 )
                             }
+                        }
+
+                        if (!state.showConditionsSection && (
+                                state.minOrderItemError != null ||
+                                    state.minOrderAmountError != null ||
+                                    state.maxDiscountAmountError != null ||
+                                    state.maxClaimError != null ||
+                                    state.maxUsageError != null
+                                )
+                        ) {
+                            Text(
+                                text = "Please fill in all required fields",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
                 }
@@ -400,18 +442,20 @@ fun AddVoucherScreen(
                             fontWeight = FontWeight.Bold
                         )
 
+                        var showStartDatePicker by remember { mutableStateOf(false) }
                         OutlinedTextField(
                             value = state.claimPeriodStart,
-                            onValueChange = {
-                                viewModel.onEvent(AddVoucherScreenUiEvent.ClaimPeriodStartChanged(it))
-                            },
+                            onValueChange = {},
+                            readOnly = true,
                             label = { Text("Start Date") },
                             modifier = Modifier.fillMaxWidth(),
                             trailingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.DateRange,
-                                    contentDescription = "Select date"
-                                )
+                                IconButton(onClick = { showStartDatePicker = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = "Select date"
+                                    )
+                                }
                             },
                             isError = state.claimPeriodStartError != null,
                             supportingText = state.claimPeriodStartError?.let { { Text(it) } },
@@ -419,24 +463,54 @@ fun AddVoucherScreen(
                             singleLine = true
                         )
 
+                        if (showStartDatePicker) {
+                            DatePicker(
+                                onDateSelected = {
+                                    eventReceiver.onEvent(
+                                        AddVoucherScreenUiEvent.ClaimPeriodStartChanged(
+                                            it
+                                        )
+                                    )
+                                    showStartDatePicker = false
+                                },
+                                onDismiss = { showStartDatePicker = false }
+                            )
+                        }
+
+                        var showEndDatePicker by remember { mutableStateOf(false) }
                         OutlinedTextField(
                             value = state.claimPeriodEnd,
-                            onValueChange = {
-                                viewModel.onEvent(AddVoucherScreenUiEvent.ClaimPeriodEndChanged(it))
-                            },
+                            onValueChange = { },
+                            readOnly = true,
                             label = { Text("End Date") },
                             modifier = Modifier.fillMaxWidth(),
                             trailingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.DateRange,
-                                    contentDescription = "Select date"
-                                )
+                                IconButton(onClick = { showEndDatePicker = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = "Select date"
+                                    )
+                                }
                             },
                             isError = state.claimPeriodEndError != null,
                             supportingText = state.claimPeriodEndError?.let { { Text(it) } },
                             placeholder = { Text("YYYY-MM-DD") },
                             singleLine = true
                         )
+
+                        if (showEndDatePicker) {
+                            DatePicker(
+                                onDateSelected = {
+                                    eventReceiver.onEvent(
+                                        AddVoucherScreenUiEvent.ClaimPeriodEndChanged(
+                                            it
+                                        )
+                                    )
+                                    showEndDatePicker = false
+                                },
+                                onDismiss = { showEndDatePicker = false }
+                            )
+                        }
                     }
                 }
 
@@ -446,7 +520,7 @@ fun AddVoucherScreen(
             Button(
                 text = if (state.isLoading) "Creating..." else "Create Voucher",
                 onClick = {
-                    viewModel.onEvent(AddVoucherScreenUiEvent.SaveVoucher)
+                    eventReceiver.onEvent(AddVoucherScreenUiEvent.SaveVoucher)
                 },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

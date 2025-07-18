@@ -28,8 +28,8 @@ data class LoginScreenUiState(
 }
 
 sealed interface LoginScreenUiEvent {
-    data object NavigateBack : LoginScreenUiEvent
-    data object NavigateToRegister : LoginScreenUiEvent
+    data object NavigateBack : NavigationEvent, LoginScreenUiEvent
+    data object NavigateToRegister : NavigationEvent, LoginScreenUiEvent
     data object NavigateToHome : LoginScreenUiEvent, NavigationEvent
     data object NavigateToAdminHome : LoginScreenUiEvent, NavigationEvent
     data class EmailChanged(val email: TextFieldValue) : LoginScreenUiEvent

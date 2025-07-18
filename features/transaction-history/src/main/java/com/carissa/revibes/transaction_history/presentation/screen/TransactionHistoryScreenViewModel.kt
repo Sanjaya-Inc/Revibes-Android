@@ -26,8 +26,9 @@ data class TransactionHistoryScreenUiState(
     val currentTab: Int = 0,
 )
 
-sealed interface TransactionHistoryScreenUiEvent : NavigationEvent {
+sealed interface TransactionHistoryScreenUiEvent {
     data class NavigateToTransactionDetail(val transactionId: String) :
+        NavigationEvent,
         TransactionHistoryScreenUiEvent
 
     data object Initialize : TransactionHistoryScreenUiEvent

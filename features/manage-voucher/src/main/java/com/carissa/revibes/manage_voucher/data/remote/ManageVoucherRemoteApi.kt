@@ -42,7 +42,7 @@ interface ManageVoucherRemoteApi {
         @Part("claimPeriodEnd") claimPeriodEnd: String,
 //        @Part("currency") currency: String,
 //        @Part("image") image: ByteArray? = null,
-    ): VoucherDetailResponse
+    ): BaseResponse
 
     @DELETE("vouchers/{id}")
     suspend fun deleteVoucher(

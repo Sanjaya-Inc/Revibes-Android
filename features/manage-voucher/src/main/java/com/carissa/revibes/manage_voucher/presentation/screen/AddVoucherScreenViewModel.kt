@@ -1,8 +1,8 @@
 package com.carissa.revibes.manage_voucher.presentation.screen
 
+import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
-import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.manage_voucher.data.ManageVoucherRepository
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
@@ -39,8 +39,8 @@ data class AddVoucherScreenUiState(
     val claimPeriodEndError: String? = null
 )
 
-sealed interface AddVoucherScreenUiEvent : NavigationEvent {
-    data object NavigateBack : AddVoucherScreenUiEvent
+sealed interface AddVoucherScreenUiEvent {
+    data object OnVoucherAddedSuccessfully : AddVoucherScreenUiEvent
     data object SaveVoucher : AddVoucherScreenUiEvent
     data class CodeChanged(val code: TextFieldValue) : AddVoucherScreenUiEvent
     data class NameChanged(val name: TextFieldValue) : AddVoucherScreenUiEvent
@@ -98,27 +98,36 @@ class AddVoucherScreenViewModel(
     }
 
     private fun updateCode(code: TextFieldValue) = intent {
+        val formattedCode = code.text.uppercase().replace(" ", "-")
         reduce {
             state.copy(
-                code = code,
+                code = code.copy(text = formattedCode),
                 codeError = null
             )
         }
     }
 
     private fun updateName(name: TextFieldValue) = intent {
+        val formattedName = name.text.split(" ").joinToString(" ") {
+            it.replaceFirstChar { char ->
+                if (char.isLowerCase()) char.titlecase() else char.toString()
+            }
+        }
         reduce {
             state.copy(
-                name = name,
+                name = name.copy(text = formattedName),
                 nameError = null
             )
         }
     }
 
     private fun updateDescription(description: TextFieldValue) = intent {
+        val formattedDescription = description.text.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase() else it.toString()
+        }
         reduce {
             state.copy(
-                description = description,
+                description = description.copy(text = formattedDescription),
                 descriptionError = null
             )
         }
@@ -212,49 +221,54 @@ class AddVoucherScreenViewModel(
         reduce { state.copy(showConditionsSection = !state.showConditionsSection) }
     }
 
-    private fun saveVoucher() = intent {
-        if (!validateForm(state)) return@intent
+    private fun saveVoucher() {
+        intent {
+            val isFormValid = validateForm(state)
+            if (isFormValid) {
+                reduce { state.copy(isLoading = true) }
 
-        reduce { state.copy(isLoading = true) }
+                val conditions = if (state.showConditionsSection) {
+                    VoucherConditions(
+                        maxClaim = state.maxClaim.text.toIntOrNull() ?: 0,
+                        maxUsage = state.maxUsage.text.toIntOrNull() ?: 0,
+                        minOrderItem = state.minOrderItem.text.toIntOrNull() ?: 0,
+                        minOrderAmount = state.minOrderAmount.text.toLongOrNull() ?: 0L,
+                        maxDiscountAmount = state.maxDiscountAmount.text.toLongOrNull() ?: 0L
+                    )
+                } else {
+                    VoucherConditions(
+                        maxClaim = 0,
+                        maxUsage = 0,
+                        minOrderItem = 0,
+                        minOrderAmount = 0L,
+                        maxDiscountAmount = 0L
+                    )
+                }
 
-        val conditions = if (state.showConditionsSection) {
-            VoucherConditions(
-                maxClaim = state.maxClaim.text.toIntOrNull() ?: 0,
-                maxUsage = state.maxUsage.text.toIntOrNull() ?: 0,
-                minOrderItem = state.minOrderItem.text.toIntOrNull() ?: 0,
-                minOrderAmount = state.minOrderAmount.text.toLongOrNull() ?: 0L,
-                maxDiscountAmount = state.maxDiscountAmount.text.toLongOrNull() ?: 0L
-            )
-        } else {
-            VoucherConditions(
-                maxClaim = 0,
-                maxUsage = 0,
-                minOrderItem = 0,
-                minOrderAmount = 0L,
-                maxDiscountAmount = 0L
-            )
-        }
-
-        repository.createVoucher(
-            code = state.code.text,
-            name = state.name.text,
-            description = state.description.text,
-            type = state.type,
-            amount = state.amount.text.toDoubleOrNull() ?: 0.0,
+                repository.createVoucher(
+                    code = state.code.text,
+                    name = state.name.text,
+                    description = state.description.text,
+                    type = state.type,
+                    amount = state.amount.text.toDoubleOrNull() ?: 0.0,
 //            currency = state.currency,
-            conditions = conditions,
-            claimPeriodStart = state.claimPeriodStart,
-            claimPeriodEnd = state.claimPeriodEnd,
-            imageUrl = state.imageUrl
-        )
+                    conditions = conditions,
+                    claimPeriodStart = state.claimPeriodStart,
+                    claimPeriodEnd = state.claimPeriodEnd,
+                    imageUrl = state.imageUrl
+                )
 
-        reduce { state.copy(isLoading = false) }
-        postSideEffect(AddVoucherScreenUiEvent.NavigateBack)
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(AddVoucherScreenUiEvent.OnVoucherAddedSuccessfully)
+            } else {
+                Log.e(TAG, "Form validation failed")
+            }
+        }
     }
 
     private fun validateForm(state: AddVoucherScreenUiState): Boolean {
         var hasError = false
-        val newState = state.copy(
+        var newState = state.copy(
             codeError = null,
             nameError = null,
             descriptionError = null,
@@ -268,86 +282,64 @@ class AddVoucherScreenViewModel(
             claimPeriodEndError = null
         )
 
-        val updatedState = when {
-            state.code.text.isBlank() -> {
-                hasError = true
-                newState.copy(codeError = "Code is required")
-            }
-
-            state.name.text.isBlank() -> {
-                hasError = true
-                newState.copy(nameError = "Name is required")
-            }
-
-            state.description.text.isBlank() -> {
-                hasError = true
-                newState.copy(descriptionError = "Description is required")
-            }
-
-            state.amount.text.isBlank() || state.amount.text.toDoubleOrNull() == null -> {
-                hasError = true
-                newState.copy(amountError = "Valid amount is required")
-            }
-
-            state.showConditionsSection &&
-                (
-                    state.maxClaim.text.isBlank() ||
-                        state.maxClaim.text.toIntOrNull() == null
-                    ) -> {
-                hasError = true
-                newState.copy(maxClaimError = "Valid max claim is required")
-            }
-
-            state.showConditionsSection &&
-                (
-                    state.maxUsage.text.isBlank() ||
-                        state.maxUsage.text.toIntOrNull() == null
-                    ) -> {
-                hasError = true
-                newState.copy(maxUsageError = "Valid max usage is required")
-            }
-
-            state.showConditionsSection &&
-                (
-                    state.minOrderItem.text.isBlank() ||
-                        state.minOrderItem.text.toIntOrNull() == null
-                    ) -> {
-                hasError = true
-                newState.copy(minOrderItemError = "Valid min order item is required")
-            }
-
-            state.showConditionsSection &&
-                (
-                    state.minOrderAmount.text.isBlank() ||
-                        state.minOrderAmount.text.toLongOrNull() == null
-                    ) -> {
-                hasError = true
-                newState.copy(minOrderAmountError = "Valid min order amount is required")
-            }
-
-            state.showConditionsSection &&
-                (
-                    state.maxDiscountAmount.text.isBlank() ||
-                        state.maxDiscountAmount.text.toLongOrNull() == null
-                    ) -> {
-                hasError = true
-                newState.copy(maxDiscountAmountError = "Valid max discount amount is required")
-            }
-
-            state.claimPeriodStart.isBlank() -> {
-                hasError = true
-                newState.copy(claimPeriodStartError = "Start date is required")
-            }
-
-            state.claimPeriodEnd.isBlank() -> {
-                hasError = true
-                newState.copy(claimPeriodEndError = "End date is required")
-            }
-
-            else -> newState
+        if (state.code.text.isBlank()) {
+            hasError = true
+            newState = newState.copy(codeError = "Code is required")
         }
-        intent { reduce { updatedState } }
+
+        if (state.name.text.isBlank()) {
+            hasError = true
+            newState = newState.copy(nameError = "Name is required")
+        }
+
+        if (state.description.text.isBlank()) {
+            hasError = true
+            newState = newState.copy(descriptionError = "Description is required")
+        }
+
+        if (state.amount.text.isBlank() || state.amount.text.toDoubleOrNull() == null) {
+            hasError = true
+            newState = newState.copy(amountError = "Valid amount is required")
+        }
+
+        if (state.maxClaim.text.isBlank() || state.maxClaim.text.toIntOrNull() == null) {
+            hasError = true
+            newState = newState.copy(maxClaimError = "Valid max claim is required")
+        }
+        if (state.maxUsage.text.isBlank() || state.maxUsage.text.toIntOrNull() == null) {
+            hasError = true
+            newState = newState.copy(maxUsageError = "Valid max usage is required")
+        }
+        if (state.minOrderItem.text.isBlank() || state.minOrderItem.text.toIntOrNull() == null) {
+            hasError = true
+            newState = newState.copy(minOrderItemError = "Valid min order item is required")
+        }
+        if (state.minOrderAmount.text.isBlank() || state.minOrderAmount.text.toLongOrNull() == null) {
+            hasError = true
+            newState = newState.copy(minOrderAmountError = "Valid min order amount is required")
+        }
+        if (state.maxDiscountAmount.text.isBlank() || state.maxDiscountAmount.text.toLongOrNull() == null) {
+            hasError = true
+            newState =
+                newState.copy(maxDiscountAmountError = "Valid max discount amount is required")
+        }
+
+        if (state.claimPeriodStart.isBlank()) {
+            hasError = true
+            newState = newState.copy(claimPeriodStartError = "Start date is required")
+        }
+
+        if (state.claimPeriodEnd.isBlank()) {
+            hasError = true
+            newState = newState.copy(claimPeriodEndError = "End date is required")
+        }
+
+        intent { reduce { newState } }
 
         return !hasError
+    }
+
+    companion object {
+        private const val TAG = "AddVoucherScreenViewMod"
     }
 }

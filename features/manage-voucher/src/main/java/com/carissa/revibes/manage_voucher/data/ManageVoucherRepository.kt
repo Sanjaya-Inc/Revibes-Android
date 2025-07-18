@@ -35,7 +35,7 @@ interface ManageVoucherRepository {
         claimPeriodStart: String,
         claimPeriodEnd: String,
         imageUrl: String? = null
-    ): VoucherDomain
+    )
 
     suspend fun deleteVoucher(id: String)
 }
@@ -85,12 +85,12 @@ internal class ManageVoucherRepositoryImpl(
         claimPeriodStart: String,
         claimPeriodEnd: String,
         imageUrl: String?
-    ): VoucherDomain {
+    ) {
         val conditions = Json.encodeToString(
             serializer = VoucherConditions.serializer(),
             value = conditions
         )
-        val response = remoteApi.createVoucher(
+        remoteApi.createVoucher(
             code = code,
             name = name,
             description = description,
@@ -102,8 +102,6 @@ internal class ManageVoucherRepositoryImpl(
             claimPeriodEnd = claimPeriodEnd,
 //            image = null
         )
-
-        return getVoucherDetail(response.data.id)
     }
 
     override suspend fun deleteVoucher(id: String) {

@@ -2,7 +2,6 @@ package com.carissa.revibes.manage_users.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
-import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.util.EmailValidator
 import com.carissa.revibes.core.presentation.util.FullNameValidator
 import com.carissa.revibes.core.presentation.util.PasswordValidator
@@ -38,8 +37,7 @@ data class AddUserScreenUiState(
             phoneError == null && passwordError == null
 }
 
-sealed interface AddUserScreenUiEvent : NavigationEvent {
-    data object NavigateBack : AddUserScreenUiEvent
+sealed interface AddUserScreenUiEvent {
     data object CreateUser : AddUserScreenUiEvent
     data class NameChanged(val name: TextFieldValue) : AddUserScreenUiEvent
     data class EmailChanged(val email: TextFieldValue) : AddUserScreenUiEvent

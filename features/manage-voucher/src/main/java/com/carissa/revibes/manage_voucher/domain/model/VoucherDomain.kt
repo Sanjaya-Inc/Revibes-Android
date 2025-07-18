@@ -23,8 +23,13 @@ data class VoucherDomain(
     val createdAt: String,
     val updatedAt: String
 ) {
-    enum class VoucherType {
-        PERCENT_OFF, FIXED_AMOUNT
+    enum class VoucherType(val value: String) {
+        PERCENT_OFF("percent-off"),
+        FIXED_AMOUNT("fixed-amount");
+
+        override fun toString(): String {
+            return value
+        }
     }
 
 //    enum class Currency {

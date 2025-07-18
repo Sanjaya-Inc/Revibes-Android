@@ -24,8 +24,8 @@ data class ManageVoucherScreenUiState(
     val voucherToDelete: VoucherDomain? = null
 )
 
-sealed interface ManageVoucherScreenUiEvent : NavigationEvent {
-    data object NavigateToAddVoucher : ManageVoucherScreenUiEvent
+sealed interface ManageVoucherScreenUiEvent {
+    data object NavigateToAddVoucher : NavigationEvent, ManageVoucherScreenUiEvent
     data object Initialize : ManageVoucherScreenUiEvent
     data object LoadMore : ManageVoucherScreenUiEvent
     data object Refresh : ManageVoucherScreenUiEvent
