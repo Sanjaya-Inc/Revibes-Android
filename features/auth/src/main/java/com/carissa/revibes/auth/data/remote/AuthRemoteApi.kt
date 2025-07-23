@@ -6,6 +6,7 @@ import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.Field
 import de.jensklingenberg.ktorfit.http.FormUrlEncoded
+import de.jensklingenberg.ktorfit.http.Header
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.PUT
 import org.koin.core.annotation.Single
@@ -13,7 +14,10 @@ import org.koin.core.annotation.Single
 interface AuthRemoteApi {
     @POST("auth/login/email")
     @FormUrlEncoded
-    suspend fun loginWithEmail(@Field("email") email: String, @Field("password") password: String): LoginResponse
+    suspend fun loginWithEmail(
+        @Field("email") email: String,
+        @Field("password") password: String
+    ): LoginResponse
 
     @POST("auth/signup/email")
     @FormUrlEncoded
@@ -25,7 +29,10 @@ interface AuthRemoteApi {
     )
 
     @PUT("me/devices")
-    suspend fun registerDevice(@Body request: DeviceRegistrationRequest)
+    suspend fun registerDevice(
+        @Body request: DeviceRegistrationRequest,
+        @Header("Content-Type") contentType: String = "application/json",
+    )
 }
 
 @Single

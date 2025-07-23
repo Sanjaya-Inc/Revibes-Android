@@ -108,7 +108,7 @@ private fun ExchangePointsScreenContent(
                                 .clickable {
                                     eventReceiver.onEvent(
                                         ExchangePointsScreenUiEvent.NavigateToDetailExchangePoint(
-                                            voucher.id
+                                            voucher
                                         )
                                     )
                                 },

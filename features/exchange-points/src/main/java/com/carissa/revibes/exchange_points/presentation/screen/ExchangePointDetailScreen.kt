@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.exchange_points.presentation.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,11 +29,17 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,7 +49,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.Yellow900
 import com.carissa.revibes.core.presentation.components.components.Button
@@ -52,12 +58,12 @@ import com.carissa.revibes.core.presentation.components.components.Text
 import com.carissa.revibes.exchange_points.R
 import com.carissa.revibes.exchange_points.domain.model.Voucher
 import com.carissa.revibes.exchange_points.presentation.navigation.ExchangePointsGraph
-import com.carissa.revibes.exchange_points.presentation.screen.ExchangePointDetailScreenUiEvent.DismissBottomSheet
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<ExchangePointsGraph>
@@ -67,27 +73,53 @@ fun ExchangePointDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: ExchangePointDetailScreenViewModel = koinViewModel()
 ) {
-    val state = viewModel.collectAsState().value
+    val state by viewModel.collectAsState()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var quantity by remember { mutableIntStateOf(1) }
+    val context = LocalContext.current
+
+    viewModel.collectSideEffect {
+        when (it) {
+            is ExchangePointDetailScreenUiEvent.ShowToast -> {
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+            }
+
+            else -> Unit
+        }
+    }
 
     ExchangePointDetailScreenContent(
-        uiState = state,
+        voucher = voucher,
         modifier = modifier,
-        eventReceiver = viewModel
+        onBuyNowClicked = {
+            showBottomSheet = true
+        }
     )
 
-    if (state.showBottomSheet) {
+    if (showBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = { viewModel.onEvent(DismissBottomSheet) },
+            onDismissRequest = { showBottomSheet = false },
             sheetState = bottomSheetState,
             dragHandle = { },
             containerColor = RevibesTheme.colors.primary,
         ) {
             CouponConfirmationBottomSheet(
-                uiState = state,
-                eventReceiver = viewModel,
+                voucher = voucher,
+                quantity = quantity,
+                onDismiss = { showBottomSheet = false },
+                onQuantityChanged = { quantity = it },
+                onConfirm = {
+                    viewModel.onEvent(
+                        ExchangePointDetailScreenUiEvent.PurchaseVoucher(
+                            id = voucher.id,
+                            qty = quantity
+                        )
+                    )
+                },
+                isConfirmEnabled = voucher.point * quantity <= state.userPoints,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp)
@@ -98,9 +130,9 @@ fun ExchangePointDetailScreen(
 
 @Composable
 private fun ExchangePointDetailScreenContent(
-    uiState: ExchangePointDetailScreenUiState,
+    voucher: Voucher,
     modifier: Modifier = Modifier,
-    eventReceiver: EventReceiver<ExchangePointDetailScreenUiEvent> = EventReceiver { }
+    onBuyNowClicked: () -> Unit
 ) {
     val navigator = RevibesTheme.navigator
     Scaffold(
@@ -110,7 +142,7 @@ private fun ExchangePointDetailScreenContent(
                 searchTextFieldValue = TextFieldValue(),
                 backgroundDrawRes = R.drawable.bg_exchange_points,
                 onBackClicked = navigator::navigateUp,
-                onProfileClicked = { eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.NavigateToProfile) }
+                onProfileClicked = { }
             )
         },
         modifier = modifier
@@ -129,7 +161,7 @@ private fun ExchangePointDetailScreenContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
-                    model = uiState.image,
+                    model = voucher.imageUri,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -139,16 +171,16 @@ private fun ExchangePointDetailScreenContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 TimeToShopSection(
-                    validUntil = uiState.validUntil,
-                    description = uiState.description
+                    validUntil = voucher.validUntil,
+                    description = voucher.description
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-                TermsAndConditionsSection(terms = uiState.terms.toImmutableList())
+                TermsAndConditionsSection(terms = voucher.terms.toImmutableList())
                 Spacer(modifier = Modifier.height(32.dp))
                 Button(
                     text = stringResource(R.string.buy_it_now),
                     variant = ButtonVariant.Primary,
-                    onClick = { eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.BuyCoupon) },
+                    onClick = onBuyNowClicked,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
@@ -252,9 +284,13 @@ private fun TermsAndConditionsSection(
 
 @Composable
 private fun CouponConfirmationBottomSheet(
-    uiState: ExchangePointDetailScreenUiState,
-    modifier: Modifier = Modifier,
-    eventReceiver: EventReceiver<ExchangePointDetailScreenUiEvent> = EventReceiver { },
+    voucher: Voucher,
+    quantity: Int,
+    onDismiss: () -> Unit,
+    onQuantityChanged: (Int) -> Unit,
+    onConfirm: () -> Unit,
+    isConfirmEnabled: Boolean,
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier.fillMaxWidth()
@@ -267,7 +303,7 @@ private fun CouponConfirmationBottomSheet(
                 .padding(8.dp)
                 .size(24.dp)
                 .align(Alignment.TopEnd)
-                .clickable { with(eventReceiver) { onEvent(DismissBottomSheet) } }
+                .clickable { onDismiss() }
         )
 
         Column(
@@ -281,7 +317,7 @@ private fun CouponConfirmationBottomSheet(
                 verticalAlignment = Alignment.Bottom
             ) {
                 AsyncImage(
-                    model = uiState.image,
+                    model = voucher.imageUri,
                     contentDescription = null,
                     modifier = Modifier
                         .size(80.dp)
@@ -301,7 +337,7 @@ private fun CouponConfirmationBottomSheet(
                         tint = Yellow900
                     )
                     Text(
-                        text = "10",
+                        text = voucher.point.toString(),
                         style = RevibesTheme.typography.h4.copy(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
@@ -342,15 +378,15 @@ private fun CouponConfirmationBottomSheet(
                         modifier = Modifier
                             .size(36.dp)
                             .background(
-                                color = if (uiState.quantity > 1) {
+                                color = if (quantity > 1) {
                                     RevibesTheme.colors.background
                                 } else {
                                     RevibesTheme.colors.background.copy(alpha = 0.3f)
                                 },
                                 shape = CircleShape
                             )
-                            .clickable(enabled = uiState.quantity > 1) {
-                                eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.DecreaseQuantity)
+                            .clickable(enabled = quantity > 1) {
+                                onQuantityChanged(quantity - 1)
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -365,7 +401,7 @@ private fun CouponConfirmationBottomSheet(
                     }
 
                     Text(
-                        text = uiState.quantity.toString(),
+                        text = quantity.toString(),
                         style = RevibesTheme.typography.h4.copy(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
@@ -383,7 +419,7 @@ private fun CouponConfirmationBottomSheet(
                                 shape = CircleShape
                             )
                             .clickable {
-                                eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.IncreaseQuantity)
+                                onQuantityChanged(quantity + 1)
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -402,7 +438,8 @@ private fun CouponConfirmationBottomSheet(
             Button(
                 text = stringResource(R.string.confirmation),
                 variant = ButtonVariant.PrimaryOutlined,
-                onClick = { eventReceiver.onEvent(ExchangePointDetailScreenUiEvent.ConfirmPurchase) },
+                onClick = onConfirm,
+                enabled = isConfirmEnabled,
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .clip(RoundedCornerShape(56.dp))
@@ -420,7 +457,17 @@ private fun ExchangePointDetailScreenPreview() {
     RevibesTheme {
         ExchangePointDetailScreenContent(
             modifier = Modifier.background(Color.White),
-            uiState = ExchangePointDetailScreenUiState()
+            voucher = Voucher(
+                id = "1",
+                name = "Voucher Title",
+                description = "Voucher Title",
+                imageUri = "https://gcdnb.pbrd.co/images/16vLvVICjqy3.webp",
+                point = 10,
+                quota = 10,
+                validUntil = "Valid until: 31 Dec 2025",
+                terms = listOf("Term 1", "Term 2", "Term 3")
+            ),
+            onBuyNowClicked = {}
         )
     }
 }
@@ -431,14 +478,21 @@ private fun CouponConfirmationBottomSheetPreview() {
     RevibesTheme {
         Box(modifier = Modifier.background(RevibesTheme.colors.primary)) {
             CouponConfirmationBottomSheet(
-                uiState = ExchangePointDetailScreenUiState(
-                    image = "https://gcdnb.pbrd.co/images/16vLvVICjqy3.webp",
-                    discount = 20,
+                voucher = Voucher(
+                    id = "1",
+                    name = "Voucher Title",
+                    description = "Voucher Title",
+                    imageUri = "https://gcdnb.pbrd.co/images/16vLvVICjqy3.webp",
+                    point = 10,
+                    quota = 10,
                     validUntil = "Valid until: 31 Dec 2025",
-                    description = "Get 20% off on your next purchase!",
-                    terms = listOf("Term 1", "Term 2", "Term 3").toImmutableList(),
-                    quantity = 1
+                    terms = listOf("Term 1", "Term 2", "Term 3")
                 ),
+                quantity = 1,
+                onDismiss = {},
+                onQuantityChanged = {},
+                onConfirm = {},
+                isConfirmEnabled = true
             )
         }
     }

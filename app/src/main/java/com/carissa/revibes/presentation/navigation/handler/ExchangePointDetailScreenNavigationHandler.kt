@@ -22,7 +22,6 @@ class ExchangePointDetailScreenNavigationHandler : NavigationEventHandler() {
             )
 
             is ExchangePointDetailScreenUiEvent.NavigateToConfirmation -> {
-                println("ketai: ExchangePointDetailScreenNavigationHandler")
                 navigator.navigate(ExchangePointConfirmationScreenDestination)
             }
         }
