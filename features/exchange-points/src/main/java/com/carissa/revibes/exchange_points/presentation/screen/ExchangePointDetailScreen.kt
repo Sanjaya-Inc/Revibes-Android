@@ -50,6 +50,7 @@ import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.core.presentation.components.components.Text
 import com.carissa.revibes.exchange_points.R
+import com.carissa.revibes.exchange_points.domain.model.Voucher
 import com.carissa.revibes.exchange_points.presentation.navigation.ExchangePointsGraph
 import com.carissa.revibes.exchange_points.presentation.screen.ExchangePointDetailScreenUiEvent.DismissBottomSheet
 import com.ramcosta.composedestinations.annotation.Destination
@@ -62,6 +63,7 @@ import org.orbitmvi.orbit.compose.collectAsState
 @Destination<ExchangePointsGraph>
 @Composable
 fun ExchangePointDetailScreen(
+    voucher: Voucher,
     modifier: Modifier = Modifier,
     viewModel: ExchangePointDetailScreenViewModel = koinViewModel()
 ) {

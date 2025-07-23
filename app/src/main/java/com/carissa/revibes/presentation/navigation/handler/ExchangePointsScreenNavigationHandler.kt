@@ -19,7 +19,7 @@ class ExchangePointsScreenNavigationHandler : NavigationEventHandler() {
         when (event) {
             is ExchangePointsScreenUiEvent.NavigateToProfile -> navigator.navigate(ProfileScreenDestination)
             is ExchangePointsScreenUiEvent.NavigateToDetailExchangePoint -> {
-                navigator.navigate(ExchangePointDetailScreenDestination)
+                navigator.navigate(ExchangePointDetailScreenDestination(event.voucher))
             }
         }
     }

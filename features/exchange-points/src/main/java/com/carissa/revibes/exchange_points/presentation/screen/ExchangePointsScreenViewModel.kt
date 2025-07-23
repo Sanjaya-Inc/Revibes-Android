@@ -19,7 +19,7 @@ data class ExchangePointsScreenUiState(
 )
 
 sealed interface ExchangePointsScreenUiEvent {
-    data class NavigateToDetailExchangePoint(val voucherId: String) :
+    data class NavigateToDetailExchangePoint(val voucher: Voucher) :
         NavigationEvent,
         ExchangePointsScreenUiEvent
 
