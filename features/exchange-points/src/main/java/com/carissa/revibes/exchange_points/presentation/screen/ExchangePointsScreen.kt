@@ -6,12 +6,14 @@ package com.carissa.revibes.exchange_points.presentation.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,8 +31,10 @@ import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.exchange_points.R
+import com.carissa.revibes.exchange_points.domain.model.Voucher
 import com.carissa.revibes.exchange_points.presentation.navigation.ExchangePointsGraph
 import com.ramcosta.composedestinations.annotation.Destination
+import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 
@@ -50,7 +54,6 @@ private fun ExchangePointsScreenContent(
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<ExchangePointsScreenUiEvent> = EventReceiver { }
 ) {
-    val navigator = RevibesTheme.navigator
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -61,8 +64,7 @@ private fun ExchangePointsScreenContent(
                 searchTextFieldValue = TextFieldValue(),
                 subtitle = stringResource(R.string.exchange_points_subtitle, uiState.points),
                 backgroundDrawRes = R.drawable.bg_exchange_points,
-                onBackClicked = navigator::navigateUp,
-                onProfileClicked = { eventReceiver.onEvent(ExchangePointsScreenUiEvent.NavigateToProfile) }
+                onProfileClicked = { }
             )
         }
     ) { paddingValues ->
@@ -80,19 +82,39 @@ private fun ExchangePointsScreenContent(
                 textAlign = TextAlign.Center,
                 color = RevibesTheme.colors.primary,
             )
-            LazyColumn {
-                items(uiState.images) { image ->
-                    AsyncImage(
-                        model = image,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 32.dp, vertical = 4.dp)
-                            .clickable {
-                                eventReceiver.onEvent(ExchangePointsScreenUiEvent.NavigateToDetailExchangePoint)
-                            },
-                        contentScale = ContentScale.FillWidth,
-                    )
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.error != null) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Error: ${uiState.error}")
+                }
+            } else {
+                LazyColumn {
+                    items(uiState.vouchers) { voucher ->
+                        AsyncImage(
+                            model = voucher.imageUri,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 32.dp, vertical = 4.dp)
+                                .clickable {
+                                    eventReceiver.onEvent(
+                                        ExchangePointsScreenUiEvent.NavigateToDetailExchangePoint(
+                                            voucher.id
+                                        )
+                                    )
+                                },
+                            contentScale = ContentScale.FillWidth,
+                        )
+                    }
                 }
             }
         }
@@ -105,7 +127,18 @@ private fun ExchangePointsScreenPreview() {
     RevibesTheme {
         ExchangePointsScreenContent(
             modifier = Modifier.background(Color.White),
-            uiState = ExchangePointsScreenUiState()
+            uiState = ExchangePointsScreenUiState(
+                vouchers = persistentListOf(
+                    Voucher(
+                        id = "1",
+                        name = "Voucher 1",
+                        description = "Description 1",
+                        imageUri = "",
+                        point = 100,
+                        quota = 10
+                    )
+                )
+            )
         )
     }
 }

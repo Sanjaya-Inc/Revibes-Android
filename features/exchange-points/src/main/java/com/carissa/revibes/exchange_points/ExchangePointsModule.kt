@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2025 Sanjaya Inc. All rights reserved.
- */
-
 package com.carissa.revibes.exchange_points
 
 import org.koin.core.annotation.ComponentScan
