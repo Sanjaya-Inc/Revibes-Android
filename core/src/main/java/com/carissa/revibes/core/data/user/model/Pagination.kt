@@ -1,4 +1,4 @@
-package com.carissa.revibes.exchange_points.data.model
+package com.carissa.revibes.core.data.user.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

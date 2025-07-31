@@ -8,14 +8,12 @@ fun ExchangeItem.toVoucher(): Voucher {
         id = this.id,
         name = this.metadata.name,
         description = this.metadata.description,
-        imageUri = this.metadata.imageUri.run {
-            if (this.startsWith("http")) {
-                this
-            } else {
-                "https://alkuwaiti.com/wp-content/uploads/2020/05/Hero-Banner-Placeholder-Dark-1024x480.png"
-            }
-        },
+        imageUri = this.metadata.imageUri.ifNotUrlOrBlank("https://placehold.co/1200x800.png"),
         point = this.prices.first().amount,
         quota = this.quota
     )
+}
+
+private fun String.ifNotUrlOrBlank(default: String): String {
+    return if (this.isBlank() || !this.contains("http")) default else this
 }

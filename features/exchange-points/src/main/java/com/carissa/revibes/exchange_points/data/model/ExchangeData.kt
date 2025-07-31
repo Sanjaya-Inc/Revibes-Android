@@ -1,5 +1,6 @@
 package com.carissa.revibes.exchange_points.data.model
 
+import com.carissa.revibes.core.data.user.model.Pagination
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -27,6 +27,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,14 +45,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.PointGoldBg
 import com.carissa.revibes.core.presentation.components.PointModalBg
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.RevibesLoading
 import com.carissa.revibes.core.presentation.components.components.Text
 import com.carissa.revibes.point.R
+import com.carissa.revibes.point.domain.model.Mission
+import com.carissa.revibes.point.domain.model.MissionType
 import com.carissa.revibes.point.presentation.navigation.PointGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel
@@ -78,6 +83,20 @@ fun PointScreen(
             }
 
             else -> Unit
+        }
+    }
+
+    LaunchedEffect(state.missionSuccess) {
+        if (state.missionSuccess != null) {
+            Toast.makeText(context, state.missionSuccess, Toast.LENGTH_SHORT).show()
+            viewModel.onEvent(PointScreenUiEvent.ClearMissionMessage)
+        }
+    }
+
+    LaunchedEffect(state.missionError) {
+        if (state.missionError != null) {
+            Toast.makeText(context, state.missionError, Toast.LENGTH_SHORT).show()
+            viewModel.onEvent(PointScreenUiEvent.ClearMissionMessage)
         }
     }
 
@@ -221,14 +240,16 @@ private fun PointScreenContent(
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        itemsIndexed(items = uiState.missions) { index, (title, desc, point) ->
-                            MissionCard(
-                                isRecycleIcon = title.contains("Change"),
-                                title = title,
-                                description = desc,
-                                point = point
-                            )
+                    if (uiState.isMissionsLoading || uiState.isClaimingReward) {
+                        RevibesLoading(color = RevibesTheme.colors.background)
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(items = uiState.missions) { mission ->
+                                MissionCard(mission = mission, eventReceiver = eventReceiver)
+                            }
                         }
                     }
                 }
@@ -238,10 +259,16 @@ private fun PointScreenContent(
 }
 
 @Composable
-private fun MissionCard(isRecycleIcon: Boolean, title: String, description: String, point: Int) {
+private fun MissionCard(
+    mission: Mission,
+    eventReceiver: EventReceiver<PointScreenUiEvent> = EventReceiver { }
+) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                eventReceiver.onEvent(PointScreenUiEvent.ClaimMission(mission.id))
+            },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -250,29 +277,39 @@ private fun MissionCard(isRecycleIcon: Boolean, title: String, description: Stri
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val icon: Painter = if (isRecycleIcon) {
-                painterResource(id = R.drawable.ic_recycle)
+            if (mission.imageUri.isNotBlank()) {
+                AsyncImage(
+                    model = mission.imageUri,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(end = 12.dp),
+                    placeholder = painterResource(id = R.drawable.image_placeholder),
+                )
             } else {
-                painterResource(id = R.drawable.ic_account)
+                val icon: Painter = if (mission.type == MissionType.LOGISTIC_ORDER_COMPLETE) {
+                    painterResource(id = R.drawable.ic_recycle)
+                } else {
+                    painterResource(id = R.drawable.ic_account)
+                }
+
+                Image(
+                    painter = icon,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(end = 12.dp)
+                )
             }
-
-            Image(
-                painter = icon,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 12.dp)
-            )
-
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = title,
+                    text = mission.title,
                     fontWeight = FontWeight.SemiBold,
                     color = RevibesTheme.colors.primary,
                     fontSize = 14.sp
                 )
                 Text(
-                    text = description,
+                    text = mission.description,
                     color = RevibesTheme.colors.primary.copy(alpha = 0.7f),
                     fontSize = 12.sp
                 )
@@ -283,14 +320,21 @@ private fun MissionCard(isRecycleIcon: Boolean, title: String, description: Stri
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                     )
-                    Text(text = "$point Points", fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                    Text(
+                        text = "${mission.reward} Points",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "Go",
-                tint = Color.Gray
+                tint = Color.Gray,
+                modifier = Modifier.clickable {
+                    eventReceiver.onEvent(PointScreenUiEvent.ClaimMission(mission.id))
+                }
             )
         }
     }

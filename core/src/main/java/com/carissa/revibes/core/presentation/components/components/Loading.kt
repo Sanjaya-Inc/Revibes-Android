@@ -6,10 +6,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 
 @Composable
-fun RevibesLoading(modifier: Modifier = Modifier) {
+fun RevibesLoading(modifier: Modifier = Modifier, color: Color = RevibesTheme.colors.primary) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
