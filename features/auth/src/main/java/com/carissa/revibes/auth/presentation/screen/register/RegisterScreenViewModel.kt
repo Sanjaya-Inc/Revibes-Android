@@ -53,6 +53,7 @@ sealed interface RegisterScreenUiEvent {
     data class ConfirmPasswordChanged(val confirmPassword: TextFieldValue) : RegisterScreenUiEvent
     data object SubmitRegister : RegisterScreenUiEvent
     data class RegisterError(val message: String) : RegisterScreenUiEvent
+    data object RegisterSuccess : RegisterScreenUiEvent
 }
 
 @KoinViewModel

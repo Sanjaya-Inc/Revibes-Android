@@ -62,6 +62,19 @@ fun RegisterScreen(
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
+            is RegisterScreenUiEvent.RegisterSuccess -> {
+                Toast.makeText(
+                    context,
+                    "Registration success, please login",
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigator.navigate(LoginScreenDestination) {
+                    popUpTo(RegisterScreenDestination) {
+                        inclusive = true
+                    }
+                }
+            }
+
             else -> Unit
         }
     }

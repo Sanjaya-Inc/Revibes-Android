@@ -25,5 +25,6 @@ class RegisterSubmitHandler(
         syntax.reduce {
             this.state.copy(isLoading = false)
         }
+        syntax.postSideEffect(RegisterScreenUiEvent.RegisterSuccess)
     }
 }
