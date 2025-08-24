@@ -64,7 +64,6 @@ private fun ExchangePointsScreenContent(
                 searchTextFieldValue = TextFieldValue(),
                 subtitle = stringResource(R.string.exchange_points_subtitle, uiState.points),
                 backgroundDrawRes = R.drawable.bg_exchange_points,
-                onProfileClicked = { }
             )
         }
     ) { paddingValues ->

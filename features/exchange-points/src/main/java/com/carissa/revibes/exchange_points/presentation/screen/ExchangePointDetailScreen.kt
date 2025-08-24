@@ -142,7 +142,6 @@ private fun ExchangePointDetailScreenContent(
                 searchTextFieldValue = TextFieldValue(),
                 backgroundDrawRes = R.drawable.bg_exchange_points,
                 onBackClicked = navigator::navigateUp,
-                onProfileClicked = { }
             )
         },
         modifier = modifier

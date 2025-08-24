@@ -120,9 +120,6 @@ private fun PointScreenContent(
                 searchTextFieldValue = searchText,
                 onTextChange = { searchText = it },
                 backgroundDrawRes = R.drawable.bg_point,
-                onProfileClicked = {
-                    eventReceiver.onEvent(PointScreenUiEvent.NavigateToProfile)
-                },
             )
         }
     ) { contentPadding ->

@@ -122,7 +122,6 @@ fun DropOffScreen(
                 backgroundDrawRes = R.drawable.bg_drop_off,
                 searchTextFieldValue = searchText,
                 onTextChange = { searchText = it },
-                onProfileClicked = {},
             )
         }
     ) { contentPadding ->

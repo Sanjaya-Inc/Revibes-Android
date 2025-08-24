@@ -30,10 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.R
+import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextField
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CommonHeader(
@@ -41,11 +42,12 @@ fun CommonHeader(
     @DrawableRes backgroundDrawRes: Int,
     searchTextFieldValue: TextFieldValue,
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator = RevibesTheme.navigator,
+    viewModel: CommonHeaderViewModel = koinViewModel(),
+    eventReceiver: EventReceiver<ToolbarEvent> = viewModel,
     subtitle: String? = null,
     onTextChange: (TextFieldValue) -> Unit = {},
-    onBackClicked: () -> Unit = { navigator.navigateUp() },
-    onProfileClicked: () -> Unit = {},
+    onBackClicked: () -> Unit = { eventReceiver.onEvent(ToolbarEvent.NavigateBack) },
+    onProfileClicked: () -> Unit = { eventReceiver.onEvent(ToolbarEvent.NavigateToProfile) },
 ) {
     val headerHeight = if (subtitle != null) 312.dp else 272.dp
     Box(modifier = modifier.height(headerHeight)) {
@@ -218,8 +220,6 @@ private fun CommonHeaderPreview() {
             backgroundDrawRes = -1,
             searchTextFieldValue = TextFieldValue(""),
             onTextChange = {},
-            onBackClicked = {},
-            onProfileClicked = {},
             modifier = Modifier.background(Color.White)
         )
     }
@@ -235,8 +235,6 @@ private fun CommonHeaderWithSubtitlePreview() {
             backgroundDrawRes = -1,
             searchTextFieldValue = TextFieldValue(""),
             onTextChange = {},
-            onBackClicked = {},
-            onProfileClicked = {},
             modifier = Modifier.background(Color.White)
         )
     }
