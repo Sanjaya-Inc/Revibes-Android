@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -282,6 +283,7 @@ private fun MissionCard(
                         .size(40.dp)
                         .padding(end = 12.dp),
                     placeholder = painterResource(id = R.drawable.image_placeholder),
+                    contentScale = ContentScale.Crop,
                 )
             } else {
                 val icon: Painter = if (mission.type == MissionType.LOGISTIC_ORDER_COMPLETE) {
