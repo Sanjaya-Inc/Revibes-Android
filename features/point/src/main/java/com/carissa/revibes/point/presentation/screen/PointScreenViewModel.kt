@@ -1,5 +1,6 @@
 package com.carissa.revibes.point.presentation.screen
 
+import com.carissa.revibes.core.data.main.remote.config.ConfigRepository
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.point.data.PointRepository
@@ -9,6 +10,7 @@ import org.koin.android.annotation.KoinViewModel
 
 data class PointScreenUiState(
     val isLoading: Boolean = false,
+    val isMaintenance: Boolean = false,
     val isClaimingReward: Boolean = false,
     val allowedToClaimReward: Boolean = true,
     val dailyRewards: List<DailyReward> = emptyList(),
@@ -27,6 +29,7 @@ data class DailyReward(
 )
 
 sealed interface PointScreenUiEvent {
+    data object NavigateBack : PointScreenUiEvent
     data object NavigateToProfile : PointScreenUiEvent, NavigationEvent
     data object Initialize : PointScreenUiEvent
     data object ClaimDailyReward : PointScreenUiEvent
@@ -40,12 +43,18 @@ sealed interface PointScreenUiEvent {
 @KoinViewModel
 class PointScreenViewModel(
     private val pointRepository: PointRepository,
-    private val pointExceptionHandler: PointExceptionHandler
+    private val pointExceptionHandler: PointExceptionHandler,
+    configRepository: ConfigRepository
 ) : BaseViewModel<PointScreenUiState, PointScreenUiEvent>(
-    initialState = PointScreenUiState(isLoading = true),
+    initialState = PointScreenUiState(
+        isLoading = true,
+        isMaintenance = !configRepository.getYourPointFeatureFlagEnabled()
+    ),
     onCreate = {
-        onEvent(PointScreenUiEvent.Initialize)
-        onEvent(PointScreenUiEvent.GetMissions)
+        if (!it.state.isMaintenance) {
+            onEvent(PointScreenUiEvent.Initialize)
+            onEvent(PointScreenUiEvent.GetMissions)
+        }
     },
     exceptionHandler = { syntax, exception ->
         pointExceptionHandler.onPointError(syntax, exception)
@@ -54,6 +63,9 @@ class PointScreenViewModel(
     override fun onEvent(event: PointScreenUiEvent) {
         super.onEvent(event)
         when (event) {
+            PointScreenUiEvent.NavigateBack -> intent {
+                postSideEffect(event)
+            }
             PointScreenUiEvent.Initialize -> loadDailyRewards()
             PointScreenUiEvent.ClaimDailyReward -> claimDailyReward()
             PointScreenUiEvent.GetMissions -> getMissions()

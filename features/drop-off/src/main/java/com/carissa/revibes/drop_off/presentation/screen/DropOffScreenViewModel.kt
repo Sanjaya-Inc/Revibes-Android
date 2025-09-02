@@ -6,6 +6,7 @@ package com.carissa.revibes.drop_off.presentation.screen
 import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.text.input.TextFieldValue
+import com.carissa.revibes.core.data.main.remote.config.ConfigRepository
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.drop_off.data.DropOffRepository
@@ -20,6 +21,7 @@ import org.koin.android.annotation.KoinViewModel
 
 data class DropOffScreenUiState(
     val isLoading: Boolean = false,
+    val isMaintenance: Boolean = false,
     val stores: ImmutableList<StoreData> = persistentListOf(),
     val currentOrderId: String? = null,
     val items: ImmutableList<DropOffItem> = persistentListOf(),
@@ -36,6 +38,7 @@ data class ValidationErrors(
 )
 
 sealed interface DropOffScreenUiEvent {
+    data object NavigateBack : DropOffScreenUiEvent
     data object NavigateToProfile : DropOffScreenUiEvent, NavigationEvent
     data class NavigateToConfirmOrder(val arguments: DropOffConfirmationScreenArguments) :
         DropOffScreenUiEvent, NavigationEvent
@@ -87,10 +90,15 @@ data class DropOffItem(
 @KoinViewModel
 class DropOffScreenViewModel(
     private val dropOffRepository: DropOffRepository,
+    configRepository: ConfigRepository
 ) : BaseViewModel<DropOffScreenUiState, DropOffScreenUiEvent>(
-    initialState = DropOffScreenUiState(),
+    initialState = DropOffScreenUiState(
+        isMaintenance = !configRepository.getDropOffFeatureFlagEnabled()
+    ),
     onCreate = {
-        onEvent(DropOffScreenUiEvent.LoadDropOffData)
+        if (!it.state.isMaintenance) {
+            onEvent(DropOffScreenUiEvent.LoadDropOffData)
+        }
     },
     exceptionHandler = { syntax, throwable ->
         when (throwable) {
@@ -107,6 +115,7 @@ class DropOffScreenViewModel(
         super.onEvent(event)
         intent {
             when (event) {
+                is DropOffScreenUiEvent.NavigateBack -> postSideEffect(event)
                 is DropOffScreenUiEvent.LoadDropOffData -> loadDropOffData()
                 is DropOffScreenUiEvent.AddItemToOrder -> addItemToOrder(event.orderId)
                 is DropOffScreenUiEvent.MakeOrder -> makeOrder()

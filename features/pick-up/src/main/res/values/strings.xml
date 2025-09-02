@@ -3,12 +3,6 @@
     <!-- Screen titles -->
     <string name="pick_up_title">Pick Up</string>
     
-    <!-- Coming soon content -->
-    <string name="coming_soon_title">Coming Soon!</string>
-    <string name="coming_soon_message">The Pick Up feature is currently under development. Stay tuned for exciting updates!</string>
-    <string name="back_to_home">Back to Home</string>
-    
     <!-- Content descriptions -->
     <string name="back_desc">Back</string>
-    <string name="coming_soon_illustration_desc">Coming Soon Illustration</string>
 </resources>

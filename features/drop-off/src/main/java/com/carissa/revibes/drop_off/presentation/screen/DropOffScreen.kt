@@ -8,6 +8,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -70,6 +71,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.components.ComingSoon
 import com.carissa.revibes.core.presentation.components.DropOffDialogBg
 import com.carissa.revibes.core.presentation.components.DropOffDialogItemBg
 import com.carissa.revibes.core.presentation.components.DropOffLabelColor
@@ -99,8 +101,12 @@ fun DropOffScreen(
     val context = LocalContext.current
     val state by viewModel.collectAsState()
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    val navigator = RevibesTheme.navigator
     viewModel.collectSideEffect { event ->
         when (event) {
+            is DropOffScreenUiEvent.NavigateBack -> {
+                navigator.navigateUp()
+            }
             is DropOffScreenUiEvent.OnLoadDropOffDataFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
@@ -125,22 +131,40 @@ fun DropOffScreen(
             )
         }
     ) { contentPadding ->
-        if (state.isLoading || state.currentOrderId.isNullOrBlank()) {
-            RevibesLoading(modifier = Modifier.padding(contentPadding))
-        } else {
-            DropOffScreenContent(
-                modifier = Modifier
-                    .padding(contentPadding)
-                    .background(RevibesTheme.colors.background),
-                orderId = state.currentOrderId.orEmpty(),
-                items = state.items,
-                name = state.name,
-                eventReceiver = viewModel,
-                nearestStores = state.stores,
-                selectedStore = state.selectedStore,
-                isFormValid = state.isFormValid,
-                validationErrors = state.validationErrors
-            )
+        AnimatedContent(state) { state ->
+            when {
+                state.isMaintenance -> {
+                    ComingSoon(
+                        featureName = "Drop off",
+                        modifier = Modifier
+                            .padding(contentPadding)
+                            .padding(32.dp),
+                        onClick = {
+                            viewModel.onEvent(DropOffScreenUiEvent.NavigateBack)
+                        }
+                    )
+                }
+
+                state.isLoading || state.currentOrderId.isNullOrBlank() -> {
+                    RevibesLoading(modifier = Modifier.padding(contentPadding))
+                }
+
+                else -> {
+                    DropOffScreenContent(
+                        modifier = Modifier
+                            .padding(contentPadding)
+                            .background(RevibesTheme.colors.background),
+                        orderId = state.currentOrderId.orEmpty(),
+                        items = state.items,
+                        name = state.name,
+                        eventReceiver = viewModel,
+                        nearestStores = state.stores,
+                        selectedStore = state.selectedStore,
+                        isFormValid = state.isFormValid,
+                        validationErrors = state.validationErrors
+                    )
+                }
+            }
         }
     }
 }

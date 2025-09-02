@@ -5,6 +5,7 @@
 package com.carissa.revibes.transaction_history.presentation.screen
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.components.ComingSoon
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.TabButton
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
@@ -60,9 +62,14 @@ fun TransactionHistoryScreen(
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
+    val navigator = RevibesTheme.navigator
 
     viewModel.collectSideEffect { event ->
         when (event) {
+            is TransactionHistoryScreenUiEvent.NavigateBack -> {
+                navigator.navigateUp()
+            }
+
             is TransactionHistoryScreenUiEvent.OnLoadTransactionHistoryFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
@@ -93,81 +100,108 @@ private fun TransactionHistoryScreenContent(
             }
         )
     }) { contentPadding ->
-        Column(
-            modifier = Modifier
-                .padding(contentPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            val pagerState = rememberPagerState { 2 }
-            val scope = rememberCoroutineScope()
-
-            LaunchedEffect(pagerState.currentPage) {
-                eventReceiver.onEvent(TransactionHistoryScreenUiEvent.TabChanged(pagerState.currentPage))
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TabButton(
-                    "Process",
-                    pagerState.currentPage == 0,
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(0)
-                        }
-                    }
-                )
-                TabButton(
-                    "Transaction Complete",
-                    pagerState.currentPage == 1,
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(1)
-                        }
-                    }
-                )
-            }
-
+        AnimatedContent(uiState) { state ->
             when {
-                uiState.isLoading && uiState.transactions.isEmpty() -> {
-                    RevibesLoading()
-                }
-
-                uiState.error != null && uiState.transactions.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        GeneralError(
-                            message = uiState.error,
-                            onRetry = {
-                                eventReceiver.onEvent(TransactionHistoryScreenUiEvent.Refresh)
-                            }
-                        )
-                    }
+                state.isMaintenance -> {
+                    ComingSoon(
+                        featureName = "Transcation History",
+                        modifier = Modifier
+                            .padding(contentPadding)
+                            .padding(32.dp),
+                        onClick = {
+                            eventReceiver.onEvent(TransactionHistoryScreenUiEvent.NavigateBack)
+                        }
+                    )
                 }
 
                 else -> {
-                    HorizontalPager(pagerState, modifier = Modifier.weight(1f)) { page ->
-                        if (uiState.filteredTransactions.isEmpty()) {
-                            TransactionEmptyState()
-                        } else {
-                            TransactionList(
-                                transactions = uiState.filteredTransactions,
-                                isLoadingMore = uiState.isLoadingMore,
-                                hasMoreData = uiState.pagination?.hasMoreNext ?: false,
-                                onLoadMore = {
-                                    eventReceiver.onEvent(TransactionHistoryScreenUiEvent.LoadMore)
-                                },
-                                onTransactionClick = { transaction ->
-                                    eventReceiver.onEvent(
-                                        TransactionHistoryScreenUiEvent.NavigateToTransactionDetail(
-                                            transactionId = transaction.id
-                                        )
-                                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(contentPadding)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        val pagerState = rememberPagerState { 2 }
+                        val scope = rememberCoroutineScope()
+
+                        LaunchedEffect(pagerState.currentPage) {
+                            eventReceiver.onEvent(
+                                TransactionHistoryScreenUiEvent.TabChanged(
+                                    pagerState.currentPage
+                                )
+                            )
+                        }
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            TabButton(
+                                "Process",
+                                pagerState.currentPage == 0,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(0)
+                                    }
                                 }
                             )
+                            TabButton(
+                                "Transaction Complete",
+                                pagerState.currentPage == 1,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(1)
+                                    }
+                                }
+                            )
+                        }
+
+                        when {
+                            uiState.isLoading && uiState.transactions.isEmpty() -> {
+                                RevibesLoading()
+                            }
+
+                            uiState.error != null && uiState.transactions.isEmpty() -> {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    GeneralError(
+                                        message = uiState.error,
+                                        onRetry = {
+                                            eventReceiver.onEvent(TransactionHistoryScreenUiEvent.Refresh)
+                                        }
+                                    )
+                                }
+                            }
+
+                            else -> {
+                                HorizontalPager(
+                                    pagerState,
+                                    modifier = Modifier.weight(1f)
+                                ) { page ->
+                                    if (uiState.filteredTransactions.isEmpty()) {
+                                        TransactionEmptyState()
+                                    } else {
+                                        TransactionList(
+                                            transactions = uiState.filteredTransactions,
+                                            isLoadingMore = uiState.isLoadingMore,
+                                            hasMoreData = uiState.pagination?.hasMoreNext ?: false,
+                                            onLoadMore = {
+                                                eventReceiver.onEvent(
+                                                    TransactionHistoryScreenUiEvent.LoadMore
+                                                )
+                                            },
+                                            onTransactionClick = { transaction ->
+                                                eventReceiver.onEvent(
+                                                    TransactionHistoryScreenUiEvent.NavigateToTransactionDetail(
+                                                        transactionId = transaction.id
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }

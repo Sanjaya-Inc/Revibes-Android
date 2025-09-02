@@ -27,15 +27,15 @@ class ConfigRepository(
     fun getPhoneNumber(): String = remoteConfigSource.getString(PHONE_NUMBER_KEY)
     fun getWhatsappNumber(): String = remoteConfigSource.getString(WHATSAPP_NUMBER_KEY)
     fun getFaxNumber(): String = remoteConfigSource.getString(FAX_NUMBER_KEY)
-    fun getYourPointFeatureFlag(): Boolean =
+    fun getYourPointFeatureFlagEnabled(): Boolean =
         remoteConfigSource.getBoolean(FEATURE_FLAG_YOUR_POINT_KEY)
 
-    fun getDropOffFeatureFlag(): Boolean = remoteConfigSource.getBoolean(FEATURE_FLAG_DROP_OFF_KEY)
-    fun getPickUpFeatureFlag(): Boolean = remoteConfigSource.getBoolean(FEATURE_FLAG_PICK_UP_KEY)
-    fun getExchangesFeatureFlag(): Boolean =
+    fun getDropOffFeatureFlagEnabled(): Boolean = remoteConfigSource.getBoolean(FEATURE_FLAG_DROP_OFF_KEY)
+    fun getPickUpFeatureFlagEnabled(): Boolean = remoteConfigSource.getBoolean(FEATURE_FLAG_PICK_UP_KEY)
+    fun getExchangesFeatureFlagEnabled(): Boolean =
         remoteConfigSource.getBoolean(FEATURE_FLAG_EXCHANGES_KEY)
 
-    fun getMyTransactionsFeatureFlag(): Boolean =
+    fun getMyTransactionsFeatureFlagEnabled(): Boolean =
         remoteConfigSource.getBoolean(FEATURE_FLAG_MY_TRANSACTIONS_KEY)
 
     companion object {

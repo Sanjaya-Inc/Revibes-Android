@@ -4,6 +4,7 @@
 package com.carissa.revibes.transaction_history.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
+import com.carissa.revibes.core.data.main.remote.config.ConfigRepository
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.transaction_history.data.TransactionHistoryRepository
@@ -17,6 +18,7 @@ import org.koin.android.annotation.KoinViewModel
 
 data class TransactionHistoryScreenUiState(
     val isLoading: Boolean = false,
+    val isMaintenance: Boolean = false,
     val isLoadingMore: Boolean = false,
     val searchValue: TextFieldValue = TextFieldValue(),
     val transactions: PersistentList<TransactionHistoryData> = persistentListOf(),
@@ -27,6 +29,7 @@ data class TransactionHistoryScreenUiState(
 )
 
 sealed interface TransactionHistoryScreenUiEvent {
+    data object NavigateBack : TransactionHistoryScreenUiEvent
     data class NavigateToTransactionDetail(val transactionId: String) :
         NavigationEvent,
         TransactionHistoryScreenUiEvent
@@ -42,10 +45,17 @@ sealed interface TransactionHistoryScreenUiEvent {
 @KoinViewModel
 class TransactionHistoryScreenViewModel(
     private val repository: TransactionHistoryRepository,
-    private val exceptionHandler: TransactionHistoryExceptionHandler
+    private val exceptionHandler: TransactionHistoryExceptionHandler,
+    configRepository: ConfigRepository
 ) : BaseViewModel<TransactionHistoryScreenUiState, TransactionHistoryScreenUiEvent>(
-    initialState = TransactionHistoryScreenUiState(),
-    onCreate = { onEvent(TransactionHistoryScreenUiEvent.Initialize) },
+    initialState = TransactionHistoryScreenUiState(
+        isMaintenance = !configRepository.getMyTransactionsFeatureFlagEnabled()
+    ),
+    onCreate = {
+        if (!it.state.isMaintenance) {
+            onEvent(TransactionHistoryScreenUiEvent.Initialize)
+        }
+    },
     exceptionHandler = { syntax, exception ->
         exceptionHandler.onTransactionHistoryError(syntax, exception)
     }
@@ -54,6 +64,9 @@ class TransactionHistoryScreenViewModel(
     override fun onEvent(event: TransactionHistoryScreenUiEvent) {
         super.onEvent(event)
         when (event) {
+            TransactionHistoryScreenUiEvent.NavigateBack -> intent {
+                postSideEffect(event)
+            }
             TransactionHistoryScreenUiEvent.Initialize -> loadTransactionHistory()
             TransactionHistoryScreenUiEvent.LoadMore -> loadMoreTransactions()
             TransactionHistoryScreenUiEvent.Refresh -> onRefresh()

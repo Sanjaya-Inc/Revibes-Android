@@ -6,4 +6,8 @@
     <string name="empty_data">No data available</string>
     <string name="error_message">An error occurred. Please try again.</string>
     <string name="retry">Retry</string>
+    <string name="coming_soon_title">Coming Soon!</string>
+    <string name="coming_soon_message">The %1$s feature is currently under development. Stay tuned for exciting updates!</string>
+    <string name="coming_soon_illustration_desc">Coming Soon Illustration</string>
+    <string name="back_to_home">Back to Home</string>
 </resources>

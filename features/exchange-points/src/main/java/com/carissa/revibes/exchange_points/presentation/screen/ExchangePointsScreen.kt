@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.exchange_points.presentation.screen
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.components.ComingSoon
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.exchange_points.R
@@ -37,6 +39,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Destination<ExchangePointsGraph>(start = true)
 @Composable
@@ -45,6 +48,10 @@ fun ExchangePointsScreen(
     viewModel: ExchangePointsScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
+    val navigator = RevibesTheme.navigator
+    viewModel.collectSideEffect {
+        if (it is ExchangePointsScreenUiEvent.NavigateBack) navigator.navigateUp()
+    }
     ExchangePointsScreenContent(uiState = state, modifier = modifier, eventReceiver = viewModel)
 }
 
@@ -67,52 +74,69 @@ private fun ExchangePointsScreenContent(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color.White),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(R.string.exchange_points_description),
-                modifier = Modifier.padding(top = 24.dp, bottom = 16.dp),
-                style = RevibesTheme.typography.h3,
-                textAlign = TextAlign.Center,
-                color = RevibesTheme.colors.primary,
-            )
-            if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+        AnimatedContent(uiState) { state ->
+            when {
+                state.isMaintenance -> {
+                    ComingSoon(
+                        featureName = "Exchange Points",
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .padding(32.dp),
+                        onClick = {
+                            eventReceiver.onEvent(ExchangePointsScreenUiEvent.NavigateBack)
+                        }
+                    )
                 }
-            } else if (uiState.error != null) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Error: ${uiState.error}")
-                }
-            } else {
-                LazyColumn {
-                    items(uiState.vouchers) { voucher ->
-                        AsyncImage(
-                            model = voucher.imageUri,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 32.dp, vertical = 4.dp)
-                                .clickable {
-                                    eventReceiver.onEvent(
-                                        ExchangePointsScreenUiEvent.NavigateToDetailExchangePoint(
-                                            voucher
-                                        )
-                                    )
-                                },
-                            contentScale = ContentScale.FillWidth,
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .background(Color.White),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.exchange_points_description),
+                            modifier = Modifier.padding(top = 24.dp, bottom = 16.dp),
+                            style = RevibesTheme.typography.h3,
+                            textAlign = TextAlign.Center,
+                            color = RevibesTheme.colors.primary,
                         )
+                        if (uiState.isLoading) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        } else if (uiState.error != null) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = "Error: ${uiState.error}")
+                            }
+                        } else {
+                            LazyColumn {
+                                items(uiState.vouchers) { voucher ->
+                                    AsyncImage(
+                                        model = voucher.imageUri,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 32.dp, vertical = 4.dp)
+                                            .clickable {
+                                                eventReceiver.onEvent(
+                                                    ExchangePointsScreenUiEvent.NavigateToDetailExchangePoint(
+                                                        voucher
+                                                    )
+                                                )
+                                            },
+                                        contentScale = ContentScale.FillWidth,
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

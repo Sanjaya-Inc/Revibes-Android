@@ -1,6 +1,7 @@
 package com.carissa.revibes.point.presentation.screen
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,6 +26,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.components.ComingSoon
 import com.carissa.revibes.core.presentation.components.PointGoldBg
 import com.carissa.revibes.core.presentation.components.PointModalBg
 import com.carissa.revibes.core.presentation.components.RevibesTheme
@@ -72,9 +75,13 @@ fun PointScreen(
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
+    val navigator = RevibesTheme.navigator
 
     viewModel.collectSideEffect { event ->
         when (event) {
+            is PointScreenUiEvent.NavigateBack -> {
+                navigator.navigateUp()
+            }
             is PointScreenUiEvent.OnLoadDailyRewardsFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
@@ -100,7 +107,6 @@ fun PointScreen(
             viewModel.onEvent(PointScreenUiEvent.ClearMissionMessage)
         }
     }
-
     PointScreenContent(uiState = state, modifier = modifier, eventReceiver = viewModel)
 }
 
@@ -124,129 +130,156 @@ private fun PointScreenContent(
             )
         }
     ) { contentPadding ->
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = RevibesTheme.colors.primary
-                )
-            }
-        } else {
-            Column(modifier = Modifier.padding(contentPadding)) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .background(PointModalBg, RoundedCornerShape(16.dp))
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(uiState.dailyRewards) { point ->
-                            val isLastItem = point == uiState.dailyRewards.last()
-                            val surfaceColor = if (point.claimedAt != null) {
-                                RevibesTheme.colors.background
-                            } else {
-                                RevibesTheme.colors.primary
-                            }
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .then(
-                                        if (!isLastItem) {
-                                            Modifier.border(
-                                                width = 1.dp,
-                                                color = RevibesTheme.colors.primary,
-                                                shape = RoundedCornerShape(12.dp)
-                                            )
-                                        } else {
-                                            Modifier
-                                        }
-                                    )
-                                    .background(
-                                        color = if (isLastItem) {
-                                            PointGoldBg
-                                        } else if (point.claimedAt != null) {
-                                            RevibesTheme.colors.primary
-                                        } else {
-                                            RevibesTheme.colors.background
-                                        },
-                                        shape = RoundedCornerShape(12.dp)
-                                    )
-                                    .padding(8.dp)
-                            ) {
-                                Text(
-                                    text = "+${point.amount}",
-                                    fontWeight = FontWeight.Bold,
-                                    color = surfaceColor
-                                )
-                                Image(
-                                    painter = painterResource(
-                                        if (isLastItem) R.drawable.ic_coins else R.drawable.ic_coin
-                                    ),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .then(
-                                            if (isLastItem) Modifier else Modifier.padding(vertical = 3.dp)
-                                        )
-                                        .size(if (isLastItem) 30.dp else 24.dp),
-                                )
-                                Text(
-                                    text = "Day ${point.dayIndex}",
-                                    fontSize = 12.sp,
-                                    color = surfaceColor
-                                )
-                            }
-                        }
-                    }
-                    Text(
-                        text = "Check this 7 days & Earn Points up to 50k coins",
-                        fontSize = 12.sp,
-                        color = RevibesTheme.colors.primary,
+        AnimatedContent(uiState) { state ->
+            when {
+                state.isMaintenance -> {
+                    ComingSoon(
+                        featureName = "Point",
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                    Button(
-                        text = "CHECK-IN TODAY",
-                        onClick = { eventReceiver.onEvent(PointScreenUiEvent.ClaimDailyReward) },
-                        modifier = Modifier.fillMaxWidth(),
-                        loading = uiState.isClaimingReward,
-                        enabled = uiState.allowedToClaimReward && !uiState.isClaimingReward,
+                            .padding(contentPadding)
+                            .padding(32.dp),
+                        onClick = {
+                            eventReceiver.onEvent(PointScreenUiEvent.NavigateBack)
+                        }
                     )
                 }
 
-                Column(
-                    modifier = Modifier
-                        .background(
-                            color = RevibesTheme.colors.primary,
-                            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                state.isLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(contentPadding),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = RevibesTheme.colors.primary
                         )
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 16.dp, bottom = 4.dp)
-                ) {
-                    Text(
-                        text = "Complete New Missions to Earn Points",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = RevibesTheme.colors.background,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    }
+                }
 
-                    if (uiState.isMissionsLoading || uiState.isClaimingReward) {
-                        RevibesLoading(color = RevibesTheme.colors.background)
-                    } else {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxSize()
+                else -> {
+                    Column(modifier = Modifier.padding(contentPadding)) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .background(PointModalBg, RoundedCornerShape(16.dp))
+                                .fillMaxWidth()
+                                .padding(16.dp)
                         ) {
-                            items(items = uiState.missions) { mission ->
-                                MissionCard(mission = mission, eventReceiver = eventReceiver)
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(uiState.dailyRewards) { point ->
+                                    val isLastItem = point == uiState.dailyRewards.last()
+                                    val surfaceColor = if (point.claimedAt != null) {
+                                        RevibesTheme.colors.background
+                                    } else {
+                                        RevibesTheme.colors.primary
+                                    }
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier
+                                            .then(
+                                                if (!isLastItem) {
+                                                    Modifier.border(
+                                                        width = 1.dp,
+                                                        color = RevibesTheme.colors.primary,
+                                                        shape = RoundedCornerShape(12.dp)
+                                                    )
+                                                } else {
+                                                    Modifier
+                                                }
+                                            )
+                                            .background(
+                                                color = if (isLastItem) {
+                                                    PointGoldBg
+                                                } else if (point.claimedAt != null) {
+                                                    RevibesTheme.colors.primary
+                                                } else {
+                                                    RevibesTheme.colors.background
+                                                },
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .padding(8.dp)
+                                    ) {
+                                        Text(
+                                            text = "+${point.amount}",
+                                            fontWeight = FontWeight.Bold,
+                                            color = surfaceColor
+                                        )
+                                        Image(
+                                            painter = painterResource(
+                                                if (isLastItem) R.drawable.ic_coins else R.drawable.ic_coin
+                                            ),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .then(
+                                                    if (isLastItem) {
+                                                        Modifier
+                                                    } else {
+                                                        Modifier.padding(
+                                                            vertical = 3.dp
+                                                        )
+                                                    }
+                                                )
+                                                .size(if (isLastItem) 30.dp else 24.dp),
+                                        )
+                                        Text(
+                                            text = "Day ${point.dayIndex}",
+                                            fontSize = 12.sp,
+                                            color = surfaceColor
+                                        )
+                                    }
+                                }
+                            }
+                            Text(
+                                text = "Check this 7 days & Earn Points up to 50k coins",
+                                fontSize = 12.sp,
+                                color = RevibesTheme.colors.primary,
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                            Button(
+                                text = "CHECK-IN TODAY",
+                                onClick = { eventReceiver.onEvent(PointScreenUiEvent.ClaimDailyReward) },
+                                modifier = Modifier.fillMaxWidth(),
+                                loading = uiState.isClaimingReward,
+                                enabled = uiState.allowedToClaimReward && !uiState.isClaimingReward,
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .background(
+                                    color = RevibesTheme.colors.primary,
+                                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                                )
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 16.dp, bottom = 4.dp)
+                        ) {
+                            Text(
+                                text = "Complete New Missions to Earn Points",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = RevibesTheme.colors.background,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+
+                            if (uiState.isMissionsLoading || uiState.isClaimingReward) {
+                                RevibesLoading(color = RevibesTheme.colors.background)
+                            } else {
+                                LazyColumn(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    items(items = uiState.missions) { mission ->
+                                        MissionCard(
+                                            mission = mission,
+                                            eventReceiver = eventReceiver
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
