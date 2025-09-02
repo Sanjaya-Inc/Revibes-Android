@@ -26,6 +26,8 @@ local.properties
 /.idea/.gitignore
 /.idea/appInsightsSettings.xml
 /.idea/inspectionProfiles/Project_Default.xml
+/.idea/deviceManager.xml
+/.idea/shelf/**
 /app/google-services.json
 /navigation-docs/
 /.kotlin/

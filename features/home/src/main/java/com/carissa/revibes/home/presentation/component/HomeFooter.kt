@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.carissa.revibes.core.domain.model.SupportData
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
@@ -46,12 +47,12 @@ data class FooterItem(
     val color: Color? = null
 ) {
     companion object {
-        fun default() = persistentListOf(
+        fun default(supportData: SupportData) = persistentListOf(
             FooterItem(R.drawable.ic_location, "Jakarta, Indonesia", Color.Red),
-            FooterItem(R.drawable.ic_phone, "+62 816 1805 621 (Hotline)"),
-            FooterItem(R.drawable.ic_fax, "+62 816 1805 621"),
-            FooterItem(R.drawable.ic_whatsapp, "+62 816 1805 621"),
-            FooterItem(R.drawable.ic_email, "support@revibes.com"),
+            FooterItem(R.drawable.ic_phone, "${supportData.phoneNumber} (Hotline)"),
+            FooterItem(R.drawable.ic_fax, supportData.faxNumber),
+            FooterItem(R.drawable.ic_whatsapp, supportData.whatsappNumber),
+            FooterItem(R.drawable.ic_email, supportData.supportEmail),
         )
     }
 }
@@ -126,7 +127,16 @@ fun HomeFooter(
 private fun HomeFooterPreview() {
     RevibesTheme {
         Box(modifier = Modifier.background(Color.White)) {
-            HomeFooter(FooterItem.default())
+            HomeFooter(
+                FooterItem.default(
+                    SupportData(
+                        supportEmail = "james.s.sherman@example-pet-store.com",
+                        phoneNumber = "+62 816 1805 621",
+                        whatsappNumber = "+62 816 1805 621",
+                        faxNumber = "+62 816 1805 621"
+                    )
+                )
+            )
         }
     }
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>support_email</key>
+        <value>help.revibes@gmail.com</value>
+    </entry>
+    <entry>
+        <key>phone_number</key>
+        <value>+62 816 1805 621</value>
+    </entry>
+    <entry>
+        <key>whatsapp_number</key>
+        <value>+62 816 1805 621</value>
+    </entry>
+    <entry>
+        <key>fax_number</key>
+        <value>+62 816 1805 621</value>
+    </entry>
+    <entry>
+        <key>your_point_feature_flag</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>drop_off_feature_flag</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>pick_up_feature_flag</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>exchanges_feature_flag</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>my_transactions_feature_flag</key>
+        <value>true</value>
+    </entry>
+</defaultsMap>

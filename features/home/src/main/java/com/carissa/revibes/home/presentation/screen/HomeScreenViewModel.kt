@@ -4,6 +4,7 @@
 package com.carissa.revibes.home.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
+import com.carissa.revibes.core.domain.supportdata.GetSupportDataUseCase
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.home.data.HomeRepository
@@ -18,7 +19,7 @@ import org.koin.android.annotation.KoinViewModel
 data class HomeScreenUiState(
     val isLoading: Boolean = false,
     val searchValue: TextFieldValue = TextFieldValue(),
-    val footerItems: ImmutableList<FooterItem> = FooterItem.default(),
+    val footerItems: ImmutableList<FooterItem> = persistentListOf(),
     val banners: ImmutableList<HomeBannerData> = persistentListOf(),
     val userPoints: Int = 0,
     val userName: String = "",
@@ -44,8 +45,11 @@ sealed interface HomeScreenUiEvent {
 class HomeScreenViewModel(
     private val homeRepository: HomeRepository,
     private val homeExceptionHandler: HomeExceptionHandler,
+    getSupportDataUseCase: GetSupportDataUseCase
 ) : BaseViewModel<HomeScreenUiState, HomeScreenUiEvent>(
-    initialState = HomeScreenUiState(),
+    initialState = HomeScreenUiState(
+        footerItems = FooterItem.default(getSupportDataUseCase.getSupportData())
+    ),
     onCreate = {
         onEvent(HomeScreenUiEvent.LoadHomeData)
     },
