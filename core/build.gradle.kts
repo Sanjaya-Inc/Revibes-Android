@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.sjy.lib)
     alias(libs.plugins.sjy.compose)
     alias(libs.plugins.sjy.firebase)
-    kotlin("plugin.serialization") version sjy.versions.kotlin.core.get()
     alias(sjy.plugins.lumo)
 }
 
