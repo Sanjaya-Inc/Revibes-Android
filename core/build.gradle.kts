@@ -2,9 +2,9 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.sjy.lib)
-    alias(libs.plugins.sjy.compose)
-    alias(libs.plugins.sjy.firebase)
+    alias(sjy.plugins.buildlogic.lib)
+    alias(sjy.plugins.buildlogic.compose)
+    alias(sjy.plugins.buildlogic.firebase)
     alias(sjy.plugins.lumo)
 }
 

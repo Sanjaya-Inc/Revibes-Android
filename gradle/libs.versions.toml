@@ -14,8 +14,3 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
-sjy-detekt = { id = "com.sanjaya.buildlogic.detekt" }
-sjy-lib = { id = "com.sanjaya.buildlogic.lib" }
-sjy-compose = { id = "com.sanjaya.buildlogic.compose" }
-sjy-app = { id = "com.sanjaya.buildlogic.app" }
-sjy-firebase = { id = "com.sanjaya.buildlogic.firebase" }

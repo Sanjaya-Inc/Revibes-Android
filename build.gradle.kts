@@ -11,5 +11,5 @@ plugins {
     alias(sjy.plugins.gms.services) apply false
     alias(sjy.plugins.crashlytics) apply false
     alias(sjy.plugins.lumo) apply false
-    alias(libs.plugins.sjy.detekt) apply true
+    alias(sjy.plugins.buildlogic.detekt) apply true
 }

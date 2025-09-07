@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.sjy.lib)
-    alias(libs.plugins.sjy.compose)
+    alias(sjy.plugins.buildlogic.lib)
+    alias(sjy.plugins.buildlogic.compose)
 }
 
 android {
