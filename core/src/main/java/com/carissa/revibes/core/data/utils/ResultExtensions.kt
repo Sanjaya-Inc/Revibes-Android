@@ -10,7 +10,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * @return The original [Result] receiver, to allow for further chaining.
  */
-inline fun <T> Result<T>.rethrowCancellation(): Result<T> {
+fun <T> Result<T>.rethrowCancellation(): Result<T> {
     onFailure { exception ->
         if (exception is CancellationException) {
             throw exception
