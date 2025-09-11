@@ -27,6 +27,7 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.core.presentation.components.components.Text
 import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.help_center.R
@@ -61,8 +62,10 @@ private fun HelpCenterScreenContent(
             CommonHeader(
                 title = "HELP CENTER",
                 backgroundDrawRes = R.drawable.bg_help_center,
-                searchTextFieldValue = uiState.searchValue,
-                onTextChange = { eventReceiver.onEvent(HelpCenterScreenUiEvent.OnSearchChange(it)) },
+                searchConfig = SearchConfig.Enabled(
+                    value = uiState.searchValue,
+                    onValueChange = { eventReceiver.onEvent(HelpCenterScreenUiEvent.OnSearchChange(it)) }
+                ),
                 onProfileClicked = {
                     eventReceiver.onEvent(HelpCenterScreenUiEvent.NavigateToProfile)
                 },

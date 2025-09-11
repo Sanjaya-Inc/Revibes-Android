@@ -25,6 +25,7 @@ import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.TabButton
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.core.presentation.components.components.Text
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
@@ -54,8 +55,10 @@ private fun AdminMenuScreenContent(
             CommonHeader(
                 title = "ADMIN MENU",
                 backgroundDrawRes = R.drawable.bg_help_center,
-                searchTextFieldValue = uiState.searchValue,
-                onTextChange = { eventReceiver.onEvent(AdminMenuScreenUiEvent.OnSearchChange(it)) },
+                searchConfig = SearchConfig.Enabled(
+                    value = uiState.searchValue,
+                    onValueChange = { eventReceiver.onEvent(AdminMenuScreenUiEvent.OnSearchChange(it)) }
+                ),
                 onProfileClicked = {
                     eventReceiver.onEvent(AdminMenuScreenUiEvent.NavigateToProfile)
                 },

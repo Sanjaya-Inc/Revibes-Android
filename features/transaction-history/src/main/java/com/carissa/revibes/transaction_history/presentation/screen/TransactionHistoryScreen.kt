@@ -42,6 +42,7 @@ import com.carissa.revibes.core.presentation.components.TabButton
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.core.presentation.components.components.GeneralError
 import com.carissa.revibes.core.presentation.components.components.RevibesLoading
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.transaction_history.R
 import com.carissa.revibes.transaction_history.data.model.TransactionHistoryData
 import com.carissa.revibes.transaction_history.presentation.component.TransactionHistoryItem
@@ -94,10 +95,12 @@ private fun TransactionHistoryScreenContent(
         CommonHeader(
             "MY TRANSACTION HISTORY",
             backgroundDrawRes = R.drawable.bg_transaction_history,
-            searchTextFieldValue = uiState.searchValue,
-            onTextChange = { searchValue ->
-                eventReceiver.onEvent(TransactionHistoryScreenUiEvent.SearchValueChanged(searchValue))
-            }
+            searchConfig = SearchConfig.Enabled(
+                value = uiState.searchValue,
+                onValueChange = { searchValue ->
+                    eventReceiver.onEvent(TransactionHistoryScreenUiEvent.SearchValueChanged(searchValue))
+                }
+            )
         )
     }) { contentPadding ->
         AnimatedContent(uiState) { state ->

@@ -80,6 +80,7 @@ import com.carissa.revibes.core.presentation.components.DropOffTextFieldBg
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.core.presentation.components.components.RevibesLoading
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextField
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
 import com.carissa.revibes.drop_off.R
@@ -126,8 +127,7 @@ fun DropOffScreen(
             CommonHeader(
                 title = context.getString(R.string.drop_off_title),
                 backgroundDrawRes = R.drawable.bg_drop_off,
-                searchTextFieldValue = searchText,
-                onTextChange = { searchText = it },
+                searchConfig = SearchConfig.None,
             )
         }
     ) { contentPadding ->

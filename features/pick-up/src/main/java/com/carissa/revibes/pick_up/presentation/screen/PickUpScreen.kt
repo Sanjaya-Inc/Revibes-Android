@@ -11,21 +11,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.ComingSoon
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.pick_up.R
 import com.carissa.revibes.pick_up.presentation.navigation.PickUpGraph
 import com.ramcosta.composedestinations.annotation.Destination
@@ -48,9 +45,6 @@ private fun PickUpScreenContent(
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<PickUpScreenUiEvent> = EventReceiver { }
 ) {
-    val context = LocalContext.current
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
-
     Scaffold(
         modifier = modifier,
         containerColor = Color.Transparent,
@@ -58,8 +52,7 @@ private fun PickUpScreenContent(
             CommonHeader(
                 title = stringResource(R.string.pick_up_title),
                 backgroundDrawRes = R.drawable.bg_pick_up,
-                searchTextFieldValue = searchText,
-                onTextChange = { searchText = it },
+                searchConfig = SearchConfig.None,
                 onProfileClicked = {
                     eventReceiver.onEvent(PickUpScreenUiEvent.NavigateToProfile)
                 },

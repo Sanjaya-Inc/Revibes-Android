@@ -40,49 +40,71 @@ import com.carissa.revibes.core.presentation.components.components.textfield.Out
 import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Represents the configuration for the search bar in the header.
+ * Using a sealed interface ensures that you either provide all necessary
+ * information for the search bar (`Enabled`) or none at all (`None`).
+ */
+sealed interface SearchConfig {
+    data object None : SearchConfig
+    data class Enabled(
+        val value: TextFieldValue,
+        val onValueChange: (TextFieldValue) -> Unit
+    ) : SearchConfig
+}
+
 @Composable
 fun CommonHeader(
     title: String,
     @DrawableRes backgroundDrawRes: Int,
-    searchTextFieldValue: TextFieldValue,
     modifier: Modifier = Modifier,
     viewModel: CommonHeaderViewModel = koinViewModel(),
     eventReceiver: EventReceiver<ToolbarEvent> = viewModel,
     subtitle: String? = null,
-    onTextChange: (TextFieldValue) -> Unit = {},
+    searchConfig: SearchConfig = SearchConfig.None,
     onBackClicked: () -> Unit = { eventReceiver.onEvent(ToolbarEvent.NavigateBack) },
     onProfileClicked: () -> Unit = { eventReceiver.onEvent(ToolbarEvent.NavigateToProfile) },
 ) {
-    val headerHeight = if (subtitle != null) 362.dp else 322.dp
+    val hasSearch = searchConfig is SearchConfig.Enabled
+    val searchBarHeight = if (hasSearch) 50.dp else 0.dp
+
+    val baseHeight = if (subtitle != null) 312.dp else 272.dp
+    val headerHeight = baseHeight + searchBarHeight
     Box(modifier = modifier.height(headerHeight)) {
         Box {
+            val backgroundModifier = Modifier
+                .fillMaxWidth()
+                .padding(top = searchBarHeight)
+                .height(256.dp)
+            val clipModifier =
+                Modifier.clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
+            val fadeModifier = Modifier.graphicsLayer { alpha = 0.99f }
+                .drawWithContent {
+                    val gradientBrush = Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color.Black),
+                        startY = 0f,
+                        endY = size.height * 0.4f
+                    )
+                    drawContent()
+                    drawRect(
+                        brush = gradientBrush,
+                        blendMode = BlendMode.DstIn
+                    )
+                }
+            val finalModifier = if (hasSearch) {
+                backgroundModifier.then(fadeModifier).then(clipModifier)
+            } else {
+                backgroundModifier.then(clipModifier)
+            }
             AsyncImage(
                 model = backgroundDrawRes,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 50.dp)
-                    .height(256.dp)
-                    .graphicsLayer { alpha = 0.99f }
-                    .drawWithContent {
-                        val gradientBrush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black),
-                            startY = 0f,
-                            endY = size.height * 0.4f
-                        )
-                        drawContent()
-                        drawRect(
-                            brush = gradientBrush,
-                            blendMode = BlendMode.DstIn
-                        )
-                    }
-                    .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
+                modifier = finalModifier
             )
 
             CommonToolbar(
-                searchTextFieldValue = searchTextFieldValue,
-                onTextChange = onTextChange,
+                searchConfig = searchConfig,
                 onBackClicked = onBackClicked,
                 onProfileClicked = onProfileClicked,
                 modifier = Modifier
@@ -142,9 +164,8 @@ fun CommonHeader(
 
 @Composable
 private fun CommonToolbar(
-    searchTextFieldValue: TextFieldValue,
+    searchConfig: SearchConfig,
     modifier: Modifier = Modifier,
-    onTextChange: (TextFieldValue) -> Unit = {},
     onBackClicked: () -> Unit = {},
     onProfileClicked: () -> Unit = {},
 ) {
@@ -164,67 +185,69 @@ private fun CommonToolbar(
             )
         }
         Row {
-            OutlinedTextField(
-                value = searchTextFieldValue,
-                onValueChange = onTextChange,
-                modifier = Modifier
-                    .weight(1f)
-                    .alpha(0.5f),
-                leadingIcon = {
+            if (searchConfig is SearchConfig.Enabled) {
+                OutlinedTextField(
+                    value = searchConfig.value,
+                    onValueChange = searchConfig.onValueChange,
+                    modifier = Modifier
+                        .weight(1f)
+                        .alpha(0.5f),
+                    leadingIcon = {
+                        Icon(
+                            painterResource(R.drawable.ic_search),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(8.dp),
+                            tint = RevibesTheme.colors.onPrimary
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            text = "Search",
+                            style = RevibesTheme.typography.input,
+                            color = RevibesTheme.colors.onPrimary
+                        )
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors().copy(
+                        focusedLeadingIconColor = RevibesTheme.colors.onPrimary,
+                        unfocusedLeadingIconColor = RevibesTheme.colors.onPrimary,
+                        disabledLeadingIconColor = RevibesTheme.colors.onPrimary,
+                        errorLeadingIconColor = RevibesTheme.colors.onPrimary,
+                        focusedTextColor = RevibesTheme.colors.onPrimary,
+                        unfocusedTextColor = RevibesTheme.colors.onPrimary,
+                        disabledTextColor = RevibesTheme.colors.onPrimary,
+                        errorTextColor = RevibesTheme.colors.onPrimary,
+                        focusedContainerColor = RevibesTheme.colors.primary,
+                        unfocusedContainerColor = RevibesTheme.colors.primary,
+                        disabledContainerColor = RevibesTheme.colors.primary,
+                        errorContainerColor = RevibesTheme.colors.primary,
+                        focusedOutlineColor = RevibesTheme.colors.primary,
+                        unfocusedOutlineColor = RevibesTheme.colors.primary,
+                        disabledOutlineColor = RevibesTheme.colors.primary,
+                        errorOutlineColor = RevibesTheme.colors.primary,
+                    )
+                )
+                Spacer(modifier = Modifier.size(16.dp))
+                IconButton(
+                    onClick = onProfileClicked,
+                    colors = IconButtonColors(
+                        containerColor = RevibesTheme.colors.primary,
+                        contentColor = RevibesTheme.colors.onPrimary,
+                        disabledContainerColor = RevibesTheme.colors.primary,
+                        disabledContentColor = RevibesTheme.colors.onPrimary
+                    )
+                ) {
                     Icon(
-                        painterResource(R.drawable.ic_search),
+                        painterResource(R.drawable.ic_profile),
                         contentDescription = null,
                         modifier = Modifier
                             .size(36.dp)
                             .padding(8.dp),
                         tint = RevibesTheme.colors.onPrimary
                     )
-                },
-                placeholder = {
-                    Text(
-                        text = "Search",
-                        style = RevibesTheme.typography.input,
-                        color = RevibesTheme.colors.onPrimary
-                    )
-                },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors().copy(
-                    focusedLeadingIconColor = RevibesTheme.colors.onPrimary,
-                    unfocusedLeadingIconColor = RevibesTheme.colors.onPrimary,
-                    disabledLeadingIconColor = RevibesTheme.colors.onPrimary,
-                    errorLeadingIconColor = RevibesTheme.colors.onPrimary,
-                    focusedTextColor = RevibesTheme.colors.onPrimary,
-                    unfocusedTextColor = RevibesTheme.colors.onPrimary,
-                    disabledTextColor = RevibesTheme.colors.onPrimary,
-                    errorTextColor = RevibesTheme.colors.onPrimary,
-                    focusedContainerColor = RevibesTheme.colors.primary,
-                    unfocusedContainerColor = RevibesTheme.colors.primary,
-                    disabledContainerColor = RevibesTheme.colors.primary,
-                    errorContainerColor = RevibesTheme.colors.primary,
-                    focusedOutlineColor = RevibesTheme.colors.primary,
-                    unfocusedOutlineColor = RevibesTheme.colors.primary,
-                    disabledOutlineColor = RevibesTheme.colors.primary,
-                    errorOutlineColor = RevibesTheme.colors.primary,
-                )
-            )
-            Spacer(modifier = Modifier.size(16.dp))
-            IconButton(
-                onClick = onProfileClicked,
-                colors = IconButtonColors(
-                    containerColor = RevibesTheme.colors.primary,
-                    contentColor = RevibesTheme.colors.onPrimary,
-                    disabledContainerColor = RevibesTheme.colors.primary,
-                    disabledContentColor = RevibesTheme.colors.onPrimary
-                )
-            ) {
-                Icon(
-                    painterResource(R.drawable.ic_profile),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .padding(8.dp),
-                    tint = RevibesTheme.colors.onPrimary
-                )
+                }
             }
         }
     }
@@ -237,8 +260,10 @@ private fun CommonHeaderPreview() {
         CommonHeader(
             title = "Common Header",
             backgroundDrawRes = -1,
-            searchTextFieldValue = TextFieldValue(""),
-            onTextChange = {},
+            searchConfig = SearchConfig.Enabled(
+                value = TextFieldValue(""),
+                onValueChange = {},
+            ),
             modifier = Modifier.background(Color.White)
         )
     }
@@ -252,8 +277,10 @@ private fun CommonHeaderWithSubtitlePreview() {
             title = "Common Header",
             subtitle = "This is a subtitle",
             backgroundDrawRes = -1,
-            searchTextFieldValue = TextFieldValue(""),
-            onTextChange = {},
+            searchConfig = SearchConfig.Enabled(
+                value = TextFieldValue(""),
+                onValueChange = {},
+            ),
             modifier = Modifier.background(Color.White)
         )
     }

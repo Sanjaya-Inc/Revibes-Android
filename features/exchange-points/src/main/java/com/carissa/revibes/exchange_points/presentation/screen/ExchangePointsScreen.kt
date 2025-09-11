@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +31,7 @@ import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.ComingSoon
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.exchange_points.R
 import com.carissa.revibes.exchange_points.domain.model.Voucher
 import com.carissa.revibes.exchange_points.presentation.navigation.ExchangePointsGraph
@@ -68,7 +68,7 @@ private fun ExchangePointsScreenContent(
         topBar = {
             CommonHeader(
                 title = stringResource(R.string.exchange_points_title),
-                searchTextFieldValue = TextFieldValue(),
+                searchConfig = SearchConfig.None,
                 subtitle = stringResource(R.string.exchange_points_subtitle, uiState.points),
                 backgroundDrawRes = R.drawable.bg_exchange_points,
             )

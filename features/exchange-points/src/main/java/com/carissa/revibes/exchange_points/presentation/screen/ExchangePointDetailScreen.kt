@@ -43,7 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,6 +53,7 @@ import com.carissa.revibes.core.presentation.components.Yellow900
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.core.presentation.components.components.Text
 import com.carissa.revibes.exchange_points.R
 import com.carissa.revibes.exchange_points.domain.model.Voucher
@@ -139,7 +139,7 @@ private fun ExchangePointDetailScreenContent(
         topBar = {
             CommonHeader(
                 title = stringResource(R.string.exchange_point_detail_title),
-                searchTextFieldValue = TextFieldValue(),
+                searchConfig = SearchConfig.None,
                 backgroundDrawRes = R.drawable.bg_exchange_points,
                 onBackClicked = navigator::navigateUp,
             )

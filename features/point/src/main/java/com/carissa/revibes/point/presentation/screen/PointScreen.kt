@@ -57,6 +57,7 @@ import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
 import com.carissa.revibes.core.presentation.components.components.RevibesLoading
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.core.presentation.components.components.Text
 import com.carissa.revibes.point.R
 import com.carissa.revibes.point.domain.model.Mission
@@ -124,8 +125,7 @@ private fun PointScreenContent(
         topBar = {
             CommonHeader(
                 title = stringResource(R.string.point_title),
-                searchTextFieldValue = searchText,
-                onTextChange = { searchText = it },
+                searchConfig = SearchConfig.None,
                 backgroundDrawRes = R.drawable.bg_point,
             )
         }

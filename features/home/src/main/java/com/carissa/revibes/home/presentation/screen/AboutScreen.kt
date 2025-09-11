@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.home.R
 import com.carissa.revibes.home.presentation.component.HomeFooter
 import com.carissa.revibes.home.presentation.navigation.HomeGraph
@@ -75,7 +75,7 @@ private fun AboutScreenContent(
             CommonHeader(
                 title = stringResource(R.string.about_us),
                 backgroundDrawRes = R.drawable.bg_about_us,
-                searchTextFieldValue = TextFieldValue(),
+                searchConfig = SearchConfig.None,
                 onBackClicked = navigator::navigateUp,
                 onProfileClicked = { eventReceiver.onEvent(AboutScreenUiEvent.NavigateToProfile) }
             )

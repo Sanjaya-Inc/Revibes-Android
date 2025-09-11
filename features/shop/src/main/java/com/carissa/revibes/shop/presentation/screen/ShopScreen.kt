@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
@@ -29,6 +28,7 @@ import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.CommonHeader
+import com.carissa.revibes.core.presentation.components.components.SearchConfig
 import com.carissa.revibes.core.presentation.components.components.Text
 import com.carissa.revibes.core.presentation.util.DeeplinkHandler
 import com.carissa.revibes.shop.R
@@ -62,7 +62,7 @@ private fun ShopScreenContent(
     ) {
         CommonHeader(
             title = stringResource(R.string.shop_title),
-            searchTextFieldValue = TextFieldValue(),
+            searchConfig = SearchConfig.None,
             backgroundDrawRes = R.drawable.bg_shop_header,
             onBackClicked = navigator::navigateUp,
             onProfileClicked = { eventReceiver.onEvent(ShopScreenUiEvent.NavigateToProfile) }
