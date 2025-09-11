@@ -22,7 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -49,7 +53,7 @@ fun CommonHeader(
     onBackClicked: () -> Unit = { eventReceiver.onEvent(ToolbarEvent.NavigateBack) },
     onProfileClicked: () -> Unit = { eventReceiver.onEvent(ToolbarEvent.NavigateToProfile) },
 ) {
-    val headerHeight = if (subtitle != null) 312.dp else 272.dp
+    val headerHeight = if (subtitle != null) 362.dp else 322.dp
     Box(modifier = modifier.height(headerHeight)) {
         Box {
             AsyncImage(
@@ -58,9 +62,24 @@ fun CommonHeader(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(top = 50.dp)
                     .height(256.dp)
+                    .graphicsLayer { alpha = 0.99f }
+                    .drawWithContent {
+                        val gradientBrush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black),
+                            startY = 0f,
+                            endY = size.height * 0.4f
+                        )
+                        drawContent()
+                        drawRect(
+                            brush = gradientBrush,
+                            blendMode = BlendMode.DstIn
+                        )
+                    }
                     .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
             )
+
             CommonToolbar(
                 searchTextFieldValue = searchTextFieldValue,
                 onTextChange = onTextChange,
