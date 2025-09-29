@@ -6,6 +6,7 @@
     <string name="label_enter_full_name">Enter Your Full Name</string>
     <string name="label_enter_email">Enter Your Email</string>
     <string name="label_enter_phone">Enter Your Mobile Phone</string>
+    <string name="label_pass">Password</string>
     <string name="label_enter_pass">Create Password</string>
     <string name="label_enter_confirm_pass">Confirm Password</string>
     <string name="label_already_have_an_account">Already have an account?</string>

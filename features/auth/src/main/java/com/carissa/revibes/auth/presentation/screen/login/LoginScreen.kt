@@ -108,7 +108,7 @@ private fun LoginScreenContent(
             PasswordField(
                 value = uiState.password,
                 onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.PasswordChanged(it)) },
-                label = stringResource(R.string.label_enter_pass),
+                label = stringResource(R.string.label_pass),
                 isEnabled = !uiState.isLoading,
                 errorText = uiState.passwordError,
                 onImeAction = {
