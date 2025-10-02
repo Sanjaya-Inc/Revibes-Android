@@ -9,6 +9,7 @@ import com.carissa.revibes.manage_users.data.model.UserListResponse
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Headers
 import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
@@ -31,6 +32,7 @@ interface ManageUsersRemoteApi {
     ): UserDetailResponse
 
     @PATCH("users/{id}/points/add")
+    @Headers("Content-Type: application/json")
     suspend fun addPointsToUser(
         @Path("id") id: String,
         @Body request: AddPointsRequest
