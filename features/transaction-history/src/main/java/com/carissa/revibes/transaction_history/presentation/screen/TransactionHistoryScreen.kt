@@ -91,6 +91,7 @@ private fun TransactionHistoryScreenContent(
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<TransactionHistoryScreenUiEvent> = EventReceiver { }
 ) {
+    val pagerState = rememberPagerState { 2 }
     Scaffold(modifier, topBar = {
         CommonHeader(
             "MY TRANSACTION HISTORY",
@@ -107,7 +108,7 @@ private fun TransactionHistoryScreenContent(
             when {
                 state.isMaintenance -> {
                     ComingSoon(
-                        featureName = "Transcation History",
+                        featureName = "Transaction History",
                         modifier = Modifier
                             .padding(contentPadding)
                             .padding(32.dp),
@@ -124,7 +125,6 @@ private fun TransactionHistoryScreenContent(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        val pagerState = rememberPagerState { 2 }
                         val scope = rememberCoroutineScope()
 
                         LaunchedEffect(pagerState.currentPage) {
