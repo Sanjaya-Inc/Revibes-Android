@@ -1,10 +1,15 @@
 package com.carissa.revibes.manage_voucher.data
 
+import android.content.Context
+import android.net.Uri
 import com.carissa.revibes.manage_voucher.data.mapper.toDomain
 import com.carissa.revibes.manage_voucher.data.model.PaginationData
 import com.carissa.revibes.manage_voucher.data.remote.ManageVoucherRemoteApi
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
+import io.ktor.client.request.forms.formData
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
 
@@ -25,16 +30,16 @@ interface ManageVoucherRepository {
     suspend fun getVoucherDetail(id: String): VoucherDomain
 
     suspend fun createVoucher(
+        context: Context,
         code: String,
         name: String,
         description: String,
         type: VoucherDomain.VoucherType,
         amount: Double,
-//        currency: VoucherDomain.Currency,
         conditions: VoucherConditions,
         claimPeriodStart: String,
         claimPeriodEnd: String,
-        imageUrl: String? = null
+        imageUri: Uri
     )
 
     suspend fun deleteVoucher(id: String)
@@ -75,32 +80,47 @@ internal class ManageVoucherRepositoryImpl(
     }
 
     override suspend fun createVoucher(
+        context: Context,
         code: String,
         name: String,
         description: String,
         type: VoucherDomain.VoucherType,
         amount: Double,
-//        currency: VoucherDomain.Currency,
         conditions: VoucherConditions,
         claimPeriodStart: String,
         claimPeriodEnd: String,
-        imageUrl: String?
+        imageUri: Uri
     ) {
-        val conditions = Json.encodeToString(
+        val conditionsJson = Json.encodeToString(
             serializer = VoucherConditions.serializer(),
             value = conditions
         )
+
+        val inputStream = context.contentResolver.openInputStream(imageUri)
+        val imageBytes = inputStream?.readBytes() ?: throw IllegalArgumentException("Cannot read image")
+        inputStream.close()
+
+        val imageFormData = formData {
+            append(
+                "image",
+                imageBytes,
+                Headers.build {
+                    append(HttpHeaders.ContentType, "image/jpeg")
+                    append(HttpHeaders.ContentDisposition, "filename=voucher_image.jpg")
+                }
+            )
+        }
+
         remoteApi.createVoucher(
             code = code,
             name = name,
             description = description,
             type = type.toString(),
             amount = amount.toString(),
-//            currency = currency.toString(),
-            conditions = conditions,
+            conditions = conditionsJson,
             claimPeriodStart = claimPeriodStart,
             claimPeriodEnd = claimPeriodEnd,
-//            image = null
+            image = imageFormData
         )
     }
 

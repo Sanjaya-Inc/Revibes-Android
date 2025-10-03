@@ -1,6 +1,8 @@
 package com.carissa.revibes.manage_voucher.presentation.screen
 
 import android.util.Log
+import android.content.Context
+import android.net.Uri
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.manage_voucher.data.ManageVoucherRepository
@@ -25,6 +27,8 @@ data class AddVoucherScreenUiState(
     val claimPeriodStart: String = "",
     val claimPeriodEnd: String = "",
     val imageUrl: String? = null,
+    val selectedImageUri: Uri? = null,
+    val isUploadingImage: Boolean = false,
     val showConditionsSection: Boolean = false,
     val codeError: String? = null,
     val nameError: String? = null,
@@ -36,12 +40,14 @@ data class AddVoucherScreenUiState(
     val minOrderAmountError: String? = null,
     val maxDiscountAmountError: String? = null,
     val claimPeriodStartError: String? = null,
-    val claimPeriodEndError: String? = null
+    val claimPeriodEndError: String? = null,
+    val imageError: String? = null
 )
 
 sealed interface AddVoucherScreenUiEvent {
     data object OnVoucherAddedSuccessfully : AddVoucherScreenUiEvent
     data object SaveVoucher : AddVoucherScreenUiEvent
+    data class SaveVoucherWithContext(val context: Context) : AddVoucherScreenUiEvent
     data class CodeChanged(val code: TextFieldValue) : AddVoucherScreenUiEvent
     data class NameChanged(val name: TextFieldValue) : AddVoucherScreenUiEvent
     data class DescriptionChanged(val description: TextFieldValue) : AddVoucherScreenUiEvent
@@ -59,6 +65,11 @@ sealed interface AddVoucherScreenUiEvent {
     data class ClaimPeriodStartChanged(val date: String) : AddVoucherScreenUiEvent
     data class ClaimPeriodEndChanged(val date: String) : AddVoucherScreenUiEvent
     data class ImageUrlChanged(val imageUrl: String?) : AddVoucherScreenUiEvent
+    data class ImageSelected(val uri: Uri) : AddVoucherScreenUiEvent
+    data class UploadImage(val context: Context, val uri: Uri) : AddVoucherScreenUiEvent
+    data class OnImageUploadSuccess(val imageUrl: String) : AddVoucherScreenUiEvent
+    data class OnImageUploadFailed(val message: String) : AddVoucherScreenUiEvent
+    data object RemoveImage : AddVoucherScreenUiEvent
     data object ToggleConditionsSection : AddVoucherScreenUiEvent
     data class OnCreateVoucherFailed(val message: String) : AddVoucherScreenUiEvent
 }
@@ -78,6 +89,7 @@ class AddVoucherScreenViewModel(
         super.onEvent(event)
         when (event) {
             AddVoucherScreenUiEvent.SaveVoucher -> saveVoucher()
+            is AddVoucherScreenUiEvent.SaveVoucherWithContext -> saveVoucherWithContext(event.context)
             is AddVoucherScreenUiEvent.CodeChanged -> updateCode(event.code)
             is AddVoucherScreenUiEvent.NameChanged -> updateName(event.name)
             is AddVoucherScreenUiEvent.DescriptionChanged -> updateDescription(event.description)
@@ -92,6 +104,11 @@ class AddVoucherScreenViewModel(
             is AddVoucherScreenUiEvent.ClaimPeriodStartChanged -> updateClaimPeriodStart(event.date)
             is AddVoucherScreenUiEvent.ClaimPeriodEndChanged -> updateClaimPeriodEnd(event.date)
             is AddVoucherScreenUiEvent.ImageUrlChanged -> updateImageUrl(event.imageUrl)
+            is AddVoucherScreenUiEvent.ImageSelected -> updateSelectedImage(event.uri)
+            is AddVoucherScreenUiEvent.UploadImage -> uploadImage(event.context, event.uri)
+            is AddVoucherScreenUiEvent.OnImageUploadSuccess -> onImageUploadSuccess(event.imageUrl)
+            is AddVoucherScreenUiEvent.OnImageUploadFailed -> onImageUploadFailed(event.message)
+            AddVoucherScreenUiEvent.RemoveImage -> removeImage()
             AddVoucherScreenUiEvent.ToggleConditionsSection -> toggleConditionsSection()
             else -> Unit
         }
@@ -217,6 +234,65 @@ class AddVoucherScreenViewModel(
         reduce { state.copy(imageUrl = imageUrl) }
     }
 
+    private fun updateSelectedImage(uri: Uri) = intent {
+        reduce {
+            state.copy(
+                selectedImageUri = uri,
+                imageError = null
+            )
+        }
+    }
+
+    private fun uploadImage(context: Context, uri: Uri) = intent {
+        reduce { state.copy(isUploadingImage = true) }
+
+        try {
+            // For now, we'll simulate the upload and use a placeholder URL
+            // In a real implementation, you would upload to your server/cloud storage
+            val imageUrl = "https://example.com/voucher-images/${System.currentTimeMillis()}.jpg"
+
+            reduce {
+                state.copy(
+                    isUploadingImage = false,
+                    imageUrl = imageUrl
+                )
+            }
+            postSideEffect(AddVoucherScreenUiEvent.OnImageUploadSuccess(imageUrl))
+        } catch (e: Exception) {
+            reduce { state.copy(isUploadingImage = false) }
+            postSideEffect(AddVoucherScreenUiEvent.OnImageUploadFailed(e.message ?: "Upload failed"))
+        }
+    }
+
+    private fun onImageUploadSuccess(imageUrl: String) = intent {
+        reduce {
+            state.copy(
+                imageUrl = imageUrl,
+                isUploadingImage = false,
+                imageError = null
+            )
+        }
+    }
+
+    private fun onImageUploadFailed(message: String) = intent {
+        reduce {
+            state.copy(
+                isUploadingImage = false,
+                imageError = message
+            )
+        }
+    }
+
+    private fun removeImage() = intent {
+        reduce {
+            state.copy(
+                selectedImageUri = null,
+                imageUrl = null,
+                imageError = null
+            )
+        }
+    }
+
     private fun toggleConditionsSection() = intent {
         reduce { state.copy(showConditionsSection = !state.showConditionsSection) }
     }
@@ -245,23 +321,56 @@ class AddVoucherScreenViewModel(
                     )
                 }
 
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(AddVoucherScreenUiEvent.OnVoucherAddedSuccessfully)
+            } else {
+                Log.e(TAG, "Form validation failed")
+            }
+        }
+    }
+
+    private fun saveVoucherWithContext(context: Context) {
+        intent {
+            val isFormValid = validateForm(state)
+            val selectedImageUri = state.selectedImageUri
+            if (isFormValid && selectedImageUri != null) {
+                reduce { state.copy(isLoading = true) }
+
+                val conditions = if (state.showConditionsSection) {
+                    VoucherConditions(
+                        maxClaim = state.maxClaim.text.toIntOrNull() ?: 0,
+                        maxUsage = state.maxUsage.text.toIntOrNull() ?: 0,
+                        minOrderItem = state.minOrderItem.text.toIntOrNull() ?: 0,
+                        minOrderAmount = state.minOrderAmount.text.toLongOrNull() ?: 0L,
+                        maxDiscountAmount = state.maxDiscountAmount.text.toLongOrNull() ?: 0L
+                    )
+                } else {
+                    VoucherConditions(
+                        maxClaim = 0,
+                        maxUsage = 0,
+                        minOrderItem = 0,
+                        minOrderAmount = 0L,
+                        maxDiscountAmount = 0L
+                    )
+                }
+
                 repository.createVoucher(
+                    context = context,
                     code = state.code.text,
                     name = state.name.text,
                     description = state.description.text,
                     type = state.type,
                     amount = state.amount.text.toDoubleOrNull() ?: 0.0,
-//            currency = state.currency,
                     conditions = conditions,
                     claimPeriodStart = state.claimPeriodStart,
                     claimPeriodEnd = state.claimPeriodEnd,
-                    imageUrl = state.imageUrl
+                    imageUri = selectedImageUri
                 )
 
                 reduce { state.copy(isLoading = false) }
                 postSideEffect(AddVoucherScreenUiEvent.OnVoucherAddedSuccessfully)
             } else {
-                Log.e(TAG, "Form validation failed")
+                Log.e(TAG, "Form validation failed or no image selected")
             }
         }
     }
@@ -279,7 +388,8 @@ class AddVoucherScreenViewModel(
             minOrderAmountError = null,
             maxDiscountAmountError = null,
             claimPeriodStartError = null,
-            claimPeriodEndError = null
+            claimPeriodEndError = null,
+            imageError = null
         )
 
         if (state.code.text.isBlank()) {
@@ -332,6 +442,11 @@ class AddVoucherScreenViewModel(
         if (state.claimPeriodEnd.isBlank()) {
             hasError = true
             newState = newState.copy(claimPeriodEndError = "End date is required")
+        }
+
+        if (state.selectedImageUri == null) {
+            hasError = true
+            newState = newState.copy(imageError = "Voucher image is required")
         }
 
         intent { reduce { newState } }

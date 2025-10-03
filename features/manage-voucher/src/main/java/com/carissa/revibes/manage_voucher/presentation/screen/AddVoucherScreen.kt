@@ -1,27 +1,39 @@
 package com.carissa.revibes.manage_voucher.presentation.screen
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -42,10 +54,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
@@ -85,6 +102,22 @@ fun AddVoucherScreen(
                     Toast.LENGTH_SHORT
                 ).show()
                 navigator.navigateUp()
+            }
+
+            is AddVoucherScreenUiEvent.OnImageUploadSuccess -> {
+                Toast.makeText(
+                    context,
+                    "Image uploaded successfully",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            is AddVoucherScreenUiEvent.OnImageUploadFailed -> {
+                Toast.makeText(
+                    context,
+                    "Failed to upload image: ${it.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
             else -> Unit
@@ -128,7 +161,8 @@ private fun AddVoucherContent(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -142,21 +176,25 @@ private fun AddVoucherContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
                             text = "Basic Information",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
 
                         OutlinedTextField(
@@ -168,7 +206,8 @@ private fun AddVoucherContent(
                             modifier = Modifier.fillMaxWidth(),
                             isError = state.codeError != null,
                             supportingText = state.codeError?.let { { Text(it) } },
-                            singleLine = true
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
                         )
 
                         OutlinedTextField(
@@ -180,7 +219,8 @@ private fun AddVoucherContent(
                             modifier = Modifier.fillMaxWidth(),
                             isError = state.nameError != null,
                             supportingText = state.nameError?.let { { Text(it) } },
-                            singleLine = true
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
                         )
 
                         OutlinedTextField(
@@ -193,23 +233,41 @@ private fun AddVoucherContent(
                             isError = state.descriptionError != null,
                             supportingText = state.descriptionError?.let { { Text(it) } },
                             minLines = 3,
-                            maxLines = 5
+                            maxLines = 5,
+                            shape = RoundedCornerShape(12.dp)
                         )
                     }
                 }
 
+                // Image Upload Section
+                ImageUploadCard(
+                    selectedImageUri = state.selectedImageUri,
+                    isUploading = state.isUploadingImage,
+                    imageError = state.imageError,
+                    onImageSelected = { uri ->
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.ImageSelected(uri))
+                    },
+                    onRemoveImage = {
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.RemoveImage)
+                    }
+                )
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
                             text = "Discount Configuration",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
 
                         var typeExpanded by remember { mutableStateOf(false) }
@@ -228,7 +286,8 @@ private fun AddVoucherContent(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) },
                                 modifier = Modifier
                                     .menuAnchor()
-                                    .fillMaxWidth()
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
                             )
                             ExposedDropdownMenu(
                                 expanded = typeExpanded,
@@ -276,7 +335,8 @@ private fun AddVoucherContent(
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 isError = state.amountError != null,
                                 supportingText = state.amountError?.let { { Text(it) } },
-                                singleLine = true
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp)
                             )
                         }
                     }
@@ -284,10 +344,13 @@ private fun AddVoucherContent(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(20.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -297,7 +360,8 @@ private fun AddVoucherContent(
                             Text(
                                 text = "Conditions",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
                             )
 
                             TextButton(
@@ -338,7 +402,8 @@ private fun AddVoucherContent(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     isError = state.maxClaimError != null,
                                     supportingText = state.maxClaimError?.let { { Text(it) } },
-                                    singleLine = true
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp)
                                 )
 
                                 OutlinedTextField(
@@ -355,7 +420,8 @@ private fun AddVoucherContent(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     isError = state.maxUsageError != null,
                                     supportingText = state.maxUsageError?.let { { Text(it) } },
-                                    singleLine = true
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp)
                                 )
 
                                 OutlinedTextField(
@@ -372,7 +438,8 @@ private fun AddVoucherContent(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     isError = state.minOrderItemError != null,
                                     supportingText = state.minOrderItemError?.let { { Text(it) } },
-                                    singleLine = true
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp)
                                 )
 
                                 OutlinedTextField(
@@ -389,7 +456,8 @@ private fun AddVoucherContent(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     isError = state.minOrderAmountError != null,
                                     supportingText = state.minOrderAmountError?.let { { Text(it) } },
-                                    singleLine = true
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp)
                                 )
 
                                 OutlinedTextField(
@@ -406,7 +474,8 @@ private fun AddVoucherContent(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     isError = state.maxDiscountAmountError != null,
                                     supportingText = state.maxDiscountAmountError?.let { { Text(it) } },
-                                    singleLine = true
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp)
                                 )
                             }
                         }
@@ -430,16 +499,20 @@ private fun AddVoucherContent(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
                             text = "Claim Period",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
 
                         var showStartDatePicker by remember { mutableStateOf(false) }
@@ -460,7 +533,8 @@ private fun AddVoucherContent(
                             isError = state.claimPeriodStartError != null,
                             supportingText = state.claimPeriodStartError?.let { { Text(it) } },
                             placeholder = { Text("YYYY-MM-DD") },
-                            singleLine = true
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
                         )
 
                         if (showStartDatePicker) {
@@ -495,7 +569,8 @@ private fun AddVoucherContent(
                             isError = state.claimPeriodEndError != null,
                             supportingText = state.claimPeriodEndError?.let { { Text(it) } },
                             placeholder = { Text("YYYY-MM-DD") },
-                            singleLine = true
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
                         )
 
                         if (showEndDatePicker) {
@@ -514,13 +589,14 @@ private fun AddVoucherContent(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(100.dp))
             }
 
+            val context = LocalContext.current
             Button(
                 text = if (state.isLoading) "Creating..." else "Create Voucher",
                 onClick = {
-                    eventReceiver.onEvent(AddVoucherScreenUiEvent.SaveVoucher)
+                    eventReceiver.onEvent(AddVoucherScreenUiEvent.SaveVoucherWithContext(context))
                 },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -529,6 +605,160 @@ private fun AddVoucherContent(
                 enabled = !state.isLoading,
                 loading = state.isLoading
             )
+        }
+    }
+}
+
+@Composable
+private fun ImageUploadCard(
+    selectedImageUri: Uri?,
+    isUploading: Boolean,
+    imageError: String?,
+    onImageSelected: (Uri) -> Unit,
+    onRemoveImage: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { onImageSelected(it) }
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Voucher Image",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text = "Required",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            if (selectedImageUri != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(16f / 9f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    AsyncImage(
+                        model = selectedImageUri,
+                        contentDescription = "Selected voucher image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    if (isUploading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black.copy(alpha = 0.5f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = onRemoveImage,
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Remove image",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .background(
+                                    Color.Black.copy(alpha = 0.6f),
+                                    RoundedCornerShape(50)
+                                )
+                                .padding(4.dp)
+                        )
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(16f / 9f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(
+                            width = 2.dp,
+                            color = if (imageError != null) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.outline
+                            },
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                        .clickable { imagePickerLauncher.launch("image/*") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                    RoundedCornerShape(50)
+                                )
+                                .padding(12.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+
+                        Text(
+                            text = "Tap to upload image",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Text(
+                            text = "Recommended: 16:9 aspect ratio",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+
+            if (imageError != null) {
+                Text(
+                    text = imageError,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }

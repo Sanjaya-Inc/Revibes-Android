@@ -11,6 +11,7 @@ import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Part
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
+import io.ktor.http.content.PartData
 import org.koin.core.annotation.Single
 
 interface ManageVoucherRemoteApi {
@@ -40,8 +41,7 @@ interface ManageVoucherRemoteApi {
         @Part("conditions") conditions: String,
         @Part("claimPeriodStart") claimPeriodStart: String,
         @Part("claimPeriodEnd") claimPeriodEnd: String,
-//        @Part("currency") currency: String,
-//        @Part("image") image: ByteArray? = null,
+        @Part("") image: List<PartData>
     ): BaseResponse
 
     @DELETE("vouchers/{id}")
