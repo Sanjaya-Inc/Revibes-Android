@@ -11,6 +11,9 @@
     
     <!-- Transaction List -->
     <string name="no_pending_transactions">No pending transactions found</string>
+    <string name="no_transactions_found">No transactions found</string>
+    <string name="no_rejected_transactions">No rejected transactions found</string>
+    <string name="no_completed_transactions">No completed transactions found</string>
     <string name="transaction_id">ID</string>
     <string name="items_count">%1$d items</string>
     <string name="total_points">Total points</string>

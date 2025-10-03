@@ -12,6 +12,7 @@ import org.koin.android.annotation.KoinViewModel
 
 sealed interface ManageTransactionScreenUiEvent {
     data class OnSearchQueryChanged(val query: String) : ManageTransactionScreenUiEvent
+    data class OnStatusFilterChanged(val status: TransactionStatus) : ManageTransactionScreenUiEvent
     data object RefreshTransactions : ManageTransactionScreenUiEvent
     data object LoadTransactions : ManageTransactionScreenUiEvent
     data class NavigateToDetail(val transactionId: String) :
@@ -21,10 +22,18 @@ sealed interface ManageTransactionScreenUiEvent {
     data class OnLoadTransactionsFailed(val message: String) : ManageTransactionScreenUiEvent
 }
 
+enum class TransactionStatus(val displayName: String, val queryParam: String) {
+    ALL("All", ""),
+    PENDING("Pending", "submitted"),
+    REJECTED("Rejected", "rejected"),
+    COMPLETED("Completed", "completed")
+}
+
 data class ManageTransactionScreenUiState(
     val transactions: ImmutableList<ManageTransactionDomain> = persistentListOf(),
     val filteredTransactions: ImmutableList<ManageTransactionDomain> = persistentListOf(),
     val searchQuery: String = "",
+    val selectedStatus: TransactionStatus = TransactionStatus.PENDING,
     val isLoading: Boolean = false,
     val error: String? = null
 )
@@ -46,6 +55,7 @@ class ManageTransactionScreenViewModel internal constructor(
         println("ketai: ManageTransactionScreenViewModel.onEvent $event")
         when (event) {
             is ManageTransactionScreenUiEvent.OnSearchQueryChanged -> onSearchQueryChanged(event.query)
+            is ManageTransactionScreenUiEvent.OnStatusFilterChanged -> onStatusFilterChanged(event.status)
             is ManageTransactionScreenUiEvent.RefreshTransactions,
             is ManageTransactionScreenUiEvent.LoadTransactions -> loadTransactions()
 
@@ -62,10 +72,15 @@ class ManageTransactionScreenViewModel internal constructor(
         }
     }
 
+    private fun onStatusFilterChanged(status: TransactionStatus) = intent {
+        reduce { state.copy(selectedStatus = status) }
+        loadTransactions()
+    }
+
     private fun loadTransactions() = intent {
         reduce { state.copy(isLoading = true) }
 
-        val transactions = repository.getPendingTransactions()
+        val transactions = repository.getTransactions(status = state.selectedStatus)
 
         reduce {
             state.copy(

@@ -15,6 +15,16 @@ import org.koin.core.annotation.Single
 
 interface ManageTransactionRemoteApi {
     @GET("logistic-orders")
+    suspend fun getTransactions(
+        @Query("limit") limit: Int = 10,
+        @Query("sortBy") sortBy: String = "createdAt",
+        @Query("sortOrder") sortOrder: String = "desc",
+        @Query("lastDocId") lastDocId: String? = null,
+        @Query("direction") direction: String = "next",
+        @Query("statuses") statuses: List<String>
+    ): TransactionHistoryResponse
+
+    @GET("logistic-orders")
     suspend fun getPendingTransactions(
         @Query("limit") limit: Int = 10,
         @Query("sortBy") sortBy: String = "createdAt",

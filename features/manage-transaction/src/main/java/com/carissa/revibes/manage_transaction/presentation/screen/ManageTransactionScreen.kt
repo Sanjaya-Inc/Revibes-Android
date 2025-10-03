@@ -5,14 +5,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -117,21 +126,35 @@ fun ManageTransactionScreenContent(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                OutlinedTextField(
-                    value = uiState.searchQuery,
-                    onValueChange = {
-                        eventReceiver.onEvent(
-                            ManageTransactionScreenUiEvent.OnSearchQueryChanged(
-                                it
-                            )
-                        )
-                    },
-                    label = { Text(stringResource(R.string.search_transactions)) },
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    singleLine = true
-                )
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    OutlinedTextField(
+                        value = uiState.searchQuery,
+                        onValueChange = {
+                            eventReceiver.onEvent(
+                                ManageTransactionScreenUiEvent.OnSearchQueryChanged(
+                                    it
+                                )
+                            )
+                        },
+                        label = { Text(stringResource(R.string.search_transactions)) },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    )
+
+                    StatusFilterDropdown(
+                        selectedStatus = uiState.selectedStatus,
+                        onStatusSelected = { status ->
+                            eventReceiver.onEvent(
+                                ManageTransactionScreenUiEvent.OnStatusFilterChanged(status)
+                            )
+                        }
+                    )
+                }
 
                 when {
                     uiState.isLoading && uiState.transactions.isEmpty() -> {
@@ -149,7 +172,12 @@ fun ManageTransactionScreenContent(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = stringResource(R.string.no_pending_transactions),
+                                text = when (uiState.selectedStatus) {
+                                    TransactionStatus.ALL -> stringResource(R.string.no_transactions_found)
+                                    TransactionStatus.PENDING -> stringResource(R.string.no_pending_transactions)
+                                    TransactionStatus.REJECTED -> stringResource(R.string.no_rejected_transactions)
+                                    TransactionStatus.COMPLETED -> stringResource(R.string.no_completed_transactions)
+                                },
                                 style = MaterialTheme.typography.bodyLarge,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(16.dp)
@@ -177,6 +205,43 @@ fun ManageTransactionScreenContent(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatusFilterDropdown(
+    selectedStatus: TransactionStatus,
+    onStatusSelected: (TransactionStatus) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        OutlinedButton(
+            onClick = { expanded = true }
+        ) {
+            Text(text = selectedStatus.displayName)
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            TransactionStatus.entries.forEach { status ->
+                DropdownMenuItem(
+                    text = { Text(status.displayName) },
+                    onClick = {
+                        onStatusSelected(status)
+                        expanded = false
+                    }
+                )
             }
         }
     }
