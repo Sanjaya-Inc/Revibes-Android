@@ -7,10 +7,12 @@ import com.carissa.revibes.manage_voucher.data.model.PaginationData
 import com.carissa.revibes.manage_voucher.data.remote.ManageVoucherRemoteApi
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
+import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
 
@@ -80,6 +82,7 @@ internal class ManageVoucherRepositoryImpl(
         return response.data.toDomain()
     }
 
+    @OptIn(InternalAPI::class)
     override suspend fun createVoucher(
         context: Context,
         code: String,
@@ -100,28 +103,29 @@ internal class ManageVoucherRepositoryImpl(
         val inputStream = context.contentResolver.openInputStream(imageUri)
         val imageBytes = inputStream?.readBytes() ?: throw IllegalArgumentException("Cannot read image")
         inputStream.close()
-
-        val imageFormData = formData {
-            append(
-                "\"image\"",
-                imageBytes,
-                Headers.build {
-                    append(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
-                    append(HttpHeaders.ContentDisposition, "filename=\"voucher_image.jpg\"")
-                }
-            )
-        }
+        val multipart = MultiPartFormDataContent(
+            formData {
+                append("\"code\"", code)
+                append("\"name\"", name)
+                append("\"description\"", description)
+                append("\"type\"", type.toString())
+                append("\"amount\"", amount)
+                append("\"conditions\"", conditionsJson)
+                append("\"claimPeriodStart\"", claimPeriodStart)
+                append("\"claimPeriodEnd\"", claimPeriodEnd)
+                append(
+                    "\"image\"",
+                    imageBytes,
+                    Headers.build {
+                        append(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
+                        append(HttpHeaders.ContentDisposition, "filename=\"voucher_image.jpg\"")
+                    }
+                )
+            }
+        )
 
         remoteApi.createVoucher(
-            code = code,
-            name = name,
-            description = description,
-            type = type.toString(),
-            amount = amount.toString(),
-            conditions = conditionsJson,
-            claimPeriodStart = claimPeriodStart,
-            claimPeriodEnd = claimPeriodEnd,
-            image = imageFormData
+            data = multipart
         )
     }
 
