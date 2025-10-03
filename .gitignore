@@ -37,3 +37,4 @@ local.properties
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea/graphql-settings.xml
 /.idea/codeStyles/Project.xml
+/release.keystore
