@@ -10,7 +10,7 @@ data class TransactionDetail(
     val items: List<TransactionDetailItem>,
     val status: String,
     val totalPoint: Int,
-    val store: Store
+    val store: Store?
 )
 
 data class TransactionDetailItem(

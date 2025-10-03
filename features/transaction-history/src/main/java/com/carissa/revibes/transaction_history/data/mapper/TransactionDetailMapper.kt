@@ -25,7 +25,17 @@ fun TransactionDetailData.toDomain(): TransactionDetail {
         items = items.map { it.toDomain() },
         status = status,
         totalPoint = totalPoint,
-        store = store.toDomain()
+        store = store?.toDomain() ?: Store(
+            id = "",
+            createdAt = "",
+            updatedAt = "",
+            name = "",
+            country = "",
+            address = "",
+            postalCode = "",
+            position = Position(latitude = 0.0, longitude = 0.0),
+            status = ""
+        )
     )
 }
 

@@ -269,20 +269,26 @@ private fun TransactionInfoCard(
                 value = transaction.name
             )
 
-            InfoRow(
-                label = stringResource(R.string.store_name),
-                value = transaction.storeName
-            )
+            if (transaction.storeName.isNotEmpty()) {
+                InfoRow(
+                    label = stringResource(R.string.store_name),
+                    value = transaction.storeName
+                )
+            }
 
-            InfoRow(
-                label = stringResource(R.string.address),
-                value = transaction.address
-            )
+            if (transaction.address.isNotEmpty()) {
+                InfoRow(
+                    label = stringResource(R.string.address),
+                    value = transaction.address
+                )
+            }
 
-            InfoRow(
-                label = stringResource(R.string.postal_code),
-                value = transaction.postalCode
-            )
+            if (transaction.postalCode.isNotEmpty()) {
+                InfoRow(
+                    label = stringResource(R.string.postal_code),
+                    value = transaction.postalCode
+                )
+            }
 
             InfoRow(
                 label = stringResource(R.string.total_points),

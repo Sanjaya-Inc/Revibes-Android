@@ -24,7 +24,7 @@ data class TransactionDetailData(
     val items: List<TransactionDetailItemData>,
     val status: String,
     val totalPoint: Int,
-    val store: StoreData
+    val store: StoreData? = null
 )
 
 @Keep

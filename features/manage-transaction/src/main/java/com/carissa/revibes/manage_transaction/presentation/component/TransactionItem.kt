@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.manage_transaction.R
 import com.carissa.revibes.manage_transaction.domain.model.ManageTransactionDomain
@@ -66,11 +67,21 @@ internal fun TransactionItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Text(
-                text = transaction.address,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            if (transaction.address.isNotEmpty()) {
+                Text(
+                    text = transaction.address,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            if (transaction.storeName.isNotEmpty()) {
+                Text(
+                    text = stringResource(R.string.store_name_value, transaction.storeName),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -134,6 +145,30 @@ private fun TransactionStatusChip(
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(horizontal = 8.dp, vertical = 4.dp)
+    )
+}
+
+@Preview
+@Composable
+private fun TransactionItemPreview() {
+    val sampleTransaction = ManageTransactionDomain(
+        id = "TX123456789",
+        type = "drop-off",
+        createdAt = "2023-10-01T12:34:56.789Z",
+        updatedAt = "2023-10-01T12:34:56.789Z",
+        name = "John Doe",
+        country = "USA",
+        address = "123 Main St, Springfield",
+        storeName = "Revibes Store",
+        status = TransactionStatus.COMPLETED,
+        maker = "John Doe",
+        items = listOf(),
+        totalPoint = 1500
+    )
+
+    TransactionItem(
+        transaction = sampleTransaction,
+        onClick = {}
     )
 }
 

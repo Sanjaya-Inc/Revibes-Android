@@ -28,7 +28,7 @@ data class LogisticOrderData(
     val updatedAt: String,
     val name: String,
     val country: String,
-    val store: StoreData,
+    val store: StoreData? = null, // Made nullable to handle missing field
     val status: String,
     val maker: String,
     val items: List<LogisticItemData>,

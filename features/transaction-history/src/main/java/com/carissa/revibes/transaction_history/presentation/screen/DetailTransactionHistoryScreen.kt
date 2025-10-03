@@ -139,7 +139,7 @@ private fun DetailTransactionHistoryScreenContent(
 
             TransactionDetailsContent(
                 customerName = detail.name,
-                locationAddress = detail.store.address,
+                locationAddress = detail.store?.address ?: "-",
                 dateLabel = "Transaction Date",
                 date = detail.createdAt,
                 itemDetailsTitle = "TRANSACTION DETAILS",

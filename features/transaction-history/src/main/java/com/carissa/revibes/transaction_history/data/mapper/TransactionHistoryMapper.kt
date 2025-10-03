@@ -40,7 +40,7 @@ fun LogisticOrderData.toTransactionHistoryData(): TransactionHistoryData {
         coinReceive = totalPoint,
         coinPrice = totalPoint,
         validatorName = name.ifEmpty { "-" },
-        location = this.store.address.ifEmpty { "Unknown Location" },
+        location = this.store?.address?.ifEmpty { "Unknown Location" } ?: "Unknown Location",
         status = mapToTransactionStatus(status),
         items = itemNames.toPersistentList()
     )
