@@ -8,6 +8,7 @@ import com.carissa.revibes.manage_voucher.data.remote.ManageVoucherRemoteApi
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
 import io.ktor.client.request.forms.formData
+import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
@@ -102,11 +103,11 @@ internal class ManageVoucherRepositoryImpl(
 
         val imageFormData = formData {
             append(
-                "image",
+                "\"image\"",
                 imageBytes,
                 Headers.build {
-                    append(HttpHeaders.ContentType, "image/jpeg")
-                    append(HttpHeaders.ContentDisposition, "filename=voucher_image.jpg")
+                    append(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
+                    append(HttpHeaders.ContentDisposition, "filename=\"voucher_image.jpg\"")
                 }
             )
         }
