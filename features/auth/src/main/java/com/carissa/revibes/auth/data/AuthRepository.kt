@@ -4,46 +4,40 @@ import com.carissa.revibes.auth.data.mapper.toDomain
 import com.carissa.revibes.auth.data.model.DeviceRegistrationRequest
 import com.carissa.revibes.auth.data.remote.AuthRemoteApi
 import com.carissa.revibes.auth.domain.model.LoginResult
+import com.carissa.revibes.core.data.utils.BaseRepository
 import org.koin.core.annotation.Single
 
-interface AuthRepository {
-    suspend fun loginWithEmail(email: String, password: String): LoginResult
+@Single
+class AuthRepository(private val remoteApi: AuthRemoteApi) : BaseRepository() {
+
+    suspend fun loginWithEmail(email: String, password: String): LoginResult {
+        return execute { remoteApi.loginWithEmail(email, password).toDomain() }
+    }
+
     suspend fun signUpWithEmail(
         email: String,
         displayName: String,
         phoneNumber: String,
         password: String
-    )
-
-    suspend fun registerDevice(deviceToken: String, fcmToken: String)
-}
-
-@Single
-internal class AuthRepositoryImpl(private val remoteApi: AuthRemoteApi) : AuthRepository {
-    override suspend fun loginWithEmail(email: String, password: String): LoginResult {
-        return remoteApi.loginWithEmail(email, password).toDomain()
-    }
-
-    override suspend fun signUpWithEmail(
-        email: String,
-        displayName: String,
-        phoneNumber: String,
-        password: String
     ) {
-        remoteApi.signUpWithEmail(
-            email = email,
-            displayName = displayName,
-            phoneNumber = phoneNumber,
-            password = password
-        )
+        execute {
+            remoteApi.signUpWithEmail(
+                email = email,
+                displayName = displayName,
+                phoneNumber = phoneNumber,
+                password = password
+            )
+        }
     }
 
-    override suspend fun registerDevice(deviceToken: String, fcmToken: String) {
-        remoteApi.registerDevice(
-            request = DeviceRegistrationRequest(
-                deviceToken = deviceToken,
-                fcmToken = fcmToken
+    suspend fun registerDevice(deviceToken: String, fcmToken: String) {
+        execute {
+            remoteApi.registerDevice(
+                request = DeviceRegistrationRequest(
+                    deviceToken = deviceToken,
+                    fcmToken = fcmToken
+                )
             )
-        )
+        }
     }
 }

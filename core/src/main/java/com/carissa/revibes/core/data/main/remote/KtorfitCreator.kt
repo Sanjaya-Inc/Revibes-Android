@@ -15,8 +15,6 @@ import org.koin.core.annotation.Single
 internal class KtorfitCreator(
     private val baseUrlProvider: BaseUrlProvider,
     private val okhttpClientCreator: ClientCreator,
-    private val apiErrorHandler: ApiErrorHandler,
-    private val apiErrorValidator: ApiErrorValidator,
     private val apiHttpLogger: ApiHttpLogger,
     private val json: Json
 ) {
@@ -30,14 +28,6 @@ internal class KtorfitCreator(
                     json(json, contentType = ContentType.Application.Json)
                 }
                 expectSuccess = true
-
-//                install(HttpCallValidator) {
-//                    apiErrorHandler.configure(this)
-//
-//                    validateResponse { response ->
-//                        apiErrorValidator.validate(response)
-//                    }
-//                }
                 install(Logging) {
                     logger = apiHttpLogger
                     level = LogLevel.ALL

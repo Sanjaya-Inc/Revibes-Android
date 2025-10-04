@@ -10,16 +10,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.components.RevibesTheme
 import com.carissa.revibes.core.presentation.components.components.Button
 import com.carissa.revibes.core.presentation.components.components.Text
@@ -41,6 +49,8 @@ fun AuthTextField(
     errorText: String? = null,
     onImeAction: (() -> Unit)? = null
 ) {
+    var passwordVisible by remember { mutableStateOf(false) }
+
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -63,10 +73,26 @@ fun AuthTextField(
         } else {
             KeyboardActions.Default
         },
-        visualTransformation = if (isPassword) {
+        visualTransformation = if (isPassword && !passwordVisible) {
             PasswordVisualTransformation()
         } else {
             VisualTransformation.None
+        },
+        trailingIcon = {
+            if (isPassword) {
+                val image = if (passwordVisible) {
+                    painterResource(R.drawable.ic_eye_open)
+                } else {
+                    painterResource(R.drawable.ic_eye_close)
+                }
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        painter = image,
+                        contentDescription = null,
+                        tint = RevibesTheme.colors.primary
+                    )
+                }
+            }
         },
         modifier = modifier.padding(bottom = 16.dp)
     )
