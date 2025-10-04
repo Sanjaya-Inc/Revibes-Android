@@ -1,12 +1,15 @@
 package com.carissa.revibes.exchange_points.presentation.screen
 
-import com.carissa.revibes.core.data.user.local.UserDataSource
+import androidx.lifecycle.viewModelScope
 import com.carissa.revibes.core.presentation.BaseViewModel
+import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.exchange_points.data.ExchangePointsRepository
 import com.carissa.revibes.exchange_points.data.model.PurchaseItem
 import com.carissa.revibes.exchange_points.data.model.PurchaseRequest
 import com.carissa.revibes.exchange_points.presentation.handler.ExchangePointsExceptionHandler
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import org.koin.android.annotation.KoinViewModel
 
 data class ExchangePointDetailScreenUiState(
@@ -15,12 +18,12 @@ data class ExchangePointDetailScreenUiState(
     val couponId: String = "7985x17228",
     val title: String = "DISCOUNT 70%",
     val validUntil: String = "Valid until 31 December 2024",
-    val description: String = "We are here for bigger offers. Especially for those of you shopping fans, " +
+    val description: String = "We are here for bigger offers. Especially for those " +
+        "of you shopping fans, " +
         "get a 70% promo for every item worth a minimum of IDR 300 thousand at Revibes Store",
     val image: String = "https://gcdnb.pbrd.co/images/16vLvVICjqy3.webp",
     val showBottomSheet: Boolean = false,
     val quantity: Int = 1,
-    val userPoints: Int = 0,
 )
 
 sealed interface ExchangePointDetailScreenUiEvent {
@@ -38,16 +41,15 @@ sealed interface ExchangePointDetailScreenUiEvent {
 @KoinViewModel
 class ExchangePointDetailScreenViewModel(
     private val repository: ExchangePointsRepository,
-    userDataSource: UserDataSource,
+    private val userPointFlow: UserPointFlow,
     private val exceptionHandler: ExchangePointsExceptionHandler
 ) : BaseViewModel<ExchangePointDetailScreenUiState, ExchangePointDetailScreenUiEvent>(
-    initialState = ExchangePointDetailScreenUiState(
-        userPoints = userDataSource.getUserValue().getOrNull()?.coins ?: 0
-    ),
+    initialState = ExchangePointDetailScreenUiState(),
     exceptionHandler = { syntax, exception ->
         exceptionHandler.onExchangePointsDetailError(syntax, exception)
     }
 ) {
+    val coins = userPointFlow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000L), 0)
     override fun onEvent(event: ExchangePointDetailScreenUiEvent) {
         super.onEvent(event)
         when (event) {
@@ -76,6 +78,7 @@ class ExchangePointDetailScreenViewModel(
         repository.purchaseVoucher(purchaseRequest)
 
         reduce { state.copy(isLoading = false) }
+        userPointFlow.update()
         postSideEffect(ExchangePointDetailScreenUiEvent.ShowToast("Voucher purchased successfully"))
         onEvent(ExchangePointDetailScreenUiEvent.NavigateToConfirmation)
     }

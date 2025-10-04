@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="exchange_points_title">EXCHANGE POINTS to VOUCHER</string>
-    <string name="exchange_points_subtitle">Total Revive Points = %1$d</string>
+    <string name="exchange_points_subtitle">Total Revibes Points = %1$d</string>
     <string name="exchange_points_description">Redeem Your Points for Coupons and\nGet Other Exciting Benefits</string>
     
     <string name="exchange_point_detail_title">COUPONS DETAILS</string>

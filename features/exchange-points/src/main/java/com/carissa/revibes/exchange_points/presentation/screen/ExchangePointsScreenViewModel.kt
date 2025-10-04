@@ -1,8 +1,9 @@
 package com.carissa.revibes.exchange_points.presentation.screen
 
+import androidx.lifecycle.viewModelScope
 import com.carissa.revibes.core.data.main.remote.config.ConfigRepository
-import com.carissa.revibes.core.data.user.local.UserDataSource
 import com.carissa.revibes.core.presentation.BaseViewModel
+import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.exchange_points.data.ExchangePointsRepository
 import com.carissa.revibes.exchange_points.domain.model.Voucher
@@ -10,13 +11,14 @@ import com.carissa.revibes.exchange_points.presentation.handler.ExchangePointsEx
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import org.koin.android.annotation.KoinViewModel
 
 data class ExchangePointsScreenUiState(
     val isLoading: Boolean = false,
     val isMaintenance: Boolean = false,
     val vouchers: PersistentList<Voucher> = persistentListOf(),
-    val points: Int = 0,
     val error: String? = null,
 )
 
@@ -35,12 +37,11 @@ sealed interface ExchangePointsScreenUiEvent {
 @KoinViewModel
 class ExchangePointsScreenViewModel(
     private val repository: ExchangePointsRepository,
-    userDataSource: UserDataSource,
+    userPointFlow: UserPointFlow,
     private val exceptionHandler: ExchangePointsExceptionHandler,
     configRepository: ConfigRepository
 ) : BaseViewModel<ExchangePointsScreenUiState, ExchangePointsScreenUiEvent>(
     initialState = ExchangePointsScreenUiState(
-        points = userDataSource.getUserValue().getOrNull()?.coins ?: 0,
         isMaintenance = !configRepository.getExchangesFeatureFlagEnabled()
     ),
     onCreate = {
@@ -53,12 +54,15 @@ class ExchangePointsScreenViewModel(
     }
 ) {
 
+    val coins = userPointFlow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(3_000L), 0)
+
     override fun onEvent(event: ExchangePointsScreenUiEvent) {
         super.onEvent(event)
         when (event) {
             ExchangePointsScreenUiEvent.NavigateBack -> intent {
                 postSideEffect(event)
             }
+
             ExchangePointsScreenUiEvent.Initialize -> loadVouchers()
             ExchangePointsScreenUiEvent.Refresh -> loadVouchers(true)
             else -> Unit
