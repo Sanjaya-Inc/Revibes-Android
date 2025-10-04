@@ -2,6 +2,7 @@ package com.carissa.revibes.drop_off.data
 
 import android.content.Context
 import android.net.Uri
+import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.drop_off.data.mapper.toStoreDataList
 import com.carissa.revibes.drop_off.data.model.EstimatePointItem
 import com.carissa.revibes.drop_off.data.model.EstimatePointRequest
@@ -15,35 +16,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.annotation.Single
 import java.io.IOException
-
-interface DropOffRepository {
-    suspend fun getStores(longitude: Double, latitude: Double): List<StoreData>
-    suspend fun createLogisticOrder(): String
-    suspend fun createLogisticOrderItem(orderId: String): String
-    suspend fun getPresignedUrl(
-        orderId: String,
-        itemId: String,
-        contentType: String
-    ): Triple<String, String, Long>
-
-    suspend fun uploadImageToUrl(
-        context: Context,
-        uploadUrl: String,
-        imageUri: Uri,
-        contentType: String
-    ): Boolean
-
-    suspend fun estimatePoint(items: List<EstimatePointItemData>): Pair<Map<String, Int>, Int>
-
-    suspend fun submitOrder(
-        orderId: String,
-        type: String,
-        name: String,
-        country: String,
-        storeId: String,
-        items: List<SubmitOrderItemData>
-    ): Boolean
-}
 
 data class EstimatePointItemData(
     val name: String,
@@ -59,74 +31,80 @@ data class SubmitOrderItemData(
 )
 
 @Single
-internal class DropOffRepositoryImpl(
+class DropOffRepository(
     private val remoteApi: DropOffRemoteApi,
     private val httpClient: OkHttpClient
-) : DropOffRepository {
+) : BaseRepository() {
 
-    override suspend fun getStores(longitude: Double, latitude: Double): List<StoreData> {
-        return remoteApi.getStores(longitude, latitude).data.toStoreDataList()
+    suspend fun getStores(longitude: Double, latitude: Double): List<StoreData> {
+        return execute { remoteApi.getStores(longitude, latitude).data.toStoreDataList() }
     }
 
-    override suspend fun createLogisticOrder(): String {
-        return remoteApi.createLogisticOrder().data
+    suspend fun createLogisticOrder(): String {
+        return execute { remoteApi.createLogisticOrder().data }
     }
 
-    override suspend fun createLogisticOrderItem(orderId: String): String {
-        return remoteApi.createLogisticOrderItem(orderId).data
+    suspend fun createLogisticOrderItem(orderId: String): String {
+        return execute { remoteApi.createLogisticOrderItem(orderId).data }
     }
 
-    override suspend fun getPresignedUrl(
+    suspend fun getPresignedUrl(
         orderId: String,
         itemId: String,
         contentType: String
     ): Triple<String, String, Long> {
-        val request = PresignedUrlRequest(contentType = contentType)
-        val response = remoteApi.getPresignedUrl(orderId, itemId, request)
-        return Triple(response.data.uploadUrl, response.data.downloadUrl, response.data.expiredAt)
+        return execute {
+            val request = PresignedUrlRequest(contentType = contentType)
+            val response = remoteApi.getPresignedUrl(orderId, itemId, request)
+            Triple(response.data.uploadUrl, response.data.downloadUrl, response.data.expiredAt)
+        }
     }
 
-    override suspend fun uploadImageToUrl(
+    suspend fun uploadImageToUrl(
         context: Context,
         uploadUrl: String,
         imageUri: Uri,
         contentType: String
     ): Boolean {
-        return try {
-            val inputStream = context.contentResolver.openInputStream(imageUri)
-            val imageBytes = inputStream?.readBytes() ?: return false
-            inputStream.close()
+        return execute {
+            try {
+                val inputStream = context.contentResolver.openInputStream(imageUri)
+                val imageBytes = requireNotNull(inputStream?.readBytes())
+                inputStream.close()
 
-            val requestBody = imageBytes.toRequestBody(contentType = contentType.toMediaType())
-            val request = Request.Builder()
-                .url(uploadUrl)
-                .put(requestBody)
-                .addHeader("Content-Type", contentType)
-                .addHeader("X-GOOG-ACL", "public-read")
-                .build()
+                val requestBody = imageBytes.toRequestBody(contentType = contentType.toMediaType())
+                val request = Request.Builder()
+                    .url(uploadUrl)
+                    .put(requestBody)
+                    .addHeader("Content-Type", contentType)
+                    .addHeader("X-GOOG-ACL", "public-read")
+                    .build()
 
-            val response = httpClient.newCall(request).execute()
-            response.isSuccessful
-        } catch (e: IOException) {
-            false
+                val response = httpClient.newCall(request).execute()
+                response.isSuccessful
+            } catch (e: IOException) {
+                false
+            }
         }
     }
 
-    override suspend fun estimatePoint(items: List<EstimatePointItemData>): Pair<Map<String, Int>, Int> {
-        val request = EstimatePointRequest(
-            items = items.map { item ->
-                EstimatePointItem(
-                    name = item.name,
-                    type = item.type,
-                    weight = item.weight
-                )
-            }
-        )
-        val response = remoteApi.estimatePoint(request)
-        return Pair(response.data.items, response.data.total)
+    suspend fun estimatePoint(items: List<EstimatePointItemData>): Pair<Map<String, Int>, Int> {
+        return execute {
+            val request = EstimatePointRequest(
+                items = items.map { item ->
+                    EstimatePointItem(
+                        name = item.name,
+                        type = item.type,
+                        weight = item.weight
+                    )
+                }
+            )
+            val response = remoteApi.estimatePoint(request)
+            Pair(response.data.items, response.data.total)
+        }
     }
 
-    override suspend fun submitOrder(
+    suspend fun submitOrder(
         orderId: String,
         type: String,
         name: String,
@@ -134,21 +112,23 @@ internal class DropOffRepositoryImpl(
         storeId: String,
         items: List<SubmitOrderItemData>
     ): Boolean {
-        val request = SubmitOrderRequest(
-            type = type,
-            name = name,
-            country = country,
-            storeId = storeId,
-            items = items.map { item ->
-                com.carissa.revibes.drop_off.data.model.SubmitOrderItem(
-                    id = item.id,
-                    name = item.name,
-                    type = item.type,
-                    weight = item.weight
-                )
-            }
-        )
-        val response = remoteApi.submitOrder(orderId, request)
-        return response.code == 200
+        return execute {
+            val request = SubmitOrderRequest(
+                type = type,
+                name = name,
+                country = country,
+                storeId = storeId,
+                items = items.map { item ->
+                    com.carissa.revibes.drop_off.data.model.SubmitOrderItem(
+                        id = item.id,
+                        name = item.name,
+                        type = item.type,
+                        weight = item.weight
+                    )
+                }
+            )
+            val response = remoteApi.submitOrder(orderId, request)
+            response.code == 200
+        }
     }
 }

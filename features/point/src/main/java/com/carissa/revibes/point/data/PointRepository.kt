@@ -1,5 +1,6 @@
 package com.carissa.revibes.point.data
 
+import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.point.data.mapper.toDailyRewardDataList
 import com.carissa.revibes.point.data.mapper.toDomain
 import com.carissa.revibes.point.data.remote.PointRemoteApi
@@ -7,32 +8,27 @@ import com.carissa.revibes.point.domain.model.Mission
 import com.carissa.revibes.point.presentation.screen.DailyReward
 import org.koin.core.annotation.Single
 
-interface PointRepository {
-    suspend fun getDailyRewards(): List<DailyReward>
-    suspend fun claimDailyReward()
-    suspend fun getMissions(): List<Mission>
-    suspend fun claimMission(id: String)
-}
-
 @Single
-internal class PointRepositoryImpl(
+class PointRepository(
     private val remoteApi: PointRemoteApi
-) : PointRepository {
+) : BaseRepository() {
 
-    override suspend fun getDailyRewards(): List<DailyReward> {
-        return remoteApi.getDailyRewards().data.toDailyRewardDataList()
+    suspend fun getDailyRewards(): List<DailyReward> {
+        return execute { remoteApi.getDailyRewards().data.toDailyRewardDataList() }
     }
 
-    override suspend fun claimDailyReward() {
-        return remoteApi.claimDailyReward()
+    suspend fun claimDailyReward() {
+        return execute { remoteApi.claimDailyReward() }
     }
 
-    override suspend fun getMissions(): List<Mission> {
-        val response = remoteApi.getMissions()
-        return response.data.items.map { it.toDomain() }
+    suspend fun getMissions(): List<Mission> {
+        return execute {
+            val response = remoteApi.getMissions()
+            response.data.items.map { it.toDomain() }
+        }
     }
 
-    override suspend fun claimMission(id: String) {
-        remoteApi.claimMission(id)
+    suspend fun claimMission(id: String) {
+        execute { remoteApi.claimMission(id) }
     }
 }

@@ -1,27 +1,22 @@
 package com.carissa.revibes.exchange_points.data
 
+import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.exchange_points.data.mapper.toVoucher
 import com.carissa.revibes.exchange_points.data.model.PurchaseRequest
 import com.carissa.revibes.exchange_points.data.remote.ExchangePointsRemoteApi
 import com.carissa.revibes.exchange_points.domain.model.Voucher
 import org.koin.core.annotation.Single
 
-interface ExchangePointsRepository {
-    suspend fun getVouchers(): List<Voucher>
-
-    suspend fun purchaseVoucher(purchaseRequest: PurchaseRequest)
-}
-
 @Single
-internal class ExchangePointsRepositoryImpl(
+class ExchangePointsRepository(
     private val remoteApi: ExchangePointsRemoteApi
-) : ExchangePointsRepository {
+) : BaseRepository() {
 
-    override suspend fun getVouchers(): List<Voucher> {
-        return remoteApi.getVouchers().data.items.map { it.toVoucher() }
+    suspend fun getVouchers(): List<Voucher> {
+        return execute { remoteApi.getVouchers().data.items.map { it.toVoucher() } }
     }
 
-    override suspend fun purchaseVoucher(purchaseRequest: PurchaseRequest) {
-        remoteApi.purchaseVoucher(purchaseRequest)
+    suspend fun purchaseVoucher(purchaseRequest: PurchaseRequest) {
+        execute { remoteApi.purchaseVoucher(purchaseRequest) }
     }
 }

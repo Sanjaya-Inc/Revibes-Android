@@ -2,6 +2,7 @@ package com.carissa.revibes.home.data
 
 import com.carissa.revibes.core.data.user.local.UserDataSource
 import com.carissa.revibes.core.data.user.model.UserData
+import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.home.data.mapper.toUserData
 import com.carissa.revibes.home.data.model.HomeBannerData
 import com.carissa.revibes.home.data.remote.HomeRemoteApi
@@ -14,26 +15,24 @@ data class HomeData(
     val userData: UserData
 )
 
-interface HomeRepository {
-    suspend fun getHomeData(): HomeData
-}
-
 @Single
-internal class HomeRepositoryImpl(
+class HomeRepository(
     private val remoteApi: HomeRemoteApi,
     private val userDataSource: UserDataSource
-) : HomeRepository {
-    override suspend fun getHomeData(): HomeData = coroutineScope {
-        val bannersDeferred = async { remoteApi.getBanners().data }
-        val userDataDeferred = async {
-            val userData = remoteApi.getUserMe().toUserData()
-            userDataSource.setUserValue(userData)
-            userData
-        }
+) : BaseRepository() {
+    suspend fun getHomeData(): HomeData = execute {
+        coroutineScope {
+            val bannersDeferred = async { remoteApi.getBanners().data }
+            val userDataDeferred = async {
+                val userData = remoteApi.getUserMe().toUserData()
+                userDataSource.setUserValue(userData)
+                userData
+            }
 
-        HomeData(
-            banners = bannersDeferred.await(),
-            userData = userDataDeferred.await()
-        )
+            HomeData(
+                banners = bannersDeferred.await(),
+                userData = userDataDeferred.await()
+            )
+        }
     }
 }
