@@ -10,18 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,16 +33,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.RevibesTheme.navigator
 import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
 import com.carissa.revibes.core.presentation.compose.components.Text
 import com.carissa.revibes.manage_users.R
 import com.carissa.revibes.manage_users.domain.model.UserDomain
@@ -113,69 +112,42 @@ private fun EditUserScreenContent(
 ) {
     Scaffold(
         modifier = modifier,
-        containerColor = RevibesTheme.colors.background,
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
+                    androidx.compose.material3.Text(
                         text = stringResource(R.string.edit_user),
                         style = RevibesTheme.typography.h2,
-                        color = RevibesTheme.colors.onSurface,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = null,
-                            tint = RevibesTheme.colors.onSurface
+                            painter = painterResource(com.carissa.revibes.core.R.drawable.back_cta),
+                            modifier = Modifier.size(86.dp),
+                            tint = RevibesTheme.colors.primary,
+                            contentDescription = "Back"
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = RevibesTheme.colors.background
-                ),
-                modifier = Modifier.statusBarsPadding()
+                    containerColor = Color.Transparent,
+                    titleContentColor = RevibesTheme.colors.primary
+                )
             )
         }
     ) { paddingValues ->
-        when {
-            uiState.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = RevibesTheme.colors.primary
-                    )
-                }
+        ContentStateSwitcher(
+            uiState.isLoading,
+            error = uiState.error,
+            actionButton = "Refresh" to {
+                onEvent.invoke(EditUserScreenUiEvent.LoadUserDetail)
             }
-
-            uiState.error != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(
-                            text = uiState.error,
-                            style = RevibesTheme.typography.body1,
-                            color = RevibesTheme.colors.error,
-                            textAlign = TextAlign.Center
-                        )
-                        Button(
-                            text = stringResource(R.string.refresh),
-                            onClick = { onEvent(EditUserScreenUiEvent.LoadUserDetail) }
-                        )
-                    }
-                }
-            }
-
-            uiState.user != null -> {
+        ) {
+            if (uiState.user != null) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

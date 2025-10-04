@@ -31,12 +31,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
 import com.carissa.revibes.core.presentation.compose.components.Text
 import com.carissa.revibes.manage_users.R
 import com.carissa.revibes.manage_users.domain.model.UserDomain
@@ -66,12 +68,15 @@ fun ManageUsersScreen(
             is ManageUsersScreenUiEvent.NavigateToAddUser -> {
                 navigator.navigate(AddUserScreenDestination)
             }
+
             is ManageUsersScreenUiEvent.NavigateToEditUser -> {
                 navigator.navigate(EditUserScreenDestination(userId = event.userId))
             }
+
             is ManageUsersScreenUiEvent.OnLoadUsersFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
+
             else -> Unit
         }
     }
@@ -109,7 +114,7 @@ private fun ManageUsersScreenContent(
 
     Scaffold(
         modifier = modifier,
-        containerColor = RevibesTheme.colors.background,
+        containerColor = Color.Transparent,
         topBar = {
             Column(
                 modifier = Modifier
@@ -169,37 +174,14 @@ private fun ManageUsersScreenContent(
                 singleLine = true
             )
 
-            when {
-                uiState.isLoading && uiState.users.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = RevibesTheme.colors.primary
-                        )
-                    }
+            ContentStateSwitcher(
+                uiState.isLoading && uiState.users.isEmpty(),
+                error = uiState.error,
+                actionButton = "Refresh" to {
+                    onEvent(ManageUsersScreenUiEvent.Refresh)
                 }
-
-                uiState.error != null && uiState.users.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = uiState.error,
-                                style = RevibesTheme.typography.body1,
-                                color = RevibesTheme.colors.error
-                            )
-                        }
-                    }
-                }
-
-                uiState.filteredUsers.isEmpty() && uiState.searchValue.text.isNotBlank() -> {
+            ) {
+                if (uiState.filteredUsers.isEmpty() && uiState.searchValue.text.isNotBlank()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -210,9 +192,7 @@ private fun ManageUsersScreenContent(
                             color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
                         )
                     }
-                }
-
-                else -> {
+                } else {
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
@@ -260,11 +240,13 @@ private fun ManageUsersScreenPreview() {
             uiState = ManageUsersScreenUiState(
                 users = persistentListOf(
                     UserDomain.dummy(),
-                    UserDomain.dummy().copy(id = "2", name = "Jane Smith", email = "jane@example.com")
+                    UserDomain.dummy()
+                        .copy(id = "2", name = "Jane Smith", email = "jane@example.com")
                 ),
                 filteredUsers = persistentListOf(
                     UserDomain.dummy(),
-                    UserDomain.dummy().copy(id = "2", name = "Jane Smith", email = "jane@example.com")
+                    UserDomain.dummy()
+                        .copy(id = "2", name = "Jane Smith", email = "jane@example.com")
                 )
             ),
             onEvent = {},

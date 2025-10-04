@@ -25,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
@@ -58,12 +57,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.RevibesTheme.navigator
 import com.carissa.revibes.core.presentation.compose.components.Button
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
 import com.carissa.revibes.manage_voucher.presentation.navigation.ManageVoucherGraph
@@ -142,27 +145,30 @@ private fun AddVoucherContent(
 ) {
     Scaffold(
         modifier = modifier,
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Add Voucher",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        text = "Add Vouchers",
+                        style = RevibesTheme.typography.h2,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(R.drawable.back_cta),
+                            modifier = Modifier.size(86.dp),
+                            tint = RevibesTheme.colors.primary,
                             contentDescription = "Back"
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.primary
+                    containerColor = Color.Transparent,
+                    titleContentColor = RevibesTheme.colors.primary
                 )
             )
         }
@@ -183,7 +189,7 @@ private fun AddVoucherContent(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = RevibesTheme.colors.surface
                     )
                 ) {
                     Column(
@@ -194,7 +200,7 @@ private fun AddVoucherContent(
                             text = "Basic Information",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = RevibesTheme.colors.primary
                         )
 
                         OutlinedTextField(
@@ -256,7 +262,7 @@ private fun AddVoucherContent(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = RevibesTheme.colors.surface
                     )
                 ) {
                     Column(
@@ -267,7 +273,7 @@ private fun AddVoucherContent(
                             text = "Discount Configuration",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = RevibesTheme.colors.primary
                         )
 
                         var typeExpanded by remember { mutableStateOf(false) }
@@ -346,7 +352,7 @@ private fun AddVoucherContent(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = RevibesTheme.colors.surface
                     )
                 ) {
                     Column(
@@ -361,7 +367,7 @@ private fun AddVoucherContent(
                                 text = "Conditions",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = RevibesTheme.colors.primary
                             )
 
                             TextButton(
@@ -490,7 +496,7 @@ private fun AddVoucherContent(
                         ) {
                             Text(
                                 text = "Please fill in all required fields",
-                                color = MaterialTheme.colorScheme.error,
+                                color = RevibesTheme.colors.error,
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -501,7 +507,7 @@ private fun AddVoucherContent(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = RevibesTheme.colors.surface
                     )
                 ) {
                     Column(
@@ -512,7 +518,7 @@ private fun AddVoucherContent(
                             text = "Claim Period",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = RevibesTheme.colors.primary
                         )
 
                         var showStartDatePicker by remember { mutableStateOf(false) }
@@ -628,7 +634,7 @@ private fun ImageUploadCard(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = RevibesTheme.colors.surface
         )
     ) {
         Column(
@@ -644,13 +650,13 @@ private fun ImageUploadCard(
                     text = "Voucher Image",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = RevibesTheme.colors.primary
                 )
 
                 Text(
                     text = "Required",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
+                    color = RevibesTheme.colors.error
                 )
             }
 
@@ -660,7 +666,7 @@ private fun ImageUploadCard(
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(RevibesTheme.colors.surface)
                 ) {
                     AsyncImage(
                         model = selectedImageUri,
@@ -677,7 +683,7 @@ private fun ImageUploadCard(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.primary
+                                color = RevibesTheme.colors.primary
                             )
                         }
                     }
@@ -708,13 +714,13 @@ private fun ImageUploadCard(
                         .border(
                             width = 2.dp,
                             color = if (imageError != null) {
-                                MaterialTheme.colorScheme.error
+                                RevibesTheme.colors.error
                             } else {
-                                MaterialTheme.colorScheme.outline
+                                RevibesTheme.colors.outline
                             },
                             shape = RoundedCornerShape(12.dp)
                         )
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                        .background(RevibesTheme.colors.primary.copy(alpha = 0.3f))
                         .clickable { imagePickerLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
@@ -728,24 +734,24 @@ private fun ImageUploadCard(
                             modifier = Modifier
                                 .size(48.dp)
                                 .background(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                    RevibesTheme.colors.primary.copy(alpha = 0.1f),
                                     RoundedCornerShape(50)
                                 )
                                 .padding(12.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = RevibesTheme.colors.primary
                         )
 
                         Text(
                             text = "Tap to upload image",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = RevibesTheme.colors.primary,
                             textAlign = TextAlign.Center
                         )
 
                         Text(
                             text = "Recommended: 16:9 aspect ratio",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            color = RevibesTheme.colors.primary.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center
                         )
                     }
@@ -756,7 +762,7 @@ private fun ImageUploadCard(
                 Text(
                     text = imageError,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
+                    color = RevibesTheme.colors.error
                 )
             }
         }

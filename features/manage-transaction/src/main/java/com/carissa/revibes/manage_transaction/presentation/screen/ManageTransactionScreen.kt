@@ -10,22 +10,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -36,12 +37,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
 import com.carissa.revibes.manage_transaction.R
 import com.carissa.revibes.manage_transaction.presentation.component.TransactionItem
 import com.carissa.revibes.manage_transaction.presentation.navigation.ManageTransactionGraph
@@ -92,6 +97,7 @@ fun ManageTransactionScreenContent(
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
+    val navigator = RevibesTheme.navigator
 
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
@@ -103,14 +109,33 @@ fun ManageTransactionScreenContent(
 
     Scaffold(
         modifier = modifier,
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
+                    androidx.compose.material3.Text(
                         text = stringResource(R.string.manage_transaction_title),
-                        style = MaterialTheme.typography.headlineSmall
+                        style = RevibesTheme.typography.h2,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
-                }
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navigator.navigateUp()
+                    }) {
+                        Icon(
+                            painter = painterResource(com.carissa.revibes.core.R.drawable.back_cta),
+                            modifier = Modifier.size(86.dp),
+                            tint = RevibesTheme.colors.primary,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = RevibesTheme.colors.primary
+                )
             )
         }
     ) { paddingValues ->
@@ -156,51 +181,46 @@ fun ManageTransactionScreenContent(
                     )
                 }
 
-                when {
-                    uiState.isLoading && uiState.transactions.isEmpty() -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-
-                    uiState.transactions.isEmpty() && !uiState.isLoading -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = when (uiState.selectedStatus) {
-                                    TransactionStatus.ALL -> stringResource(R.string.no_transactions_found)
-                                    TransactionStatus.PENDING -> stringResource(R.string.no_pending_transactions)
-                                    TransactionStatus.REJECTED -> stringResource(R.string.no_rejected_transactions)
-                                    TransactionStatus.COMPLETED -> stringResource(R.string.no_completed_transactions)
-                                },
-                                style = MaterialTheme.typography.bodyLarge,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                    }
-
-                    else -> {
-                        LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(uiState.filteredTransactions) { transaction ->
-                                TransactionItem(
-                                    transaction = transaction,
-                                    onClick = {
-                                        eventReceiver.onEvent(
-                                            ManageTransactionScreenUiEvent.NavigateToDetail(
-                                                transaction.id
-                                            )
+                ContentStateSwitcher(uiState.isLoading && uiState.transactions.isEmpty()) {
+                    when {
+                        uiState.transactions.isEmpty() && !uiState.isLoading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = when (uiState.selectedStatus) {
+                                        TransactionStatus.ALL -> stringResource(R.string.no_transactions_found)
+                                        TransactionStatus.PENDING -> stringResource(R.string.no_pending_transactions)
+                                        TransactionStatus.REJECTED -> stringResource(R.string.no_rejected_transactions)
+                                        TransactionStatus.COMPLETED -> stringResource(
+                                            R.string.no_completed_transactions
                                         )
-                                    }
+                                    },
+                                    style = RevibesTheme.typography.body1,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(16.dp)
                                 )
+                            }
+                        }
+
+                        else -> {
+                            LazyColumn(
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(uiState.filteredTransactions) { transaction ->
+                                    TransactionItem(
+                                        transaction = transaction,
+                                        onClick = {
+                                            eventReceiver.onEvent(
+                                                ManageTransactionScreenUiEvent.NavigateToDetail(
+                                                    transaction.id
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
                             }
                         }
                     }

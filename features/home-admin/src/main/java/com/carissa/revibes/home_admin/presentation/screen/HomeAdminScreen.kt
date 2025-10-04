@@ -54,7 +54,7 @@ private fun HomeAdminScreenContent(
 ) {
     Scaffold(
         modifier = modifier,
-        containerColor = RevibesTheme.colors.background,
+        containerColor = Color.Transparent,
         topBar = {
             AdminHeader(
                 userName = uiState.userName,

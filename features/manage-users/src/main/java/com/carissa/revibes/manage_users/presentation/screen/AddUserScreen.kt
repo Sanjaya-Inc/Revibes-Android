@@ -10,12 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -35,7 +33,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -105,30 +105,31 @@ private fun AddUserScreenContent(
 
     Scaffold(
         modifier = modifier,
-        containerColor = RevibesTheme.colors.background,
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
+                    androidx.compose.material3.Text(
                         text = stringResource(R.string.add_new_user),
                         style = RevibesTheme.typography.h2,
-                        color = RevibesTheme.colors.onSurface,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = null,
-                            tint = RevibesTheme.colors.onSurface
+                            painter = painterResource(com.carissa.revibes.core.R.drawable.back_cta),
+                            modifier = Modifier.size(86.dp),
+                            tint = RevibesTheme.colors.primary,
+                            contentDescription = "Back"
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = RevibesTheme.colors.background
-                ),
-                modifier = Modifier.statusBarsPadding()
+                    containerColor = Color.Transparent,
+                    titleContentColor = RevibesTheme.colors.primary
+                )
             )
         }
     ) { paddingValues ->

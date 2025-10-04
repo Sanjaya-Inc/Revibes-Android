@@ -16,30 +16,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -47,8 +44,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.components.Button
 import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
+import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
 import com.carissa.revibes.manage_transaction.R
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailItemDomain
@@ -97,22 +96,34 @@ fun TransactionDetailScreen(
 
     Scaffold(
         modifier = modifier,
+        containerColor = Color.Transparent,
         topBar = {
+            val navigator = RevibesTheme.navigator
             TopAppBar(
                 title = {
-                    Text(
+                    androidx.compose.material3.Text(
                         text = stringResource(R.string.transaction_detail_title),
-                        style = MaterialTheme.typography.headlineSmall
+                        style = RevibesTheme.typography.h2,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navigator.navigateUp() }) {
+                    IconButton(onClick = {
+                        navigator.navigateUp()
+                    }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            painter = painterResource(com.carissa.revibes.core.R.drawable.back_cta),
+                            modifier = Modifier.size(86.dp),
+                            tint = RevibesTheme.colors.primary,
+                            contentDescription = "Back"
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = RevibesTheme.colors.primary
+                )
             )
         }
     ) { paddingValues ->
@@ -121,35 +132,21 @@ fun TransactionDetailScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when {
-                uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+            ContentStateSwitcher(
+                uiState.isLoading,
+                error = uiState.error,
+                actionButton = "Refresh" to {
+                    viewModel.onEvent(TransactionDetailScreenUiEvent.LoadTransactionDetail(transactionId))
                 }
-
-                uiState.transactionDetail != null -> {
-                    TransactionDetailContent(
-                        transaction = uiState.transactionDetail!!,
-                        onAccept = { showCompleteDialog = true },
-                        onReject = { showRejectDialog = true },
-                        isRejecting = uiState.isRejecting,
-                        isProcessing = uiState.isProcessing
-                    )
-                }
-
-                uiState.error != null -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = uiState.error!!,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error
+            ) {
+                when {
+                    uiState.transactionDetail != null -> {
+                        TransactionDetailContent(
+                            transaction = uiState.transactionDetail!!,
+                            onAccept = { showCompleteDialog = true },
+                            onReject = { showRejectDialog = true },
+                            isRejecting = uiState.isRejecting,
+                            isProcessing = uiState.isProcessing
                         )
                     }
                 }
@@ -199,7 +196,7 @@ private fun TransactionDetailContent(
         item {
             Text(
                 text = stringResource(R.string.transaction_items),
-                style = MaterialTheme.typography.titleMedium,
+                style = RevibesTheme.typography.h1,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -255,7 +252,7 @@ private fun TransactionInfoCard(
         ) {
             Text(
                 text = stringResource(R.string.transaction_information),
-                style = MaterialTheme.typography.titleMedium,
+                style = RevibesTheme.typography.h2,
                 fontWeight = FontWeight.Bold
             )
 
@@ -324,7 +321,7 @@ private fun TransactionItemCard(
         ) {
             Text(
                 text = item.name,
-                style = MaterialTheme.typography.titleSmall,
+                style = RevibesTheme.typography.h3,
                 fontWeight = FontWeight.Medium
             )
 
@@ -371,13 +368,13 @@ private fun InfoRow(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = RevibesTheme.typography.body1,
+            color = RevibesTheme.colors.primary,
             modifier = Modifier.weight(1f)
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
+            style = RevibesTheme.typography.body2,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )

@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
@@ -30,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,11 +46,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.carissa.revibes.core.R
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
 import com.carissa.revibes.core.presentation.compose.components.RevibesEmptyState
-import com.carissa.revibes.core.presentation.compose.components.RevibesErrorState
 import com.carissa.revibes.manage_voucher.presentation.component.VoucherItem
 import com.carissa.revibes.manage_voucher.presentation.navigation.ManageVoucherGraph
 import com.ramcosta.composedestinations.annotation.Destination
@@ -101,26 +105,32 @@ fun ManageVoucherScreen(
 
     Scaffold(
         modifier = modifier,
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = "Manage Vouchers",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        style = RevibesTheme.typography.h2,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navigator.navigateUp() }) {
+                    IconButton(onClick = {
+                        navigator.navigateUp()
+                    }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(R.drawable.back_cta),
+                            modifier = Modifier.size(86.dp),
+                            tint = RevibesTheme.colors.primary,
                             contentDescription = "Back"
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = Color.Transparent,
+                    titleContentColor = RevibesTheme.colors.primary
                 )
             )
         },
@@ -129,12 +139,12 @@ fun ManageVoucherScreen(
                 onClick = {
                     viewModel.onEvent(ManageVoucherScreenUiEvent.NavigateToAddVoucher)
                 },
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = RevibesTheme.colors.primary
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add Voucher",
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = RevibesTheme.colors.onPrimary
                 )
             }
         }
@@ -162,110 +172,108 @@ fun ManageVoucherScreen(
                         onValueChange = {
                             viewModel.onEvent(ManageVoucherScreenUiEvent.SearchValueChanged(it))
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        placeholder = { Text("Search vouchers...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = {
+                            com.carissa.revibes.core.presentation.compose.components.Text(
+                                text = "Search vouchers...",
+                                style = RevibesTheme.typography.body1,
+                                color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
+                            )
+                        },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = "Search"
+                                contentDescription = null,
+                                tint = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
                             )
                         },
                         shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = RevibesTheme.colors.primary,
+                            unfocusedBorderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f)
+                        ),
                         singleLine = true
                     )
                 }
 
-                when {
-                    state.isLoading && state.vouchers.isEmpty() -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
+                ContentStateSwitcher(
+                    state.isLoading && state.vouchers.isEmpty(),
+                    error = state.error,
+                    actionButton = "Refresh" to {
+                        viewModel.onEvent(ManageVoucherScreenUiEvent.Initialize)
                     }
-
-                    state.error != null && state.vouchers.isEmpty() -> {
-                        RevibesErrorState(
-                            message = state.error ?: "An unknown error has occurred.",
-                            onRetry = {
-                                viewModel.onEvent(ManageVoucherScreenUiEvent.Initialize)
-                            },
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-
-                    state.filteredVouchers.isEmpty() && state.searchValue.text.isNotBlank() -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    when {
+                        state.filteredVouchers.isEmpty() && state.searchValue.text.isNotBlank() -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = "No vouchers found",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "Try adjusting your search terms",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
-                                )
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = "No vouchers found",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = RevibesTheme.colors.primary
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = "Try adjusting your search terms",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = RevibesTheme.colors.primary,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    state.vouchers.isEmpty() -> {
-                        RevibesEmptyState(
-                            title = "No Vouchers Yet",
-                            message = "Create your first voucher to get started",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
+                        state.vouchers.isEmpty() -> {
+                            RevibesEmptyState(
+                                title = "No Vouchers Yet",
+                                message = "Create your first voucher to get started",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
 
-                    else -> {
-                        LazyColumn(
-                            state = listState,
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(
-                                items = state.filteredVouchers,
-                                key = { it.id }
-                            ) { voucher ->
-                                VoucherItem(
-                                    voucher = voucher,
-                                    onDeleteClick = {
-                                        viewModel.onEvent(
-                                            ManageVoucherScreenUiEvent.ShowDeleteDialog(voucher)
-                                        )
-                                    }
-                                )
-                            }
+                        else -> {
+                            LazyColumn(
+                                state = listState,
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(
+                                    items = state.filteredVouchers,
+                                    key = { it.id }
+                                ) { voucher ->
+                                    VoucherItem(
+                                        voucher = voucher,
+                                        onDeleteClick = {
+                                            viewModel.onEvent(
+                                                ManageVoucherScreenUiEvent.ShowDeleteDialog(voucher)
+                                            )
+                                        }
+                                    )
+                                }
 
-                            if (state.isLoadingMore) {
-                                item {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "Loading more...",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
+                                if (state.isLoadingMore) {
+                                    item {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Loading more...",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = RevibesTheme.colors.primary
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -297,7 +305,7 @@ fun ManageVoucherScreen(
                 ) {
                     Text(
                         text = "Delete",
-                        color = MaterialTheme.colorScheme.error
+                        color = RevibesTheme.colors.error
                     )
                 }
             },
