@@ -40,7 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.auth.R
-import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import kotlinx.coroutines.launch
 
 /**

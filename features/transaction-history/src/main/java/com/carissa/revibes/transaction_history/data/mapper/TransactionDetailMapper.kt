@@ -1,6 +1,6 @@
 package com.carissa.revibes.transaction_history.data.mapper
 
-import com.carissa.revibes.core.presentation.components.components.TransactionItem
+import com.carissa.revibes.core.presentation.compose.components.TransactionItem
 import com.carissa.revibes.transaction_history.data.model.PositionData
 import com.carissa.revibes.transaction_history.data.model.StoreData
 import com.carissa.revibes.transaction_history.data.model.TransactionDetailData

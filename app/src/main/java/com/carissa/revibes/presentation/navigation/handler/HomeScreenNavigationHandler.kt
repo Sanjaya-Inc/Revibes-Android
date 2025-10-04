@@ -4,12 +4,10 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.home.presentation.screen.HomeScreenUiEvent
 import com.carissa.revibes.profile.presentation.screen.ProfileScreenUiEvent
 import com.ramcosta.composedestinations.generated.adminmenu.destinations.AdminMenuScreenDestination
-import com.ramcosta.composedestinations.generated.app.destinations.SplashScreenDestination
 import com.ramcosta.composedestinations.generated.dropoff.destinations.DropOffScreenDestination
 import com.ramcosta.composedestinations.generated.exchangepoints.destinations.ExchangePointsScreenDestination
 import com.ramcosta.composedestinations.generated.helpcenter.destinations.HelpCenterScreenDestination
 import com.ramcosta.composedestinations.generated.home.destinations.AboutScreenDestination
-import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.pickup.destinations.PickUpScreenDestination
 import com.ramcosta.composedestinations.generated.point.destinations.PointScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
@@ -43,9 +41,7 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
             )
 
             is HomeScreenUiEvent.NavigateToProfile -> navigator.navigate(ProfileScreenDestination)
-            is ProfileScreenUiEvent.NavigateToLogin -> navigator.navigate(SplashScreenDestination) {
-                popUpTo(HomeScreenDestination) { inclusive = true }
-            }
+            is ProfileScreenUiEvent.NavigateToLogin -> goToHome(navigator)
 
             is HomeScreenUiEvent.NavigateToShop -> navigator.navigate(ShopScreenDestination)
             is HomeScreenUiEvent.NavigateToExchangePoints -> navigator.navigate(
@@ -64,9 +60,7 @@ class HomeScreenNavigationHandler : NavigationEventHandler() {
                 HelpCenterScreenDestination
             )
 
-            is HomeScreenUiEvent.NavigateToLogin -> navigator.navigate(SplashScreenDestination) {
-                popUpTo(HomeScreenDestination) { inclusive = true }
-            }
+            is HomeScreenUiEvent.NavigateToLogin -> goToHome(navigator)
         }
     }
 }

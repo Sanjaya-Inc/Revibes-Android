@@ -35,14 +35,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.carissa.revibes.core.data.main.model.FeatureName
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.ComingSoon
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.TabButton
-import com.carissa.revibes.core.presentation.components.components.CommonHeader
-import com.carissa.revibes.core.presentation.components.components.GeneralError
-import com.carissa.revibes.core.presentation.components.components.RevibesLoading
-import com.carissa.revibes.core.presentation.components.components.SearchConfig
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.CommonHeader
+import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
+import com.carissa.revibes.core.presentation.compose.components.MaintenanceChecker
+import com.carissa.revibes.core.presentation.compose.components.SearchConfig
+import com.carissa.revibes.core.presentation.compose.components.TabButton
 import com.carissa.revibes.transaction_history.R
 import com.carissa.revibes.transaction_history.data.model.TransactionHistoryData
 import com.carissa.revibes.transaction_history.presentation.component.TransactionHistoryItem
@@ -99,117 +99,95 @@ private fun TransactionHistoryScreenContent(
             searchConfig = SearchConfig.Enabled(
                 value = uiState.searchValue,
                 onValueChange = { searchValue ->
-                    eventReceiver.onEvent(TransactionHistoryScreenUiEvent.SearchValueChanged(searchValue))
+                    eventReceiver.onEvent(
+                        TransactionHistoryScreenUiEvent.SearchValueChanged(
+                            searchValue
+                        )
+                    )
                 }
             )
         )
     }) { contentPadding ->
-        AnimatedContent(uiState) { state ->
-            when {
-                state.isMaintenance -> {
-                    ComingSoon(
-                        featureName = "Transaction History",
-                        modifier = Modifier
-                            .padding(contentPadding)
-                            .padding(32.dp),
-                        onClick = {
-                            eventReceiver.onEvent(TransactionHistoryScreenUiEvent.NavigateBack)
-                        }
+        MaintenanceChecker(FeatureName.MY_TRANSACTIONS, onBackAction = {
+            eventReceiver.onEvent(TransactionHistoryScreenUiEvent.NavigateBack)
+        }, onFeatureEnabled = {
+            Column(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                val scope = rememberCoroutineScope()
+
+                LaunchedEffect(pagerState.currentPage) {
+                    eventReceiver.onEvent(
+                        TransactionHistoryScreenUiEvent.TabChanged(
+                            pagerState.currentPage
+                        )
                     )
                 }
 
-                else -> {
-                    Column(
-                        modifier = Modifier
-                            .padding(contentPadding)
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        val scope = rememberCoroutineScope()
-
-                        LaunchedEffect(pagerState.currentPage) {
-                            eventReceiver.onEvent(
-                                TransactionHistoryScreenUiEvent.TabChanged(
-                                    pagerState.currentPage
-                                )
-                            )
-                        }
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            TabButton(
-                                "Process",
-                                pagerState.currentPage == 0,
-                                modifier = Modifier.weight(1f),
-                                onClick = {
-                                    scope.launch {
-                                        pagerState.animateScrollToPage(0)
-                                    }
-                                }
-                            )
-                            TabButton(
-                                "Transaction Complete",
-                                pagerState.currentPage == 1,
-                                modifier = Modifier.weight(1f),
-                                onClick = {
-                                    scope.launch {
-                                        pagerState.animateScrollToPage(1)
-                                    }
-                                }
-                            )
-                        }
-
-                        when {
-                            uiState.isLoading && uiState.transactions.isEmpty() -> {
-                                RevibesLoading()
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TabButton(
+                        "Process",
+                        pagerState.currentPage == 0,
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(0)
                             }
-
-                            uiState.error != null && uiState.transactions.isEmpty() -> {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    GeneralError(
-                                        message = uiState.error,
-                                        onRetry = {
-                                            eventReceiver.onEvent(TransactionHistoryScreenUiEvent.Refresh)
-                                        }
-                                    )
-                                }
+                        }
+                    )
+                    TabButton(
+                        "Transaction Complete",
+                        pagerState.currentPage == 1,
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(1)
                             }
-
-                            else -> {
-                                HorizontalPager(
-                                    pagerState,
-                                    modifier = Modifier.weight(1f)
-                                ) { page ->
-                                    if (uiState.filteredTransactions.isEmpty()) {
-                                        TransactionEmptyState()
-                                    } else {
-                                        TransactionList(
-                                            transactions = uiState.filteredTransactions,
-                                            isLoadingMore = uiState.isLoadingMore,
-                                            hasMoreData = uiState.pagination?.hasMoreNext ?: false,
-                                            onLoadMore = {
-                                                eventReceiver.onEvent(
-                                                    TransactionHistoryScreenUiEvent.LoadMore
-                                                )
-                                            },
-                                            onTransactionClick = { transaction ->
-                                                eventReceiver.onEvent(
-                                                    TransactionHistoryScreenUiEvent.NavigateToTransactionDetail(
-                                                        transactionId = transaction.id
-                                                    )
-                                                )
-                                            }
+                        }
+                    )
+                }
+                ContentStateSwitcher(
+                    uiState.isLoading,
+                    error = uiState.error,
+                    modifier = Modifier.padding(24.dp),
+                    actionButton = "Retry" to {
+                        eventReceiver.onEvent(TransactionHistoryScreenUiEvent.Refresh)
+                    }
+                ) {
+                    HorizontalPager(
+                        pagerState,
+                        modifier = Modifier.weight(1f)
+                    ) { page ->
+                        AnimatedContent(uiState.filteredTransactions.isEmpty()) { isEmpty ->
+                            if (isEmpty) {
+                                TransactionEmptyState()
+                            } else {
+                                TransactionList(
+                                    transactions = uiState.filteredTransactions,
+                                    isLoadingMore = uiState.isLoadingMore,
+                                    hasMoreData = uiState.pagination?.hasMoreNext ?: false,
+                                    onLoadMore = {
+                                        eventReceiver.onEvent(
+                                            TransactionHistoryScreenUiEvent.LoadMore
+                                        )
+                                    },
+                                    onTransactionClick = { transaction ->
+                                        eventReceiver.onEvent(
+                                            TransactionHistoryScreenUiEvent.NavigateToTransactionDetail(
+                                                transactionId = transaction.id
+                                            )
                                         )
                                     }
-                                }
+                                )
                             }
                         }
                     }
                 }
             }
-        }
+        })
     }
 }
 

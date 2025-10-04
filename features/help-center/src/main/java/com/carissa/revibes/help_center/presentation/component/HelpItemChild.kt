@@ -21,8 +21,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.Text
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.Text
 import com.carissa.revibes.help_center.presentation.model.HelpCenterChildData
 
 @Composable

@@ -3,7 +3,6 @@ package com.carissa.revibes.presentation.navigation.handler
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.presentation.screen.splash.SplashScreenUiEvent
 import com.ramcosta.composedestinations.generated.app.navgraphs.RevibesGraph
-import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.homeadmin.destinations.HomeAdminScreenDestination
 import com.ramcosta.composedestinations.generated.onboarding.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -28,11 +27,7 @@ class SplashScreenNavigationHandler : NavigationEventHandler() {
                 }
             }
 
-            is SplashScreenUiEvent.NavigateToHome -> navigator.navigate(HomeScreenDestination) {
-                popUpTo(RevibesGraph.startRoute) {
-                    inclusive = true
-                }
-            }
+            is SplashScreenUiEvent.NavigateToHome -> goToHome(navigator, RevibesGraph.startRoute)
 
             is SplashScreenUiEvent.NavigateToAdminHome -> navigator.navigate(HomeAdminScreenDestination) {
                 popUpTo(RevibesGraph.startRoute) {

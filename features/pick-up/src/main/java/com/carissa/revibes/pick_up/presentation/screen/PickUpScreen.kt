@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,10 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.ComingSoon
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.CommonHeader
-import com.carissa.revibes.core.presentation.components.components.SearchConfig
+import com.carissa.revibes.core.presentation.compose.components.ComingSoon
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.CommonHeader
+import com.carissa.revibes.core.presentation.compose.components.SearchConfig
 import com.carissa.revibes.pick_up.R
 import com.carissa.revibes.pick_up.presentation.navigation.PickUpGraph
 import com.ramcosta.composedestinations.annotation.Destination

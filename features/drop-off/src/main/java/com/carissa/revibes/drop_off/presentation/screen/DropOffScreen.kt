@@ -8,7 +8,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,7 +33,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.AlertDialog
-import com.carissa.revibes.core.presentation.components.components.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -45,7 +43,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import com.carissa.revibes.core.presentation.components.components.ButtonVariant
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -70,19 +67,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.carissa.revibes.core.data.main.model.FeatureName
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.ComingSoon
-import com.carissa.revibes.core.presentation.components.DropOffDialogBg
-import com.carissa.revibes.core.presentation.components.DropOffDialogItemBg
-import com.carissa.revibes.core.presentation.components.DropOffLabelColor
-import com.carissa.revibes.core.presentation.components.DropOffPlaceholderColor
-import com.carissa.revibes.core.presentation.components.DropOffTextFieldBg
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.CommonHeader
-import com.carissa.revibes.core.presentation.components.components.RevibesLoading
-import com.carissa.revibes.core.presentation.components.components.SearchConfig
-import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextField
-import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
+import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
+import com.carissa.revibes.core.presentation.compose.DropOffDialogBg
+import com.carissa.revibes.core.presentation.compose.DropOffDialogItemBg
+import com.carissa.revibes.core.presentation.compose.DropOffLabelColor
+import com.carissa.revibes.core.presentation.compose.DropOffPlaceholderColor
+import com.carissa.revibes.core.presentation.compose.DropOffTextFieldBg
+import com.carissa.revibes.core.presentation.compose.components.MaintenanceChecker
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
+import com.carissa.revibes.core.presentation.compose.components.CommonHeader
+import com.carissa.revibes.core.presentation.compose.components.SearchConfig
+import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextField
+import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextFieldDefaults
 import com.carissa.revibes.drop_off.R
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.navigation.DropOffGraph
@@ -131,41 +131,25 @@ fun DropOffScreen(
             )
         }
     ) { contentPadding ->
-        AnimatedContent(state) { state ->
-            when {
-                state.isMaintenance -> {
-                    ComingSoon(
-                        featureName = "Drop off",
-                        modifier = Modifier
-                            .padding(contentPadding)
-                            .padding(32.dp),
-                        onClick = {
-                            viewModel.onEvent(DropOffScreenUiEvent.NavigateBack)
-                        }
-                    )
-                }
-
-                state.isLoading || state.currentOrderId.isNullOrBlank() -> {
-                    RevibesLoading(modifier = Modifier.padding(contentPadding))
-                }
-
-                else -> {
-                    DropOffScreenContent(
-                        modifier = Modifier
-                            .padding(contentPadding)
-                            .background(RevibesTheme.colors.background),
-                        orderId = state.currentOrderId.orEmpty(),
-                        items = state.items,
-                        name = state.name,
-                        eventReceiver = viewModel,
-                        nearestStores = state.stores,
-                        selectedStore = state.selectedStore,
-                        isFormValid = state.isFormValid,
-                        validationErrors = state.validationErrors
-                    )
-                }
+        MaintenanceChecker(FeatureName.DROP_OFF, onBackAction = {
+            viewModel.onEvent(DropOffScreenUiEvent.NavigateBack)
+        }, onFeatureEnabled = {
+            ContentStateSwitcher(state.isLoading) {
+                DropOffScreenContent(
+                    modifier = Modifier
+                        .padding(contentPadding)
+                        .background(RevibesTheme.colors.background),
+                    orderId = state.currentOrderId.orEmpty(),
+                    items = state.items,
+                    name = state.name,
+                    eventReceiver = viewModel,
+                    nearestStores = state.stores,
+                    selectedStore = state.selectedStore,
+                    isFormValid = state.isFormValid,
+                    validationErrors = state.validationErrors
+                )
             }
-        }
+        })
     }
 }
 

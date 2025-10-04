@@ -2,7 +2,7 @@ package com.carissa.revibes.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.presentation.navigation.handler.NavigationEventHandler

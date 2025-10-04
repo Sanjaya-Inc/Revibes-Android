@@ -22,11 +22,11 @@ import androidx.compose.ui.unit.dp
 import com.carissa.revibes.admin_menu.presentation.navigation.AdminMenuGraph
 import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.TabButton
-import com.carissa.revibes.core.presentation.components.components.CommonHeader
-import com.carissa.revibes.core.presentation.components.components.SearchConfig
-import com.carissa.revibes.core.presentation.components.components.Text
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.TabButton
+import com.carissa.revibes.core.presentation.compose.components.CommonHeader
+import com.carissa.revibes.core.presentation.compose.components.SearchConfig
+import com.carissa.revibes.core.presentation.compose.components.Text
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

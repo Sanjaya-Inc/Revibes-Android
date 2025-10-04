@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.CommonHeader
-import com.carissa.revibes.core.presentation.components.components.SearchConfig
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.CommonHeader
+import com.carissa.revibes.core.presentation.compose.components.SearchConfig
 import com.carissa.revibes.home.R
 import com.carissa.revibes.home.presentation.component.HomeFooter
 import com.carissa.revibes.home.presentation.navigation.HomeGraph

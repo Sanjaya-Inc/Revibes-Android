@@ -2,7 +2,6 @@ package com.carissa.revibes.presentation.navigation.handler
 
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.pick_up.presentation.screen.PickUpScreenUiEvent
-import com.ramcosta.composedestinations.generated.home.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.core.annotation.Factory
@@ -18,7 +17,7 @@ class PickUpScreenNavigationHandler : NavigationEventHandler() {
     override fun navigate(navigator: DestinationsNavigator, event: NavigationEvent) {
         when (event) {
             is PickUpScreenUiEvent.NavigateToProfile -> navigator.navigate(ProfileScreenDestination)
-            is PickUpScreenUiEvent.NavigateToHome -> navigator.navigate(HomeScreenDestination)
+            is PickUpScreenUiEvent.NavigateToHome -> goToHome(navigator)
         }
     }
 }

@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.transaction_history.R
 import com.carissa.revibes.transaction_history.data.model.TransactionHistoryData
 

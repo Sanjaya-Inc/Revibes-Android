@@ -27,12 +27,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.R
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.Button
-import com.carissa.revibes.core.presentation.components.components.DashedBorderContainer
-import com.carissa.revibes.core.presentation.components.components.GeneralError
-import com.carissa.revibes.core.presentation.components.components.RevibesLoading
-import com.carissa.revibes.core.presentation.components.components.TransactionDetailsContent
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.DashedBorderContainer
+import com.carissa.revibes.core.presentation.compose.components.GeneralError
+import com.carissa.revibes.core.presentation.compose.components.RevibesLoading
+import com.carissa.revibes.core.presentation.compose.components.TransactionDetailsContent
 import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.transaction_history.data.mapper.toItemPoints
 import com.carissa.revibes.transaction_history.data.mapper.toTransactionItem
@@ -129,8 +129,10 @@ private fun DetailTransactionHistoryScreenContent(
 
         uiState.error != null -> {
             GeneralError(
-                message = uiState.error,
-                modifier = modifier.fillMaxSize()
+                error = uiState.error,
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
             )
         }
 

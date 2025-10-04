@@ -64,7 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.components.Button
+import com.carissa.revibes.core.presentation.compose.components.Button
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
 import com.carissa.revibes.manage_voucher.presentation.navigation.ManageVoucherGraph
 import com.carissa.revibes.manage_voucher.presentation.screen.components.DatePicker

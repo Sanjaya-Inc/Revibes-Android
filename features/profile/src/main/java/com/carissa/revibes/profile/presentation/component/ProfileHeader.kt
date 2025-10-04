@@ -17,10 +17,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.Text
-import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextField
-import com.carissa.revibes.core.presentation.components.components.textfield.OutlinedTextFieldDefaults
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.Text
+import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextField
+import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextFieldDefaults
 import com.carissa.revibes.profile.R
 
 @Composable

@@ -2,6 +2,7 @@ package com.carissa.revibes.point.presentation.screen
 
 import com.carissa.revibes.core.data.main.remote.config.ConfigRepository
 import com.carissa.revibes.core.presentation.BaseViewModel
+import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.point.data.PointRepository
 import com.carissa.revibes.point.domain.model.Mission
@@ -44,6 +45,7 @@ sealed interface PointScreenUiEvent {
 class PointScreenViewModel(
     private val pointRepository: PointRepository,
     private val pointExceptionHandler: PointExceptionHandler,
+    private val userPointFlow: UserPointFlow,
     configRepository: ConfigRepository
 ) : BaseViewModel<PointScreenUiState, PointScreenUiEvent>(
     initialState = PointScreenUiState(
@@ -66,6 +68,7 @@ class PointScreenViewModel(
             PointScreenUiEvent.NavigateBack -> intent {
                 postSideEffect(event)
             }
+
             PointScreenUiEvent.Initialize -> loadDailyRewards()
             PointScreenUiEvent.ClaimDailyReward -> claimDailyReward()
             PointScreenUiEvent.GetMissions -> getMissions()
@@ -93,6 +96,7 @@ class PointScreenViewModel(
             reduce { state.copy(isClaimingReward = true) }
             pointRepository.claimDailyReward()
             val updatedDailyRewards = pointRepository.getDailyRewards()
+            userPointFlow.update()
             reduce {
                 state.copy(
                     isClaimingReward = false,

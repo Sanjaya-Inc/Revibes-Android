@@ -41,7 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.manage_transaction.R
 import com.carissa.revibes.manage_transaction.presentation.component.TransactionItem
 import com.carissa.revibes.manage_transaction.presentation.navigation.ManageTransactionGraph

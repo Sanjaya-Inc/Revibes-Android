@@ -49,8 +49,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.carissa.revibes.core.presentation.component.RevibesEmptyState
-import com.carissa.revibes.core.presentation.component.RevibesErrorState
+import com.carissa.revibes.core.presentation.compose.components.RevibesEmptyState
+import com.carissa.revibes.core.presentation.compose.components.RevibesErrorState
 import com.carissa.revibes.manage_voucher.presentation.component.VoucherItem
 import com.carissa.revibes.manage_voucher.presentation.navigation.ManageVoucherGraph
 import com.ramcosta.composedestinations.annotation.Destination

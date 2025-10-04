@@ -40,11 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.Yellow900
-import com.carissa.revibes.core.presentation.components.components.Button
-import com.carissa.revibes.core.presentation.components.components.ButtonVariant
-import com.carissa.revibes.core.presentation.components.components.Text
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.Yellow900
+import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
+import com.carissa.revibes.core.presentation.compose.components.Text
 import com.carissa.revibes.exchange_points.R
 import com.carissa.revibes.exchange_points.presentation.navigation.ExchangePointsGraph
 import com.ramcosta.composedestinations.annotation.Destination

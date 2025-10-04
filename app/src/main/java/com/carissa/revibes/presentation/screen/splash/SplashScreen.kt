@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import com.carissa.revibes.R
-import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.presentation.navigation.RevibesNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel

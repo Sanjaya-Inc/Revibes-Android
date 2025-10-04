@@ -45,9 +45,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.Button
-import com.carissa.revibes.core.presentation.components.components.Text
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.Text
 import com.carissa.revibes.manage_users.R
 import com.carissa.revibes.manage_users.domain.model.UserDomain
 import com.carissa.revibes.manage_users.presentation.navigation.ManageUsersGraph

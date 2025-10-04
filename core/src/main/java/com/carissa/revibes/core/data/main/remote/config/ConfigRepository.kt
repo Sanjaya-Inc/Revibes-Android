@@ -1,6 +1,7 @@
 package com.carissa.revibes.core.data.main.remote.config
 
 import android.util.Log
+import com.carissa.revibes.core.data.main.model.FeatureName
 import com.carissa.revibes.core.data.utils.rethrowCancellation
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +28,10 @@ class ConfigRepository(
     fun getPhoneNumber(): String = remoteConfigSource.getString(PHONE_NUMBER_KEY)
     fun getWhatsappNumber(): String = remoteConfigSource.getString(WHATSAPP_NUMBER_KEY)
     fun getFaxNumber(): String = remoteConfigSource.getString(FAX_NUMBER_KEY)
+
+    fun getFeatureFlagKey(featureName: FeatureName): Boolean {
+        return remoteConfigSource.getBoolean(featureName.getFeatureFlagKey())
+    }
     fun getYourPointFeatureFlagEnabled(): Boolean =
         remoteConfigSource.getBoolean(FEATURE_FLAG_YOUR_POINT_KEY)
 

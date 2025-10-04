@@ -5,7 +5,6 @@
 package com.carissa.revibes.home.presentation.screen
 
 import android.Manifest
-import android.R.attr.onClick
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,10 +31,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.Button
-import com.carissa.revibes.core.presentation.components.components.ButtonVariant
-import com.carissa.revibes.core.presentation.components.components.Surface
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
+import com.carissa.revibes.core.presentation.compose.components.Surface
 import com.carissa.revibes.home.R
 import com.carissa.revibes.home.presentation.component.CtaMenu
 import com.carissa.revibes.home.presentation.component.CtaYourPoint
@@ -57,6 +57,7 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
+    val coins = viewModel.coins.collectAsState().value
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val notificationPermissionState = rememberPermissionState(
@@ -70,11 +71,17 @@ fun HomeScreen(
         }
     }
 
-    HomeScreenContent(uiState = state, modifier = modifier, eventReceiver = viewModel)
+    HomeScreenContent(
+        coins = coins,
+        uiState = state,
+        modifier = modifier,
+        eventReceiver = viewModel
+    )
 }
 
 @Composable
 private fun HomeScreenContent(
+    coins: Int,
     uiState: HomeScreenUiState,
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<HomeScreenUiEvent> = EventReceiver { }
@@ -114,7 +121,7 @@ private fun HomeScreenContent(
                         .padding(horizontal = 16.dp)
                 ) {
                     CtaYourPoint(
-                        uiState.userPoints,
+                        coins,
                         modifier = Modifier
                             .height(250.dp),
                         onClick = {
@@ -239,6 +246,7 @@ private fun HomeScreenPreview() {
     RevibesTheme {
         HomeScreenContent(
             modifier = Modifier.background(Color.White),
+            coins = 0,
             uiState = HomeScreenUiState()
         )
     }

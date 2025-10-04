@@ -6,8 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
-import com.carissa.revibes.core.presentation.components.MainBackground
-import com.carissa.revibes.core.presentation.components.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.MainBackground
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.navigation.KickUserToLogin
 import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.presentation.navigation.NavigationEventBusHandler

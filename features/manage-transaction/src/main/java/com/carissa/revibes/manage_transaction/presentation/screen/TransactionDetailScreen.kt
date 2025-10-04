@@ -47,8 +47,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.carissa.revibes.core.presentation.components.components.Button
-import com.carissa.revibes.core.presentation.components.components.ButtonVariant
+import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
 import com.carissa.revibes.manage_transaction.R
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailItemDomain

@@ -4,8 +4,10 @@
 package com.carissa.revibes.home.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.viewModelScope
 import com.carissa.revibes.core.domain.supportdata.GetSupportDataUseCase
 import com.carissa.revibes.core.presentation.BaseViewModel
+import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.home.data.HomeRepository
 import com.carissa.revibes.home.data.model.HomeBannerData
@@ -14,6 +16,8 @@ import com.carissa.revibes.home.presentation.screen.handler.HomeExceptionHandler
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import org.koin.android.annotation.KoinViewModel
 
 data class HomeScreenUiState(
@@ -21,7 +25,6 @@ data class HomeScreenUiState(
     val searchValue: TextFieldValue = TextFieldValue(),
     val footerItems: ImmutableList<FooterItem> = persistentListOf(),
     val banners: ImmutableList<HomeBannerData> = persistentListOf(),
-    val userPoints: Int = 0,
     val userName: String = "",
     val isAdmin: Boolean = false
 )
@@ -45,6 +48,7 @@ sealed interface HomeScreenUiEvent {
 class HomeScreenViewModel(
     private val homeRepository: HomeRepository,
     private val homeExceptionHandler: HomeExceptionHandler,
+    private val userPointFlow: UserPointFlow,
     getSupportDataUseCase: GetSupportDataUseCase
 ) : BaseViewModel<HomeScreenUiState, HomeScreenUiEvent>(
     initialState = HomeScreenUiState(
@@ -57,6 +61,7 @@ class HomeScreenViewModel(
         homeExceptionHandler.onHomeError(syntax, exception)
     }
 ) {
+    val coins = userPointFlow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
 
     override fun onEvent(event: HomeScreenUiEvent) {
         super.onEvent(event)
@@ -72,10 +77,10 @@ class HomeScreenViewModel(
         intent {
             reduce { state.copy(isLoading = true) }
             val homeData = homeRepository.getHomeData()
+            userPointFlow.update(homeData.userData.coins)
             reduce {
                 state.copy(
                     banners = homeData.banners.toImmutableList(),
-                    userPoints = homeData.userData.coins,
                     userName = homeData.userData.name,
                     isAdmin = homeData.userData.role == "admin",
                     isLoading = false

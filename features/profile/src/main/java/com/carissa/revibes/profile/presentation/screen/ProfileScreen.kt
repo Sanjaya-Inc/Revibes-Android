@@ -20,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.data.user.model.UserData
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.Button
-import com.carissa.revibes.core.presentation.components.components.ButtonVariant
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
 import com.carissa.revibes.core.presentation.util.openSupportWhatsApp
 import com.carissa.revibes.profile.presentation.component.ProfileHeader
 import com.carissa.revibes.profile.presentation.component.ProfileMain

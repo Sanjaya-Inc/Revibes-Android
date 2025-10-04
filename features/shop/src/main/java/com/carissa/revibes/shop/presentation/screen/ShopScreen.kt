@@ -26,10 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.components.CommonHeader
-import com.carissa.revibes.core.presentation.components.components.SearchConfig
-import com.carissa.revibes.core.presentation.components.components.Text
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.CommonHeader
+import com.carissa.revibes.core.presentation.compose.components.SearchConfig
+import com.carissa.revibes.core.presentation.compose.components.Text
 import com.carissa.revibes.core.presentation.util.DeeplinkHandler
 import com.carissa.revibes.shop.R
 import com.carissa.revibes.shop.presentation.navigation.ShopGraph

@@ -47,14 +47,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.carissa.revibes.core.presentation.components.RevibesTheme
-import com.carissa.revibes.core.presentation.components.Yellow900
-import com.carissa.revibes.core.presentation.components.components.Button
-import com.carissa.revibes.core.presentation.components.components.ButtonVariant
-import com.carissa.revibes.core.presentation.components.components.CommonHeader
-import com.carissa.revibes.core.presentation.components.components.SearchConfig
-import com.carissa.revibes.core.presentation.components.components.Text
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.Yellow900
+import com.carissa.revibes.core.presentation.compose.components.Button
+import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
+import com.carissa.revibes.core.presentation.compose.components.CommonHeader
+import com.carissa.revibes.core.presentation.compose.components.SearchConfig
+import com.carissa.revibes.core.presentation.compose.components.Text
 import com.carissa.revibes.exchange_points.R
 import com.carissa.revibes.exchange_points.domain.model.Voucher
 import com.carissa.revibes.exchange_points.presentation.navigation.ExchangePointsGraph
@@ -74,6 +75,7 @@ fun ExchangePointDetailScreen(
     viewModel: ExchangePointDetailScreenViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
+    val coins by viewModel.coins.collectAsStateWithLifecycle()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -119,7 +121,7 @@ fun ExchangePointDetailScreen(
                         )
                     )
                 },
-                isConfirmEnabled = voucher.point * quantity <= state.userPoints,
+                isConfirmEnabled = voucher.point * quantity <= coins,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp)
