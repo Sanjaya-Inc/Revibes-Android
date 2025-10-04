@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 
 interface NavigationEvent
+data object KickUserToLogin : NavigationEvent
 
 @OptIn(ExperimentalForInheritanceCoroutinesApi::class)
 interface NavigationEventBus : SharedFlow<NavigationEvent> {

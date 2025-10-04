@@ -8,7 +8,8 @@ import com.carissa.revibes.core.data.utils.BaseRepository
 import org.koin.core.annotation.Single
 
 @Single
-class AuthRepository(private val remoteApi: AuthRemoteApi) : BaseRepository() {
+class AuthRepository(private val remoteApi: AuthRemoteApi) :
+    BaseRepository(shouldKickWhenAuthFailed = false) {
 
     suspend fun loginWithEmail(email: String, password: String): LoginResult {
         return execute { remoteApi.loginWithEmail(email, password).toDomain() }
