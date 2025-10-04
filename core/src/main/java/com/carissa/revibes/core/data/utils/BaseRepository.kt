@@ -1,11 +1,7 @@
 package com.carissa.revibes.core.data.utils
 
-import android.content.Context
-import android.widget.Toast
-import com.carissa.revibes.core.data.auth.local.AuthTokenDataSource
 import com.carissa.revibes.core.data.model.ErrorResponse
-import com.carissa.revibes.core.presentation.navigation.KickUserToLogin
-import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
+import com.carissa.revibes.core.domain.usecase.TokenExpiredUseCase
 import com.carissa.revibes.core.presentation.util.AppDispatchers
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.RedirectResponseException
@@ -19,10 +15,8 @@ import org.koin.java.KoinJavaComponent
 abstract class BaseRepository(
     private val shouldKickWhenAuthFailed: Boolean = true,
     private val json: Json = KoinJavaComponent.getKoin().get(),
-    private val navigationEventBus: NavigationEventBus = KoinJavaComponent.getKoin().get(),
-    private val authTokenDataSource: AuthTokenDataSource = KoinJavaComponent.getKoin().get(),
-    private val context: Context = KoinJavaComponent.getKoin().get(),
-    private val appDispatchers: AppDispatchers = KoinJavaComponent.getKoin().get()
+    private val appDispatchers: AppDispatchers = KoinJavaComponent.getKoin().get(),
+    private val tokenExpiredUseCase: TokenExpiredUseCase = KoinJavaComponent.getKoin().get()
 ) {
     @Suppress("ThrowsCount")
     protected suspend fun <T> execute(
@@ -51,12 +45,7 @@ abstract class BaseRepository(
         val dto = runCatching { json.decodeFromString<ErrorResponse>(body ?: "") }.getOrNull()
         return ApiException(response.status.value, dto, cause).also {
             if (shouldKickWhenAuthFailed && it.statusCode == 401) {
-                authTokenDataSource.clearAuthToken()
-                withContext(appDispatchers.main) {
-                    navigationEventBus.post(KickUserToLogin)
-                    Toast.makeText(context, "Session expired, please login again", Toast.LENGTH_SHORT)
-                        .show()
-                }
+                tokenExpiredUseCase()
             }
         }
     }

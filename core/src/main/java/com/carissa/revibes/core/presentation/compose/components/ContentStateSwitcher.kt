@@ -1,6 +1,5 @@
 package com.carissa.revibes.core.presentation.compose.components
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
@@ -12,20 +11,16 @@ fun ContentStateSwitcher(
     actionButton: Pair<String, () -> Unit>? = null,
     onContent: @Composable () -> Unit
 ) {
-    AnimatedContent(
-        Pair(isLoading, !error.isNullOrBlank()),
-        modifier = modifier
-    ) { (isLoading, isError) ->
-        when {
-            isError -> {
-                GeneralError(error.orEmpty(), actionButton = actionButton)
-            }
-            isLoading -> {
-                RevibesLoading()
-            }
-            else -> {
-                onContent()
-            }
+    val targetState = when {
+        !error.isNullOrBlank() -> "ERROR"
+        isLoading -> "LOADING"
+        else -> "CONTENT"
+    }
+    StateSwitcherAnimator(targetState, modifier) { state ->
+        when (state) {
+            "ERROR" -> GeneralError(error.orEmpty(), actionButton = actionButton)
+            "LOADING" -> RevibesLoading()
+            "CONTENT" -> onContent()
         }
     }
 }
