@@ -162,7 +162,7 @@ class ManageVoucherScreenViewModel(
                 voucher.name.contains(searchQuery, ignoreCase = true) ||
                     voucher.code.contains(searchQuery, ignoreCase = true) ||
                     voucher.description.contains(searchQuery, ignoreCase = true) ||
-                    voucher.type.name.contains(searchQuery, ignoreCase = true)
+                    voucher.value.type.name.contains(searchQuery, ignoreCase = true)
             }.toPersistentList()
         }
     }

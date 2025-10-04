@@ -34,14 +34,13 @@ data class VoucherData(
     val code: String,
     val name: String,
     val description: String,
-    val type: String,
-    val amount: Double,
-    val currency: String,
+    val value: VoucherValue,
     val conditions: VoucherConditionsData,
+    val imageUri: String? = null,
     val claimPeriodStart: String,
     val claimPeriodEnd: String,
-    val imageUrl: String? = null,
-    val isActive: Boolean,
+    val isAvailable: Boolean,
+    val inUse: Boolean = false,
     val createdAt: String,
     val updatedAt: String
 )
@@ -52,10 +51,14 @@ data class VoucherItemData(
     val id: String,
     val code: String,
     val name: String,
+    val description: String,
     val value: VoucherValue,
+    val conditions: VoucherConditionsData,
     val imageUri: String,
     val claimPeriodStart: String,
     val claimPeriodEnd: String,
+    val isAvailable: Boolean,
+    val inUse: Boolean,
     val createdAt: String,
     val updatedAt: String
 )
@@ -64,7 +67,7 @@ data class VoucherItemData(
 @Keep
 data class VoucherValue(
     val type: String,
-    val amount: Long,
+    val amount: Double,
 )
 
 @Serializable

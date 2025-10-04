@@ -5,6 +5,7 @@ import com.carissa.revibes.manage_voucher.data.model.VoucherData
 import com.carissa.revibes.manage_voucher.data.model.VoucherItemData
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
+import com.carissa.revibes.manage_voucher.domain.model.VoucherValue
 
 fun VoucherData.toDomain(): VoucherDomain {
     return VoucherDomain(
@@ -12,14 +13,16 @@ fun VoucherData.toDomain(): VoucherDomain {
         code = this.code,
         name = this.name,
         description = this.description,
-        type = this.type.toVoucherType(),
-        amount = this.amount,
-//        currency = this.currency.toCurrency(),
+        value = VoucherValue(
+            type = this.value.type.toVoucherType(),
+            amount = this.value.amount
+        ),
         conditions = this.conditions.toDomain(),
+        imageUri = this.imageUri,
         claimPeriodStart = this.claimPeriodStart,
         claimPeriodEnd = this.claimPeriodEnd,
-        imageUrl = this.imageUrl,
-        isActive = true,
+        isAvailable = this.isAvailable,
+        inUse = this.inUse,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )
@@ -48,15 +51,17 @@ fun VoucherItemData.toDomain(): VoucherDomain {
         id = this.id,
         code = this.code,
         name = this.name,
-        description = "",
-        type = this.value.type.toVoucherType(),
-        amount = this.value.amount.toDouble(),
-//        currency = this.currency.toCurrency(),
-        conditions = null,
+        description = this.description,
+        value = VoucherValue(
+            type = this.value.type.toVoucherType(),
+            amount = this.value.amount
+        ),
+        conditions = this.conditions.toDomain(),
+        imageUri = this.imageUri,
         claimPeriodStart = this.claimPeriodStart,
         claimPeriodEnd = this.claimPeriodEnd,
-        imageUrl = this.imageUri,
-        isActive = true,
+        isAvailable = this.isAvailable,
+        inUse = this.inUse,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )

@@ -12,14 +12,13 @@ data class VoucherDomain(
     val code: String,
     val name: String,
     val description: String,
-    val type: VoucherType,
-    val amount: Double,
-//    val currency: Currency,
+    val value: VoucherValue,
     val conditions: VoucherConditions?,
+    val imageUri: String? = null,
     val claimPeriodStart: String,
     val claimPeriodEnd: String,
-    val imageUrl: String? = null,
-    val isActive: Boolean = true,
+    val isAvailable: Boolean = true,
+    val inUse: Boolean = false,
     val createdAt: String,
     val updatedAt: String
 ) {
@@ -31,11 +30,15 @@ data class VoucherDomain(
             return value
         }
     }
-
-//    enum class Currency {
-//        IDR, USD, EUR, GBP, JPY
-//    }
 }
+
+@Serializable
+@Keep
+@Stable
+data class VoucherValue(
+    val type: VoucherDomain.VoucherType,
+    val amount: Double
+)
 
 @Serializable
 @Keep
