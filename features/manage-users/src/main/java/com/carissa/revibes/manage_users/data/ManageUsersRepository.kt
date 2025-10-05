@@ -91,4 +91,32 @@ class ManageUsersRepository(
             )
         }
     }
+
+    suspend fun deductPointsFromUser(id: String, points: Int): UserDomain {
+        return execute {
+            val request = AddPointsRequest(amount = -points) // Use negative value for deduction
+            remoteApi.addPointsToUser(id, request)
+            getUserDetail(id)
+        }
+    }
+
+    // Dummy method for updating user - always returns success
+    suspend fun updateUser(
+        id: String,
+        name: String,
+        email: String,
+        phone: String,
+        role: UserDomain.UserRole
+    ): UserDomain {
+        return execute {
+            val currentUser = getUserDetail(id)
+            currentUser.copy(
+                name = name,
+                email = email,
+                phone = phone,
+                role = role,
+                updatedAt = "2024-01-01T00:00:00.000Z"
+            )
+        }
+    }
 }

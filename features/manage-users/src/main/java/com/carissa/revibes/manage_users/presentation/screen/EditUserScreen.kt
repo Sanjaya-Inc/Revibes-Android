@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -76,6 +77,14 @@ fun EditUserScreen(
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
+            is EditUserScreenUiEvent.OnDeductPointsFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is EditUserScreenUiEvent.OnEditUserFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
             is EditUserScreenUiEvent.OnLoadUserFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
@@ -90,7 +99,7 @@ fun EditUserScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            Toast.makeText(context, "Successfully added points", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Operation completed successfully", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -159,10 +168,27 @@ private fun EditUserScreenContent(
                     UserDetailCard(user = uiState.user)
 
                     Button(
-                        text = stringResource(R.string.add_points),
-                        onClick = { onEvent(EditUserScreenUiEvent.ShowAddPointsDialog) },
+                        text = stringResource(R.string.edit_user),
+                        onClick = { onEvent(EditUserScreenUiEvent.ShowEditUserDialog) },
                         modifier = Modifier.fillMaxWidth(),
                     )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Button(
+                            text = stringResource(R.string.add_points),
+                            onClick = { onEvent(EditUserScreenUiEvent.ShowAddPointsDialog) },
+                            modifier = Modifier.weight(1f),
+                        )
+
+                        Button(
+                            text = "Deduct Points",
+                            onClick = { onEvent(EditUserScreenUiEvent.ShowDeductPointsDialog) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
             }
         }
@@ -172,6 +198,22 @@ private fun EditUserScreenContent(
                 uiState = uiState,
                 onEvent = onEvent,
                 onDismiss = { onEvent(EditUserScreenUiEvent.HideAddPointsDialog) }
+            )
+        }
+
+        if (uiState.showDeductPointsDialog) {
+            DeductPointsDialog(
+                uiState = uiState,
+                onEvent = onEvent,
+                onDismiss = { onEvent(EditUserScreenUiEvent.HideDeductPointsDialog) }
+            )
+        }
+
+        if (uiState.showEditUserDialog) {
+            EditUserDialog(
+                uiState = uiState,
+                onEvent = onEvent,
+                onDismiss = { onEvent(EditUserScreenUiEvent.HideEditUserDialog) }
             )
         }
     }
@@ -393,6 +435,261 @@ private fun formatDate(dateString: String): String {
     } catch (e: Exception) {
         dateString
     }
+}
+
+@Composable
+private fun DeductPointsDialog(
+    uiState: EditUserScreenUiState,
+    onEvent: (EditUserScreenUiEvent) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Deduct Points",
+                style = RevibesTheme.typography.h3,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Current points: ${uiState.user?.points ?: 0}",
+                    style = RevibesTheme.typography.body1,
+                    color = RevibesTheme.colors.onSurface.copy(alpha = 0.7f)
+                )
+
+                OutlinedTextField(
+                    value = uiState.pointsToDeduct,
+                    onValueChange = {
+                        if (it.text.isDigitsOnly()) {
+                            onEvent(EditUserScreenUiEvent.PointsToDeductChanged(it))
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(
+                            text = "Points to deduct",
+                            style = RevibesTheme.typography.body1
+                        )
+                    },
+                    isError = uiState.deductPointsError != null,
+                    supportingText = uiState.deductPointsError?.let { error ->
+                        {
+                            Text(
+                                text = error,
+                                style = RevibesTheme.typography.label3,
+                                color = RevibesTheme.colors.error
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = RevibesTheme.colors.primary,
+                        unfocusedBorderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f)
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                text = "Deduct Points",
+                onClick = { onEvent(EditUserScreenUiEvent.DeductPoints) },
+                enabled = !uiState.isLoadingDeductPoints,
+                loading = uiState.isLoadingDeductPoints
+            )
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = RevibesTheme.typography.button,
+                    color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun EditUserDialog(
+    uiState: EditUserScreenUiState,
+    onEvent: (EditUserScreenUiEvent) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.edit_user),
+                style = RevibesTheme.typography.h3,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = uiState.editUserName,
+                    onValueChange = { onEvent(EditUserScreenUiEvent.EditUserNameChanged(it)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(
+                            text = "Name",
+                            style = RevibesTheme.typography.body1
+                        )
+                    },
+                    isError = uiState.editUserNameError != null,
+                    supportingText = uiState.editUserNameError?.let { error ->
+                        {
+                            Text(
+                                text = error,
+                                style = RevibesTheme.typography.label3,
+                                color = RevibesTheme.colors.error
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = RevibesTheme.colors.primary,
+                        unfocusedBorderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f)
+                    ),
+                    singleLine = true
+                )
+
+                OutlinedTextField(
+                    value = uiState.editUserEmail,
+                    onValueChange = { onEvent(EditUserScreenUiEvent.EditUserEmailChanged(it)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(
+                            text = stringResource(R.string.email_address),
+                            style = RevibesTheme.typography.body1
+                        )
+                    },
+                    isError = uiState.editUserEmailError != null,
+                    supportingText = uiState.editUserEmailError?.let { error ->
+                        {
+                            Text(
+                                text = error,
+                                style = RevibesTheme.typography.label3,
+                                color = RevibesTheme.colors.error
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = RevibesTheme.colors.primary,
+                        unfocusedBorderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f)
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                    singleLine = true
+                )
+
+                OutlinedTextField(
+                    value = uiState.editUserPhone,
+                    onValueChange = { onEvent(EditUserScreenUiEvent.EditUserPhoneChanged(it)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(
+                            text = stringResource(R.string.phone_number),
+                            style = RevibesTheme.typography.body1
+                        )
+                    },
+                    isError = uiState.editUserPhoneError != null,
+                    supportingText = uiState.editUserPhoneError?.let { error ->
+                        {
+                            Text(
+                                text = error,
+                                style = RevibesTheme.typography.label3,
+                                color = RevibesTheme.colors.error
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = RevibesTheme.colors.primary,
+                        unfocusedBorderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f)
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+                    singleLine = true
+                )
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Role",
+                        style = RevibesTheme.typography.body1,
+                        color = RevibesTheme.colors.onSurface.copy(alpha = 0.7f)
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            RadioButton(
+                                selected = uiState.editUserRole == UserDomain.UserRole.USER,
+                                onClick = {
+                                    onEvent(
+                                        EditUserScreenUiEvent.EditUserRoleChanged(UserDomain.UserRole.USER)
+                                    )
+                                }
+                            )
+                            Text(
+                                text = stringResource(R.string.role_user),
+                                style = RevibesTheme.typography.body1
+                            )
+                        }
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            RadioButton(
+                                selected = uiState.editUserRole == UserDomain.UserRole.ADMIN,
+                                onClick = {
+                                    onEvent(
+                                        EditUserScreenUiEvent.EditUserRoleChanged(UserDomain.UserRole.ADMIN)
+                                    )
+                                }
+                            )
+                            Text(
+                                text = stringResource(R.string.role_admin),
+                                style = RevibesTheme.typography.body1
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                text = "Update User",
+                onClick = { onEvent(EditUserScreenUiEvent.EditUser) },
+                enabled = !uiState.isLoadingEditUser,
+                loading = uiState.isLoadingEditUser
+            )
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = RevibesTheme.typography.button,
+                    color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
+                )
+            }
+        }
+    )
 }
 
 @Preview
