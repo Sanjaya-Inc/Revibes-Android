@@ -39,6 +39,7 @@ interface ManageUsersRemoteApi {
     ): AddPointsResponse
 
     @POST("users")
+    @Headers("Content-Type: application/json")
     suspend fun createUser(
         @Body request: CreateUserRequest
     ): CreateUserResponse
