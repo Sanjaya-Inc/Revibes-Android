@@ -1,9 +1,11 @@
 package com.carissa.revibes.exchange_points.data
 
 import com.carissa.revibes.core.data.utils.BaseRepository
+import com.carissa.revibes.exchange_points.data.mapper.toUserVoucher
 import com.carissa.revibes.exchange_points.data.mapper.toVoucher
 import com.carissa.revibes.exchange_points.data.model.PurchaseRequest
 import com.carissa.revibes.exchange_points.data.remote.ExchangePointsRemoteApi
+import com.carissa.revibes.exchange_points.domain.model.UserVoucher
 import com.carissa.revibes.exchange_points.domain.model.Voucher
 import org.koin.core.annotation.Single
 
@@ -14,6 +16,10 @@ class ExchangePointsRepository(
 
     suspend fun getVouchers(): List<Voucher> {
         return execute { remoteApi.getVouchers().data.items.map { it.toVoucher() } }
+    }
+
+    suspend fun getUserVouchers(): List<UserVoucher> {
+        return execute { remoteApi.getUserVouchers().data.items.map { it.toUserVoucher() } }
     }
 
     suspend fun purchaseVoucher(purchaseRequest: PurchaseRequest) {

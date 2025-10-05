@@ -14,5 +14,9 @@ data class VoucherMetadata(
     @SerialName("description")
     val description: String,
     @SerialName("imageUri")
-    val imageUri: String
+    val imageUri: String,
+    @SerialName("guides")
+    val guides: List<String> = emptyList(),
+    @SerialName("termConditions")
+    val termConditions: List<String> = emptyList()
 )

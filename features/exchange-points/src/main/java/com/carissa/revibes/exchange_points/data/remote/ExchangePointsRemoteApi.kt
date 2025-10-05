@@ -2,6 +2,7 @@ package com.carissa.revibes.exchange_points.data.remote
 
 import com.carissa.revibes.exchange_points.data.model.ExchangeDataResponse
 import com.carissa.revibes.exchange_points.data.model.PurchaseRequest
+import com.carissa.revibes.exchange_points.data.model.UserVoucherResponse
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
@@ -16,6 +17,11 @@ interface ExchangePointsRemoteApi {
         @Query("limit") limit: Int = 10,
         @Query("types") types: String = "voucher"
     ): ExchangeDataResponse
+
+    @GET("me/vouchers")
+    suspend fun getUserVouchers(
+        @Query("limit") limit: Int = 10
+    ): UserVoucherResponse
 
     @POST("exchanges/transactions")
     suspend fun purchaseVoucher(

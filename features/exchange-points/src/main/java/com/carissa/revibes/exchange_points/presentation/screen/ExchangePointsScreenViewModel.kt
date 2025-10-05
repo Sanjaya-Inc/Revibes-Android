@@ -6,6 +6,7 @@ import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.exchange_points.data.ExchangePointsRepository
+import com.carissa.revibes.exchange_points.domain.model.UserVoucher
 import com.carissa.revibes.exchange_points.domain.model.Voucher
 import com.carissa.revibes.exchange_points.presentation.handler.ExchangePointsExceptionHandler
 import kotlinx.collections.immutable.PersistentList
@@ -17,8 +18,11 @@ import org.koin.android.annotation.KoinViewModel
 
 data class ExchangePointsScreenUiState(
     val isLoading: Boolean = false,
+    val isLoadingUserVouchers: Boolean = false,
     val isMaintenance: Boolean = false,
     val vouchers: PersistentList<Voucher> = persistentListOf(),
+    val userVouchers: PersistentList<UserVoucher> = persistentListOf(),
+    val currentTab: Int = 0,
     val error: String? = null,
 )
 
@@ -28,9 +32,14 @@ sealed interface ExchangePointsScreenUiEvent {
         NavigationEvent,
         ExchangePointsScreenUiEvent
 
+    data class NavigateToUserVoucherDetail(val userVoucher: UserVoucher) :
+        NavigationEvent,
+        ExchangePointsScreenUiEvent
+
     data object NavigateToProfile : ExchangePointsScreenUiEvent, NavigationEvent
     data object Initialize : ExchangePointsScreenUiEvent
     data object Refresh : ExchangePointsScreenUiEvent
+    data class TabChanged(val tabIndex: Int) : ExchangePointsScreenUiEvent
     data class OnLoadVouchersFailed(val message: String) : ExchangePointsScreenUiEvent
 }
 
@@ -63,13 +72,19 @@ class ExchangePointsScreenViewModel(
                 postSideEffect(event)
             }
 
-            ExchangePointsScreenUiEvent.Initialize -> loadVouchers()
-            ExchangePointsScreenUiEvent.Refresh -> loadVouchers(true)
+            ExchangePointsScreenUiEvent.Initialize -> loadData()
+            ExchangePointsScreenUiEvent.Refresh -> loadData(true)
+            is ExchangePointsScreenUiEvent.TabChanged -> intent {
+                reduce { state.copy(currentTab = event.tabIndex) }
+                if (event.tabIndex == 1 && state.userVouchers.isEmpty()) {
+                    loadUserVouchers()
+                }
+            }
             else -> Unit
         }
     }
 
-    private fun loadVouchers(refresh: Boolean = false) = intent {
+    private fun loadData(refresh: Boolean = false) = intent {
         if (refresh) {
             reduce { state.copy(isLoading = true, error = null) }
         } else if (state.vouchers.isEmpty()) {
@@ -82,6 +97,18 @@ class ExchangePointsScreenViewModel(
                 isLoading = false,
                 vouchers = vouchers.toPersistentList(),
                 error = null
+            )
+        }
+    }
+
+    private fun loadUserVouchers() = intent {
+        reduce { state.copy(isLoadingUserVouchers = true) }
+
+        val userVouchers = repository.getUserVouchers()
+        reduce {
+            state.copy(
+                isLoadingUserVouchers = false,
+                userVouchers = userVouchers.toPersistentList()
             )
         }
     }
