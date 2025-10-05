@@ -5,6 +5,7 @@ import com.carissa.revibes.home_admin.presentation.screen.HomeAdminScreenUiEvent
 import com.ramcosta.composedestinations.generated.manageusers.destinations.ManageUsersScreenDestination
 import com.ramcosta.composedestinations.generated.managevoucher.destinations.ManageVoucherScreenDestination
 import com.ramcosta.composedestinations.generated.managetransaction.destinations.ManageTransactionScreenDestination
+import com.ramcosta.composedestinations.generated.manageclaimedvouchers.destinations.ManageClaimedVouchersScreenDestination
 import com.ramcosta.composedestinations.generated.profile.destinations.ProfileScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.core.annotation.Factory
@@ -16,6 +17,7 @@ class HomeAdminScreenNavigationHandler : NavigationEventHandler() {
         return event is HomeAdminScreenUiEvent.NavigateToManageUsers ||
             event is HomeAdminScreenUiEvent.NavigateToManageVouchers ||
             event is HomeAdminScreenUiEvent.NavigateToManageTransactions ||
+            event is HomeAdminScreenUiEvent.NavigateToClaimedVouchers ||
             event is HomeAdminScreenUiEvent.NavigateToProfile
     }
 
@@ -29,6 +31,9 @@ class HomeAdminScreenNavigationHandler : NavigationEventHandler() {
             )
             is HomeAdminScreenUiEvent.NavigateToManageTransactions -> navigator.navigate(
                 ManageTransactionScreenDestination
+            )
+            is HomeAdminScreenUiEvent.NavigateToClaimedVouchers -> navigator.navigate(
+                ManageClaimedVouchersScreenDestination
             )
             is HomeAdminScreenUiEvent.NavigateToProfile -> navigator.navigate(
                 ProfileScreenDestination

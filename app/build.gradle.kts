@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":features:home-admin"))
     implementation(project(":features:manage-users"))
     implementation(project(":features:manage-transaction"))
+    implementation(project(":features:manage-claimed-vouchers"))
     implementation(project(":features:manage-voucher"))
     implementation(project(":features:pick-up"))
     implementation(project(":features:point"))

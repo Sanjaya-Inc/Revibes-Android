@@ -10,4 +10,6 @@
     <string name="manage_vouchers_desc">Create and manage voucher campaigns</string>
     <string name="manage_transactions">Manage Transactions</string>
     <string name="manage_transactions_desc">Monitor and manage all transactions</string>
+    <string name="manage_claimed_vouchers">Claimed Vouchers</string>
+    <string name="manage_claimed_vouchers_desc">View user claimed vouchers and exchanges</string>
 </resources>

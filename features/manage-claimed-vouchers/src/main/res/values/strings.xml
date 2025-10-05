@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manage_claimed_vouchers_title">Claimed Vouchers</string>
+    <string name="search_claimed_vouchers">Search claimed vouchers...</string>
+    <string name="no_claimed_vouchers_found">No claimed vouchers found</string>
+    <string name="no_claimed_vouchers_found_for_search">No claimed vouchers found for your search</string>
+</resources>

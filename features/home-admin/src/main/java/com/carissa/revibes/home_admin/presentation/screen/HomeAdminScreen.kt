@@ -187,6 +187,14 @@ private fun AdminMenuSection(
                     eventReceiver.onEvent(HomeAdminScreenUiEvent.NavigateToManageTransactions)
                 }
             )
+
+            AdminMenuCard(
+                title = stringResource(R.string.manage_claimed_vouchers),
+                description = stringResource(R.string.manage_claimed_vouchers_desc),
+                onClick = {
+                    eventReceiver.onEvent(HomeAdminScreenUiEvent.NavigateToClaimedVouchers)
+                }
+            )
         }
     }
 }
