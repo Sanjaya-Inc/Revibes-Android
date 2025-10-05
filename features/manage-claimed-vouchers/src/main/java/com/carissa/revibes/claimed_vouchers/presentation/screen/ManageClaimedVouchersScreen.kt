@@ -113,14 +113,14 @@ fun ManageClaimedVouchersScreenContent(
                         Icon(
                             painter = painterResource(com.carissa.revibes.core.R.drawable.back_cta),
                             modifier = Modifier.size(86.dp),
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = RevibesTheme.colors.primary,
                             contentDescription = "Back"
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+                    titleContentColor = RevibesTheme.colors.primary
                 )
             )
         }
