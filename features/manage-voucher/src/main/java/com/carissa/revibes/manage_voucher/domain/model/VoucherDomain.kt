@@ -20,7 +20,9 @@ data class VoucherDomain(
     val isAvailable: Boolean = true,
     val inUse: Boolean = false,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val termConditions: List<String> = emptyList(),
+    val guides: List<String> = emptyList()
 ) {
     enum class VoucherType(val value: String) {
         PERCENT_OFF("percent-off"),

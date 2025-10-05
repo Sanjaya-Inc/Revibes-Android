@@ -71,13 +71,18 @@ class ManageVoucherRepository(
         conditions: VoucherConditions,
         claimPeriodStart: String,
         claimPeriodEnd: String,
-        imageUri: Uri
+        imageUri: Uri,
+        termConditions: List<String> = emptyList(),
+        guides: List<String> = emptyList()
     ) {
         execute {
             val conditionsJson = Json.encodeToString(
                 serializer = VoucherConditions.serializer(),
                 value = conditions
             )
+
+            val termConditionsJson = Json.encodeToString(termConditions)
+            val guidesJson = Json.encodeToString(guides)
 
             val inputStream = context.contentResolver.openInputStream(imageUri)
             val imageBytes =
@@ -93,6 +98,8 @@ class ManageVoucherRepository(
                     append("\"conditions\"", conditionsJson)
                     append("\"claimPeriodStart\"", claimPeriodStart)
                     append("\"claimPeriodEnd\"", claimPeriodEnd)
+                    append("\"termConditions\"", termConditionsJson)
+                    append("\"guides\"", guidesJson)
                     append(
                         "\"image\"",
                         imageBytes,

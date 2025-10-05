@@ -9,6 +9,9 @@ import com.carissa.revibes.manage_voucher.data.ManageVoucherRepository
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
 import com.carissa.revibes.manage_voucher.presentation.handler.ManageVoucherExceptionHandler
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.android.annotation.KoinViewModel
 
 data class AddVoucherScreenUiState(
@@ -30,6 +33,10 @@ data class AddVoucherScreenUiState(
     val selectedImageUri: Uri? = null,
     val isUploadingImage: Boolean = false,
     val showConditionsSection: Boolean = false,
+    val termConditions: ImmutableList<String> = persistentListOf(),
+    val guides: ImmutableList<String> = persistentListOf(),
+    val showTermConditionsSection: Boolean = false,
+    val showGuidesSection: Boolean = false,
     val codeError: String? = null,
     val nameError: String? = null,
     val descriptionError: String? = null,
@@ -41,7 +48,9 @@ data class AddVoucherScreenUiState(
     val maxDiscountAmountError: String? = null,
     val claimPeriodStartError: String? = null,
     val claimPeriodEndError: String? = null,
-    val imageError: String? = null
+    val imageError: String? = null,
+    val termConditionsError: String? = null,
+    val guidesError: String? = null
 )
 
 sealed interface AddVoucherScreenUiEvent {
@@ -71,6 +80,14 @@ sealed interface AddVoucherScreenUiEvent {
     data class OnImageUploadFailed(val message: String) : AddVoucherScreenUiEvent
     data object RemoveImage : AddVoucherScreenUiEvent
     data object ToggleConditionsSection : AddVoucherScreenUiEvent
+    data object ToggleTermConditionsSection : AddVoucherScreenUiEvent
+    data object ToggleGuidesSection : AddVoucherScreenUiEvent
+    data class AddTermCondition(val condition: String) : AddVoucherScreenUiEvent
+    data class RemoveTermCondition(val index: Int) : AddVoucherScreenUiEvent
+    data class UpdateTermCondition(val index: Int, val condition: String) : AddVoucherScreenUiEvent
+    data class AddGuide(val guide: String) : AddVoucherScreenUiEvent
+    data class RemoveGuide(val index: Int) : AddVoucherScreenUiEvent
+    data class UpdateGuide(val index: Int, val guide: String) : AddVoucherScreenUiEvent
     data class OnCreateVoucherFailed(val message: String) : AddVoucherScreenUiEvent
 }
 
@@ -110,6 +127,14 @@ class AddVoucherScreenViewModel(
             is AddVoucherScreenUiEvent.OnImageUploadFailed -> onImageUploadFailed(event.message)
             AddVoucherScreenUiEvent.RemoveImage -> removeImage()
             AddVoucherScreenUiEvent.ToggleConditionsSection -> toggleConditionsSection()
+            AddVoucherScreenUiEvent.ToggleTermConditionsSection -> toggleTermConditionsSection()
+            AddVoucherScreenUiEvent.ToggleGuidesSection -> toggleGuidesSection()
+            is AddVoucherScreenUiEvent.AddTermCondition -> addTermCondition(event.condition)
+            is AddVoucherScreenUiEvent.RemoveTermCondition -> removeTermCondition(event.index)
+            is AddVoucherScreenUiEvent.UpdateTermCondition -> updateTermCondition(event.index, event.condition)
+            is AddVoucherScreenUiEvent.AddGuide -> addGuide(event.guide)
+            is AddVoucherScreenUiEvent.RemoveGuide -> removeGuide(event.index)
+            is AddVoucherScreenUiEvent.UpdateGuide -> updateGuide(event.index, event.guide)
             else -> Unit
         }
     }
@@ -297,6 +322,81 @@ class AddVoucherScreenViewModel(
         reduce { state.copy(showConditionsSection = !state.showConditionsSection) }
     }
 
+    private fun toggleTermConditionsSection() = intent {
+        reduce { state.copy(showTermConditionsSection = !state.showTermConditionsSection) }
+    }
+
+    private fun toggleGuidesSection() = intent {
+        reduce { state.copy(showGuidesSection = !state.showGuidesSection) }
+    }
+
+    private fun addTermCondition(condition: String) = intent {
+        if (condition.isNotBlank()) {
+            reduce {
+                state.copy(
+                    termConditions = (state.termConditions + condition).toImmutableList(),
+                    termConditionsError = null
+                )
+            }
+        }
+    }
+
+    private fun removeTermCondition(index: Int) = intent {
+        if (index in state.termConditions.indices) {
+            reduce {
+                state.copy(
+                    termConditions = state.termConditions.toMutableList().apply { removeAt(index) }.toImmutableList()
+                )
+            }
+        }
+    }
+
+    private fun updateTermCondition(index: Int, condition: String) = intent {
+        if (index in state.termConditions.indices) {
+            reduce {
+                state.copy(
+                    termConditions = state.termConditions.toMutableList().apply {
+                        set(
+                            index,
+                            condition
+                        )
+                    }.toImmutableList(),
+                    termConditionsError = null
+                )
+            }
+        }
+    }
+
+    private fun addGuide(guide: String) = intent {
+        if (guide.isNotBlank()) {
+            reduce {
+                state.copy(
+                    guides = (state.guides + guide).toImmutableList(),
+                    guidesError = null
+                )
+            }
+        }
+    }
+
+    private fun removeGuide(index: Int) = intent {
+        if (index in state.guides.indices) {
+            reduce {
+                state.copy(guides = state.guides.toMutableList().apply { removeAt(index) }.toImmutableList())
+            }
+        }
+    }
+
+    private fun updateGuide(index: Int, guide: String) = intent {
+        if (index in state.guides.indices) {
+            reduce {
+                state.copy(
+                    guides = state.guides.toMutableList().apply { set(index, guide) }.toImmutableList(),
+                    guidesError = null
+                )
+            }
+        }
+    }
+
     private fun saveVoucher() {
         intent {
             val isFormValid = validateForm(state)
@@ -364,7 +464,9 @@ class AddVoucherScreenViewModel(
                     conditions = conditions,
                     claimPeriodStart = state.claimPeriodStart,
                     claimPeriodEnd = state.claimPeriodEnd,
-                    imageUri = selectedImageUri
+                    imageUri = selectedImageUri,
+                    termConditions = state.termConditions,
+                    guides = state.guides
                 )
 
                 reduce { state.copy(isLoading = false) }
@@ -389,7 +491,9 @@ class AddVoucherScreenViewModel(
             maxDiscountAmountError = null,
             claimPeriodStartError = null,
             claimPeriodEndError = null,
-            imageError = null
+            imageError = null,
+            termConditionsError = null,
+            guidesError = null
         )
 
         if (state.code.text.isBlank()) {
@@ -447,6 +551,16 @@ class AddVoucherScreenViewModel(
         if (state.selectedImageUri == null) {
             hasError = true
             newState = newState.copy(imageError = "Voucher image is required")
+        }
+
+        if (state.termConditions.isEmpty()) {
+            hasError = true
+            newState = newState.copy(termConditionsError = "At least one term condition is required")
+        }
+
+        if (state.guides.isEmpty()) {
+            hasError = true
+            newState = newState.copy(guidesError = "At least one guide is required")
         }
 
         intent { reduce { newState } }

@@ -15,7 +15,9 @@ data class CreateVoucherRequest(
     val conditions: VoucherConditionsRequest,
     val claimPeriodStart: String,
     val claimPeriodEnd: String,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val termConditions: List<String> = emptyList(),
+    val guides: List<String> = emptyList()
 )
 
 @Serializable
@@ -31,7 +33,9 @@ data class UpdateVoucherRequest(
     val claimPeriodStart: String,
     val claimPeriodEnd: String,
     val imageUrl: String? = null,
-    val isActive: Boolean
+    val isActive: Boolean,
+    val termConditions: List<String> = emptyList(),
+    val guides: List<String> = emptyList()
 )
 
 @Serializable

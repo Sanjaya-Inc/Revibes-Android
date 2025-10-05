@@ -73,6 +73,7 @@ import com.carissa.revibes.manage_voucher.presentation.navigation.ManageVoucherG
 import com.carissa.revibes.manage_voucher.presentation.screen.components.DatePicker
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.collections.immutable.ImmutableList
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -595,6 +596,44 @@ private fun AddVoucherContent(
                     }
                 }
 
+                // Term Conditions Section
+                TermConditionsCard(
+                    termConditions = state.termConditions,
+                    showSection = state.showTermConditionsSection,
+                    error = state.termConditionsError,
+                    onToggleSection = {
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.ToggleTermConditionsSection)
+                    },
+                    onAddCondition = { condition ->
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.AddTermCondition(condition))
+                    },
+                    onRemoveCondition = { index ->
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.RemoveTermCondition(index))
+                    },
+                    onUpdateCondition = { index, condition ->
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.UpdateTermCondition(index, condition))
+                    }
+                )
+
+                // Guides Section
+                GuidesCard(
+                    guides = state.guides,
+                    showSection = state.showGuidesSection,
+                    error = state.guidesError,
+                    onToggleSection = {
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.ToggleGuidesSection)
+                    },
+                    onAddGuide = { guide ->
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.AddGuide(guide))
+                    },
+                    onRemoveGuide = { index ->
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.RemoveGuide(index))
+                    },
+                    onUpdateGuide = { index, guide ->
+                        eventReceiver.onEvent(AddVoucherScreenUiEvent.UpdateGuide(index, guide))
+                    }
+                )
+
                 Spacer(modifier = Modifier.height(100.dp))
             }
 
@@ -763,6 +802,302 @@ private fun ImageUploadCard(
                     text = imageError,
                     style = MaterialTheme.typography.bodySmall,
                     color = RevibesTheme.colors.error
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TermConditionsCard(
+    termConditions: ImmutableList<String>,
+    showSection: Boolean,
+    error: String?,
+    onToggleSection: () -> Unit,
+    onAddCondition: (String) -> Unit,
+    onRemoveCondition: (Int) -> Unit,
+    onUpdateCondition: (Int, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var newConditionText by remember { mutableStateOf("") }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = RevibesTheme.colors.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Terms & Conditions",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = RevibesTheme.colors.primary
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Required",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = RevibesTheme.colors.error
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    TextButton(
+                        onClick = onToggleSection
+                    ) {
+                        Text(if (showSection) "Hide" else "Show")
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = if (showSection) {
+                                Icons.Default.KeyboardArrowUp
+                            } else {
+                                Icons.Default.KeyboardArrowDown
+                            },
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+
+            AnimatedVisibility(visible = showSection) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Add new condition
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        OutlinedTextField(
+                            value = newConditionText,
+                            onValueChange = { newConditionText = it },
+                            label = { Text("Add new condition") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            minLines = 2,
+                            maxLines = 3
+                        )
+
+                        IconButton(
+                            onClick = {
+                                if (newConditionText.isNotBlank()) {
+                                    onAddCondition(newConditionText.trim())
+                                    newConditionText = ""
+                                }
+                            },
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add condition",
+                                tint = RevibesTheme.colors.primary
+                            )
+                        }
+                    }
+
+                    // Display existing conditions
+                    termConditions.forEachIndexed { index, condition ->
+                        var editingCondition by remember { mutableStateOf(condition) }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            OutlinedTextField(
+                                value = editingCondition,
+                                onValueChange = {
+                                    editingCondition = it
+                                    onUpdateCondition(index, it)
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                minLines = 2,
+                                maxLines = 3
+                            )
+
+                            IconButton(
+                                onClick = { onRemoveCondition(index) },
+                                modifier = Modifier.padding(top = 8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Remove condition",
+                                    tint = RevibesTheme.colors.error
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!showSection && error != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = error,
+                    color = RevibesTheme.colors.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GuidesCard(
+    guides: ImmutableList<String>,
+    showSection: Boolean,
+    error: String?,
+    onToggleSection: () -> Unit,
+    onAddGuide: (String) -> Unit,
+    onRemoveGuide: (Int) -> Unit,
+    onUpdateGuide: (Int, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var newGuideText by remember { mutableStateOf("") }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = RevibesTheme.colors.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Usage Guides",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = RevibesTheme.colors.primary
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Required",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = RevibesTheme.colors.error
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    TextButton(
+                        onClick = onToggleSection
+                    ) {
+                        Text(if (showSection) "Hide" else "Show")
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = if (showSection) {
+                                Icons.Default.KeyboardArrowUp
+                            } else {
+                                Icons.Default.KeyboardArrowDown
+                            },
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+
+            AnimatedVisibility(visible = showSection) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Add new guide
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        OutlinedTextField(
+                            value = newGuideText,
+                            onValueChange = { newGuideText = it },
+                            label = { Text("Add new guide") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            minLines = 2,
+                            maxLines = 3
+                        )
+
+                        IconButton(
+                            onClick = {
+                                if (newGuideText.isNotBlank()) {
+                                    onAddGuide(newGuideText.trim())
+                                    newGuideText = ""
+                                }
+                            },
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add guide",
+                                tint = RevibesTheme.colors.primary
+                            )
+                        }
+                    }
+
+                    // Display existing guides
+                    guides.forEachIndexed { index, guide ->
+                        var editingGuide by remember { mutableStateOf(guide) }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            OutlinedTextField(
+                                value = editingGuide,
+                                onValueChange = {
+                                    editingGuide = it
+                                    onUpdateGuide(index, it)
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                minLines = 2,
+                                maxLines = 3
+                            )
+
+                            IconButton(
+                                onClick = { onRemoveGuide(index) },
+                                modifier = Modifier.padding(top = 8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Remove guide",
+                                    tint = RevibesTheme.colors.error
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!showSection && error != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = error,
+                    color = RevibesTheme.colors.error,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
