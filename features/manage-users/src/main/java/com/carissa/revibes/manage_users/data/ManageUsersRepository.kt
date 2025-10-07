@@ -1,6 +1,8 @@
 package com.carissa.revibes.manage_users.data
 
 import com.carissa.revibes.core.data.utils.BaseRepository
+import com.carissa.revibes.exchange_points.data.mapper.toUserVoucher
+import com.carissa.revibes.exchange_points.domain.model.UserVoucher
 import com.carissa.revibes.manage_users.data.mapper.mapToUserRole
 import com.carissa.revibes.manage_users.data.mapper.toUserDomain
 import com.carissa.revibes.manage_users.data.mapper.toUserDomainList
@@ -117,6 +119,13 @@ class ManageUsersRepository(
                 role = role,
                 updatedAt = "2024-01-01T00:00:00.000Z"
             )
+        }
+    }
+
+    suspend fun getUserVouchers(id: String): List<UserVoucher> {
+        return execute {
+            val response = remoteApi.getUserVouchers(id)
+            response.data.items.map { it.toUserVoucher() }
         }
     }
 }

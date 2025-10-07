@@ -1,5 +1,6 @@
 package com.carissa.revibes.manage_users.data.remote
 
+import com.carissa.revibes.exchange_points.data.model.UserVoucherResponse
 import com.carissa.revibes.manage_users.data.model.AddPointsRequest
 import com.carissa.revibes.manage_users.data.model.AddPointsResponse
 import com.carissa.revibes.manage_users.data.model.CreateUserRequest
@@ -43,6 +44,14 @@ interface ManageUsersRemoteApi {
     suspend fun createUser(
         @Body request: CreateUserRequest
     ): CreateUserResponse
+
+    @GET("users/{id}/vouchers")
+    suspend fun getUserVouchers(
+        @Path("id") id: String,
+        @Query("limit") limit: Int = 10,
+        @Query("sortBy") sortBy: String = "createdAt",
+        @Query("sortOrder") sortOrder: String = "desc"
+    ): UserVoucherResponse
 }
 
 @Single

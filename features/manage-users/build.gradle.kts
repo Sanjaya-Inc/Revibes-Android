@@ -22,5 +22,6 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":features:exchange-points"))
     implementation(sjy.accompanist.permissions)
 }

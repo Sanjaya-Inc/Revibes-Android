@@ -2,9 +2,13 @@ package com.carissa.revibes.manage_users.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
+import com.carissa.revibes.exchange_points.domain.model.UserVoucher
 import com.carissa.revibes.manage_users.data.ManageUsersRepository
 import com.carissa.revibes.manage_users.domain.model.UserDomain
 import com.carissa.revibes.manage_users.presentation.handler.ManageUsersExceptionHandler
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.android.annotation.KoinViewModel
 
 data class EditUserScreenUiState(
@@ -12,11 +16,14 @@ data class EditUserScreenUiState(
     val isLoadingAddPoints: Boolean = false,
     val isLoadingDeductPoints: Boolean = false,
     val isLoadingEditUser: Boolean = false,
+    val isLoadingVouchers: Boolean = false,
     val user: UserDomain? = null,
+    val userVouchers: ImmutableList<UserVoucher> = persistentListOf(),
     val pointsToAdd: TextFieldValue = TextFieldValue(),
     val pointsToDeduct: TextFieldValue = TextFieldValue(),
     val pointsError: String? = null,
     val deductPointsError: String? = null,
+    val vouchersError: String? = null,
     val error: String? = null,
     val showAddPointsDialog: Boolean = false,
     val showDeductPointsDialog: Boolean = false,
@@ -34,6 +41,7 @@ data class EditUserScreenUiState(
 sealed interface EditUserScreenUiEvent {
     data class SetUserId(val userId: String) : EditUserScreenUiEvent
     data object LoadUserDetail : EditUserScreenUiEvent
+    data object LoadUserVouchers : EditUserScreenUiEvent
     data object ShowAddPointsDialog : EditUserScreenUiEvent
     data object HideAddPointsDialog : EditUserScreenUiEvent
     data object ShowDeductPointsDialog : EditUserScreenUiEvent
@@ -53,6 +61,7 @@ sealed interface EditUserScreenUiEvent {
     data class OnAddPointsFailed(val message: String) : EditUserScreenUiEvent
     data class OnDeductPointsFailed(val message: String) : EditUserScreenUiEvent
     data class OnEditUserFailed(val message: String) : EditUserScreenUiEvent
+    data class OnLoadVouchersFailed(val message: String) : EditUserScreenUiEvent
 }
 
 @KoinViewModel
@@ -77,6 +86,7 @@ class EditUserScreenViewModel(
         when (event) {
             is EditUserScreenUiEvent.SetUserId -> setUserId(event.userId)
             EditUserScreenUiEvent.LoadUserDetail -> loadUserDetail()
+            EditUserScreenUiEvent.LoadUserVouchers -> loadUserVouchers()
             EditUserScreenUiEvent.ShowAddPointsDialog -> showAddPointsDialog()
             EditUserScreenUiEvent.HideAddPointsDialog -> hideAddPointsDialog()
             EditUserScreenUiEvent.ShowDeductPointsDialog -> showDeductPointsDialog()
@@ -99,6 +109,7 @@ class EditUserScreenViewModel(
     private fun setUserId(id: String) {
         userId = id
         onEvent(EditUserScreenUiEvent.LoadUserDetail)
+        onEvent(EditUserScreenUiEvent.LoadUserVouchers)
     }
 
     private fun loadUserDetail() = intent {
@@ -114,6 +125,30 @@ class EditUserScreenViewModel(
                 user = user,
                 error = null
             )
+        }
+    }
+
+    private fun loadUserVouchers() = intent {
+        if (userId.isEmpty()) return@intent
+
+        reduce { state.copy(isLoadingVouchers = true, vouchersError = null) }
+
+        try {
+            val vouchers = repository.getUserVouchers(userId)
+            reduce {
+                state.copy(
+                    isLoadingVouchers = false,
+                    userVouchers = vouchers.toImmutableList(),
+                    vouchersError = null
+                )
+            }
+        } catch (e: Exception) {
+            reduce {
+                state.copy(
+                    isLoadingVouchers = false,
+                    vouchersError = e.message ?: "Failed to load vouchers"
+                )
+            }
         }
     }
 

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,11 +51,15 @@ import com.carissa.revibes.core.presentation.compose.RevibesTheme.navigator
 import com.carissa.revibes.core.presentation.compose.components.Button
 import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
 import com.carissa.revibes.core.presentation.compose.components.Text
+import com.carissa.revibes.exchange_points.domain.model.UserVoucher
+import com.carissa.revibes.exchange_points.presentation.component.UserVoucherItem
 import com.carissa.revibes.manage_users.R
 import com.carissa.revibes.manage_users.domain.model.UserDomain
 import com.carissa.revibes.manage_users.presentation.navigation.ManageUsersGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -86,6 +93,10 @@ fun EditUserScreen(
             }
 
             is EditUserScreenUiEvent.OnLoadUserFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is EditUserScreenUiEvent.OnLoadVouchersFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
@@ -189,6 +200,13 @@ private fun EditUserScreenContent(
                             modifier = Modifier.weight(1f),
                         )
                     }
+
+                    UserVouchersSection(
+                        vouchers = uiState.userVouchers,
+                        isLoading = uiState.isLoadingVouchers,
+                        error = uiState.vouchersError,
+                        onRetry = { onEvent(EditUserScreenUiEvent.LoadUserVouchers) }
+                    )
                 }
             }
         }
@@ -692,13 +710,118 @@ private fun EditUserDialog(
     )
 }
 
+@Composable
+private fun UserVouchersSection(
+    vouchers: ImmutableList<UserVoucher>,
+    isLoading: Boolean,
+    error: String?,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = RevibesTheme.colors.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "User Vouchers",
+                style = RevibesTheme.typography.h3,
+                color = RevibesTheme.colors.onSurface,
+                fontWeight = FontWeight.Bold
+            )
+
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = RevibesTheme.colors.primary
+                        )
+                    }
+                }
+
+                error != null -> {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = error,
+                            style = RevibesTheme.typography.body1,
+                            color = RevibesTheme.colors.error
+                        )
+                        Button(
+                            text = "Retry",
+                            onClick = onRetry
+                        )
+                    }
+                }
+
+                vouchers.isEmpty() -> {
+                    Text(
+                        text = "No vouchers found",
+                        style = RevibesTheme.typography.body1,
+                        color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .size(300.dp), // Constrain height to prevent infinite height issues
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(vouchers) { voucher ->
+                            UserVoucherItem(
+                                userVoucher = voucher,
+                                onClick = { /* Handle voucher click if needed */ }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun EditUserScreenPreview() {
     RevibesTheme {
         EditUserScreenContent(
             uiState = EditUserScreenUiState(
-                user = UserDomain.dummy()
+                user = UserDomain.dummy(),
+                userVouchers = persistentListOf(
+                    UserVoucher(
+                        id = "1",
+                        voucherId = "voucher1",
+                        status = "available",
+                        claimedAt = null,
+                        expiredAt = null,
+                        createdAt = "2025-10-05T13:07:29.226Z",
+                        updatedAt = "2025-10-05T13:07:29.226Z",
+                        name = "Economical Grocery Package",
+                        description = "Affordable Grocery Sembako Package",
+                        imageUri = "",
+                        code = "RVB-ESP-65481",
+                        guides = emptyList(),
+                        termConditions = emptyList()
+                    )
+                )
             ),
             onEvent = {},
             onNavigateBack = {},
