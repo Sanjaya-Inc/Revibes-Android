@@ -28,9 +28,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -97,6 +100,10 @@ fun EditUserScreen(
             }
 
             is EditUserScreenUiEvent.OnLoadVouchersFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is EditUserScreenUiEvent.OnRedeemVoucherFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
@@ -205,7 +212,10 @@ private fun EditUserScreenContent(
                         vouchers = uiState.userVouchers,
                         isLoading = uiState.isLoadingVouchers,
                         error = uiState.vouchersError,
-                        onRetry = { onEvent(EditUserScreenUiEvent.LoadUserVouchers) }
+                        onRetry = { onEvent(EditUserScreenUiEvent.LoadUserVouchers) },
+                        onVoucherSwipe = { voucher ->
+                            onEvent(EditUserScreenUiEvent.ShowRedeemConfirmDialog(voucher))
+                        }
                     )
                 }
             }
@@ -232,6 +242,15 @@ private fun EditUserScreenContent(
                 uiState = uiState,
                 onEvent = onEvent,
                 onDismiss = { onEvent(EditUserScreenUiEvent.HideEditUserDialog) }
+            )
+        }
+
+        if (uiState.showRedeemConfirmDialog) {
+            RedeemVoucherConfirmDialog(
+                voucher = uiState.voucherToRedeem,
+                isLoading = uiState.isRedeemingVoucher,
+                onConfirm = { onEvent(EditUserScreenUiEvent.RedeemVoucher) },
+                onDismiss = { onEvent(EditUserScreenUiEvent.HideRedeemConfirmDialog) }
             )
         }
     }
@@ -716,7 +735,8 @@ private fun UserVouchersSection(
     isLoading: Boolean,
     error: String?,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onVoucherSwipe: (UserVoucher) -> Unit = {},
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -782,13 +802,13 @@ private fun UserVouchersSection(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .size(300.dp), // Constrain height to prevent infinite height issues
+                            .size(300.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(vouchers) { voucher ->
-                            UserVoucherItem(
-                                userVoucher = voucher,
-                                onClick = { /* Handle voucher click if needed */ }
+                        items(vouchers, key = { it.id }) { voucher ->
+                            SwipeableVoucherItem(
+                                voucher = voucher,
+                                onSwipeToRedeem = { onVoucherSwipe(voucher) }
                             )
                         }
                     }
@@ -796,6 +816,123 @@ private fun UserVouchersSection(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeableVoucherItem(
+    voucher: UserVoucher,
+    onSwipeToRedeem: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val swipeState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { value ->
+            if (value == SwipeToDismissBoxValue.EndToStart) {
+                onSwipeToRedeem()
+                false
+            } else {
+                false
+            }
+        }
+    )
+
+    SwipeToDismissBox(
+        state = swipeState,
+        modifier = modifier,
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .fillMaxSize()
+                    .background(RevibesTheme.colors.primary)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(com.carissa.revibes.core.R.drawable.back_cta),
+                        contentDescription = "Redeem",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "Redeem",
+                        style = RevibesTheme.typography.button,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        },
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = true
+    ) {
+        UserVoucherItem(
+            userVoucher = voucher,
+            onClick = {}
+        )
+    }
+}
+
+@Composable
+private fun RedeemVoucherConfirmDialog(
+    voucher: UserVoucher?,
+    isLoading: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    if (voucher == null) return
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Redeem Voucher",
+                style = RevibesTheme.typography.h3,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Are you sure you want to redeem this voucher?",
+                    style = RevibesTheme.typography.body1
+                )
+                Text(
+                    text = "Voucher: ${voucher.name}",
+                    style = RevibesTheme.typography.body1,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "Code: ${voucher.code}",
+                    style = RevibesTheme.typography.body1,
+                    color = RevibesTheme.colors.primary
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                text = "Redeem",
+                onClick = onConfirm,
+                enabled = !isLoading,
+                loading = isLoading
+            )
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = "Cancel",
+                    style = RevibesTheme.typography.button,
+                    color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
+                )
+            }
+        }
+    )
 }
 
 @Preview

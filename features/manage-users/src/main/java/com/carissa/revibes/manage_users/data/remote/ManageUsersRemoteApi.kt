@@ -52,6 +52,12 @@ interface ManageUsersRemoteApi {
         @Query("sortBy") sortBy: String = "createdAt",
         @Query("sortOrder") sortOrder: String = "desc"
     ): UserVoucherResponse
+
+    @PATCH("users/{id}/vouchers/{voucherId}/use")
+    suspend fun redeemVoucher(
+        @Path("id") id: String,
+        @Path("voucherId") voucherId: String
+    )
 }
 
 @Single

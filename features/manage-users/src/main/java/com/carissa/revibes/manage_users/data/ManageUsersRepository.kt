@@ -128,4 +128,10 @@ class ManageUsersRepository(
             response.data.items.map { it.toUserVoucher() }
         }
     }
+
+    suspend fun redeemVoucher(userId: String, voucherId: String) {
+        return execute {
+            remoteApi.redeemVoucher(userId, voucherId)
+        }
+    }
 }

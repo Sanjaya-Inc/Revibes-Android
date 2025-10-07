@@ -17,6 +17,7 @@ data class EditUserScreenUiState(
     val isLoadingDeductPoints: Boolean = false,
     val isLoadingEditUser: Boolean = false,
     val isLoadingVouchers: Boolean = false,
+    val isRedeemingVoucher: Boolean = false,
     val user: UserDomain? = null,
     val userVouchers: ImmutableList<UserVoucher> = persistentListOf(),
     val pointsToAdd: TextFieldValue = TextFieldValue(),
@@ -28,6 +29,8 @@ data class EditUserScreenUiState(
     val showAddPointsDialog: Boolean = false,
     val showDeductPointsDialog: Boolean = false,
     val showEditUserDialog: Boolean = false,
+    val showRedeemConfirmDialog: Boolean = false,
+    val voucherToRedeem: UserVoucher? = null,
     val isSuccess: Boolean = false,
     val editUserName: TextFieldValue = TextFieldValue(),
     val editUserEmail: TextFieldValue = TextFieldValue(),
@@ -48,6 +51,9 @@ sealed interface EditUserScreenUiEvent {
     data object HideDeductPointsDialog : EditUserScreenUiEvent
     data object ShowEditUserDialog : EditUserScreenUiEvent
     data object HideEditUserDialog : EditUserScreenUiEvent
+    data class ShowRedeemConfirmDialog(val voucher: UserVoucher) : EditUserScreenUiEvent
+    data object HideRedeemConfirmDialog : EditUserScreenUiEvent
+    data object RedeemVoucher : EditUserScreenUiEvent
     data object AddPoints : EditUserScreenUiEvent
     data object DeductPoints : EditUserScreenUiEvent
     data object EditUser : EditUserScreenUiEvent
@@ -62,6 +68,7 @@ sealed interface EditUserScreenUiEvent {
     data class OnDeductPointsFailed(val message: String) : EditUserScreenUiEvent
     data class OnEditUserFailed(val message: String) : EditUserScreenUiEvent
     data class OnLoadVouchersFailed(val message: String) : EditUserScreenUiEvent
+    data class OnRedeemVoucherFailed(val message: String) : EditUserScreenUiEvent
 }
 
 @KoinViewModel
@@ -93,6 +100,9 @@ class EditUserScreenViewModel(
             EditUserScreenUiEvent.HideDeductPointsDialog -> hideDeductPointsDialog()
             EditUserScreenUiEvent.ShowEditUserDialog -> showEditUserDialog()
             EditUserScreenUiEvent.HideEditUserDialog -> hideEditUserDialog()
+            is EditUserScreenUiEvent.ShowRedeemConfirmDialog -> showRedeemConfirmDialog(event.voucher)
+            EditUserScreenUiEvent.HideRedeemConfirmDialog -> hideRedeemConfirmDialog()
+            EditUserScreenUiEvent.RedeemVoucher -> redeemVoucher()
             EditUserScreenUiEvent.AddPoints -> addPoints()
             EditUserScreenUiEvent.DeductPoints -> deductPoints()
             EditUserScreenUiEvent.EditUser -> editUser()
@@ -422,6 +432,54 @@ class EditUserScreenViewModel(
                 editUserPhoneError = null,
                 isSuccess = true
             )
+        }
+    }
+
+    private fun showRedeemConfirmDialog(voucher: UserVoucher) = intent {
+        reduce {
+            state.copy(
+                showRedeemConfirmDialog = true,
+                voucherToRedeem = voucher
+            )
+        }
+    }
+
+    private fun hideRedeemConfirmDialog() = intent {
+        reduce {
+            state.copy(
+                showRedeemConfirmDialog = false,
+                voucherToRedeem = null
+            )
+        }
+    }
+
+    private fun redeemVoucher() = intent {
+        val voucher = state.voucherToRedeem ?: return@intent
+
+        reduce { state.copy(isRedeemingVoucher = true) }
+
+        try {
+            repository.redeemVoucher(userId, voucher.id)
+
+            reduce {
+                state.copy(
+                    isRedeemingVoucher = false,
+                    showRedeemConfirmDialog = false,
+                    voucherToRedeem = null,
+                    isSuccess = true
+                )
+            }
+
+            onEvent(EditUserScreenUiEvent.LoadUserVouchers)
+        } catch (e: Exception) {
+            reduce {
+                state.copy(
+                    isRedeemingVoucher = false,
+                    showRedeemConfirmDialog = false,
+                    voucherToRedeem = null
+                )
+            }
+            postSideEffect(EditUserScreenUiEvent.OnRedeemVoucherFailed(e.message ?: "Failed to redeem voucher"))
         }
     }
 }
