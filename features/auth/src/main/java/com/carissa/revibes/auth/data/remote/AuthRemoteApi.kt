@@ -19,10 +19,26 @@ interface AuthRemoteApi {
         @Field("password") password: String
     ): LoginResponse
 
+    @POST("auth/login/phone")
+    @FormUrlEncoded
+    suspend fun loginWithPhone(
+        @Field("phone") email: String,
+        @Field("password") password: String
+    ): LoginResponse
+
     @POST("auth/signup/email")
     @FormUrlEncoded
     suspend fun signUpWithEmail(
         @Field("email") email: String,
+        @Field("displayName") displayName: String,
+        @Field("phoneNumber") phoneNumber: String,
+        @Field("password") password: String
+    )
+
+    @POST("auth/signup/email")
+    @FormUrlEncoded
+    suspend fun signUpWithPhone(
+        @Field("phone") phone: String,
         @Field("displayName") displayName: String,
         @Field("phoneNumber") phoneNumber: String,
         @Field("password") password: String

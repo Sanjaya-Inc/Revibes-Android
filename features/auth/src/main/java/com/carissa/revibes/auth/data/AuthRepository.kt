@@ -11,6 +11,10 @@ import org.koin.core.annotation.Single
 class AuthRepository(private val remoteApi: AuthRemoteApi) :
     BaseRepository(shouldKickWhenAuthFailed = false) {
 
+    suspend fun loginWithPhone(phone: String, password: String): LoginResult {
+        return execute { remoteApi.loginWithPhone(phone, password).toDomain() }
+    }
+
     suspend fun loginWithEmail(email: String, password: String): LoginResult {
         return execute { remoteApi.loginWithEmail(email, password).toDomain() }
     }

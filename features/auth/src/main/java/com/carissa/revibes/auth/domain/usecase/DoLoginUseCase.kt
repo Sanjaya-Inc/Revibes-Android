@@ -2,7 +2,8 @@ package com.carissa.revibes.auth.domain.usecase
 
 import com.carissa.revibes.auth.data.AuthRepository
 import com.carissa.revibes.auth.data.local.DeviceIdDataSource
-import com.carissa.revibes.auth.presentation.mapper.toUserData
+import com.carissa.revibes.auth.presentation.mapper.toUserDataWithEmail
+import com.carissa.revibes.auth.presentation.mapper.toUserDataWithPhone
 import com.carissa.revibes.core.data.auth.local.AuthTokenDataSource
 import com.carissa.revibes.core.data.user.local.UserDataSource
 import com.carissa.revibes.core.data.user.model.UserData
@@ -26,13 +27,20 @@ class DoLoginUseCase(
     private val appScope: AppScope
 ) : BaseUseCase() {
 
-    suspend operator fun invoke(email: String, password: String): UserData {
+    suspend operator fun invoke(isPhone: Boolean, userName: String, password: String): UserData {
         return execute {
             coroutineScope {
                 val userData = async(appDispatchers.io) {
-                    val result = authRepo.loginWithEmail(email, password)
+                    val result = when (isPhone) {
+                        true -> authRepo.loginWithPhone(userName, password)
+                        false -> authRepo.loginWithEmail(userName, password)
+                    }
                     authTokenDataSource.setAuthToken(result.tokens.accessToken)
-                    result.user.toUserData(email).also { userData ->
+                    val user = when (isPhone) {
+                        true -> result.user.toUserDataWithEmail(userName)
+                        false -> result.user.toUserDataWithPhone(userName)
+                    }
+                    user.also { userData ->
                         userDataSource.setUserValue(userData)
                     }
                 }

@@ -6,10 +6,13 @@ package com.carissa.revibes.auth.presentation.screen.login
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +32,9 @@ import com.carissa.revibes.core.presentation.compose.auth.AuthActionButton
 import com.carissa.revibes.core.presentation.compose.auth.AuthNavigationRow
 import com.carissa.revibes.core.presentation.compose.auth.EmailField
 import com.carissa.revibes.core.presentation.compose.auth.PasswordField
+import com.carissa.revibes.core.presentation.compose.auth.PhoneField
+import com.carissa.revibes.core.presentation.compose.components.StateSwitcherAnimator
+import com.carissa.revibes.core.presentation.compose.components.TabButton
 import com.carissa.revibes.core.presentation.compose.components.Text
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.auth.destinations.LoginScreenDestination
@@ -97,14 +103,61 @@ private fun LoginScreenContent(
                     .padding(bottom = 32.dp)
             )
 
-            EmailField(
-                value = uiState.email,
-                onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.EmailChanged(it)) },
-                label = stringResource(R.string.label_enter_email),
-                isEnabled = !uiState.isLoading,
-                errorText = uiState.emailError
+            Text(
+                text = stringResource(R.string.label_login_with),
+                style = RevibesTheme.typography.h4,
+                modifier = Modifier.padding(bottom = 16.dp),
+                textAlign = TextAlign.Center,
+                color = RevibesTheme.colors.primary,
             )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TabButton(
+                    "Email",
+                    uiState.loginType == LoginScreenUiState.Type.EMAIL,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        eventReceiver.onEvent(
+                            LoginScreenUiEvent.ChangeLoginType(LoginScreenUiState.Type.EMAIL)
+                        )
+                    }
+                )
+                TabButton(
+                    "Phone Number",
+                    uiState.loginType == LoginScreenUiState.Type.PHONE_NUMBER,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        eventReceiver.onEvent(
+                            LoginScreenUiEvent.ChangeLoginType(LoginScreenUiState.Type.PHONE_NUMBER)
+                        )
+                    }
+                )
+            }
 
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 16.dp),
+                color = RevibesTheme.colors.primary
+            )
+            StateSwitcherAnimator(
+                uiState.loginType
+            ) { type ->
+                when (uiState.loginType) {
+                    LoginScreenUiState.Type.EMAIL -> EmailField(
+                        value = uiState.userName,
+                        onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.EmailChanged(it)) },
+                        label = stringResource(R.string.label_enter_email),
+                        isEnabled = !uiState.isLoading,
+                        errorText = uiState.emailError
+                    )
+
+                    LoginScreenUiState.Type.PHONE_NUMBER -> PhoneField(
+                        value = uiState.userName,
+                        onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.EmailChanged(it)) },
+                        label = stringResource(R.string.label_enter_phone),
+                        isEnabled = !uiState.isLoading,
+                        errorText = uiState.phoneError
+                    )
+                }
+            }
             PasswordField(
                 value = uiState.password,
                 onValueChange = { eventReceiver.onEvent(LoginScreenUiEvent.PasswordChanged(it)) },

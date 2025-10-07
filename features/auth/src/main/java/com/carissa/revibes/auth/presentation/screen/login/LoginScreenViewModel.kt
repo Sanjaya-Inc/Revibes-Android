@@ -10,21 +10,30 @@ import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.util.EmailValidator
 import com.carissa.revibes.core.presentation.util.PasswordValidator
+import com.carissa.revibes.core.presentation.util.PhoneValidator
 import org.koin.android.annotation.KoinViewModel
 
 data class LoginScreenUiState(
     val isLoading: Boolean = false,
-    val email: TextFieldValue = TextFieldValue(),
+    val loginType: Type = Type.EMAIL,
+    val userName: TextFieldValue = TextFieldValue(),
     val password: TextFieldValue = TextFieldValue()
 ) {
     val emailError: String?
-        get() = EmailValidator.validate(email.text)
+        get() = EmailValidator.validate(userName.text)
+
+    val phoneError: String?
+        get() = PhoneValidator.validate(userName.text)
 
     val passwordError: String?
         get() = PasswordValidator.validate(password.text)
 
     val isButtonEnabled: Boolean
-        get() = emailError == null && passwordError == null
+        get() = (emailError == null || phoneError == null) && passwordError == null
+
+    enum class Type {
+        EMAIL, PHONE_NUMBER
+    }
 }
 
 sealed interface LoginScreenUiEvent {
@@ -36,6 +45,7 @@ sealed interface LoginScreenUiEvent {
     data class PasswordChanged(val password: TextFieldValue) : LoginScreenUiEvent
     data object SubmitLogin : LoginScreenUiEvent
     data class LoginError(val message: String) : LoginScreenUiEvent
+    data class ChangeLoginType(val type: LoginScreenUiState.Type) : LoginScreenUiEvent
 }
 
 @KoinViewModel
@@ -55,7 +65,7 @@ class LoginScreenViewModel(
             super.onEvent(event)
             when (event) {
                 is LoginScreenUiEvent.EmailChanged -> reduce {
-                    this.state.copy(email = event.email)
+                    this.state.copy(userName = event.email)
                 }
 
                 is LoginScreenUiEvent.PasswordChanged -> reduce {
@@ -63,9 +73,14 @@ class LoginScreenViewModel(
                 }
 
                 LoginScreenUiEvent.SubmitLogin -> loginSubmitHandler.doLogin(
+                    this.state.loginType,
                     this@LoginScreenViewModel,
                     this
                 )
+
+                is LoginScreenUiEvent.ChangeLoginType -> reduce {
+                    this.state.copy(loginType = event.type, userName = TextFieldValue())
+                }
 
                 else -> postSideEffect(event)
             }
