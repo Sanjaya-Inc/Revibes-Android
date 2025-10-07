@@ -12,15 +12,16 @@ class LoginSubmitHandler(
     private val doLoginUseCase: DoLoginUseCase
 ) {
     suspend fun doLogin(
+        type: LoginScreenUiState.Type,
         eventReceiver: EventReceiver<LoginScreenUiEvent>,
         syntax: Syntax<LoginScreenUiState, LoginScreenUiEvent>,
     ) {
         syntax.reduce {
             this.state.copy(isLoading = true)
         }
-        val email = syntax.state.email.text.trim()
+        val userName = syntax.state.userName.text.trim()
         val password = syntax.state.password.text.trim()
-        val userData = doLoginUseCase(email, password)
+        val userData = doLoginUseCase(type == LoginScreenUiState.Type.PHONE_NUMBER, userName, password)
         if (userData.role == "admin") {
             eventReceiver.onEvent(LoginScreenUiEvent.NavigateToAdminHome)
         } else {

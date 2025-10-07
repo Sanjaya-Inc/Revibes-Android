@@ -42,7 +42,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -592,7 +592,7 @@ private fun ItemSection(
                             },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                             modifier = Modifier
-                                .menuAnchor(type = MenuAnchorType.PrimaryEditable, enabled = true)
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
                                 .fillMaxWidth(),
                             colors = OutlinedTextFieldDefaults.colors().copy(
                                 focusedContainerColor = DropOffTextFieldBg,
@@ -644,7 +644,7 @@ private fun ItemSection(
                             },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = weightExpanded) },
                             modifier = Modifier
-                                .menuAnchor(type = MenuAnchorType.PrimaryEditable, enabled = true)
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
                                 .fillMaxWidth(),
                             colors = OutlinedTextFieldDefaults.colors().copy(
                                 focusedContainerColor = DropOffTextFieldBg,

@@ -269,7 +269,7 @@ fun VoucherItem(
                                 VoucherDomain.VoucherType.PERCENT_OFF -> "${voucher.value.amount.toInt()}%"
                                 VoucherDomain.VoucherType.FIXED_AMOUNT -> {
                                     val formatter =
-                                        NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+                                        NumberFormat.getCurrencyInstance(Locale.forLanguageTag("id-ID"))
                                     formatter.format(voucher.value.amount)
                                 }
                             },
