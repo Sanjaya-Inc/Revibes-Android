@@ -11,10 +11,6 @@ data class Pagination(
     val sortBy: String,
     @SerialName("sortOrder")
     val sortOrder: String,
-    @SerialName("lastDocId")
-    val lastDocId: String,
-    @SerialName("firstDocId")
-    val firstDocId: String,
     @SerialName("direction")
     val direction: String,
     @SerialName("hasMoreNext")
