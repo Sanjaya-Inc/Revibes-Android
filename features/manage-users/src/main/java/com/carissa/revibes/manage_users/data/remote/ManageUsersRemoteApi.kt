@@ -5,6 +5,8 @@ import com.carissa.revibes.manage_users.data.model.AddPointsRequest
 import com.carissa.revibes.manage_users.data.model.AddPointsResponse
 import com.carissa.revibes.manage_users.data.model.CreateUserRequest
 import com.carissa.revibes.manage_users.data.model.CreateUserResponse
+import com.carissa.revibes.manage_users.data.model.UpdateUserRequest
+import com.carissa.revibes.manage_users.data.model.UpdateUserResponse
 import com.carissa.revibes.manage_users.data.model.UserDetailResponse
 import com.carissa.revibes.manage_users.data.model.UserListResponse
 import de.jensklingenberg.ktorfit.Ktorfit
@@ -13,6 +15,7 @@ import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.Headers
 import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 import org.koin.core.annotation.Single
@@ -58,6 +61,13 @@ interface ManageUsersRemoteApi {
         @Path("id") id: String,
         @Path("voucherId") voucherId: String
     )
+
+    @PUT("users/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateUser(
+        @Path("id") id: String,
+        @Body request: UpdateUserRequest
+    ): UpdateUserResponse
 }
 
 @Single

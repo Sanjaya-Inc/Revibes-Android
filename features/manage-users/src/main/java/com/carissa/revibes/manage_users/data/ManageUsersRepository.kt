@@ -4,11 +4,13 @@ import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.exchange_points.data.mapper.toUserVoucher
 import com.carissa.revibes.exchange_points.domain.model.UserVoucher
 import com.carissa.revibes.manage_users.data.mapper.mapToUserRole
+import com.carissa.revibes.manage_users.data.mapper.toApiString
 import com.carissa.revibes.manage_users.data.mapper.toUserDomain
 import com.carissa.revibes.manage_users.data.mapper.toUserDomainList
 import com.carissa.revibes.manage_users.data.model.AddPointsRequest
 import com.carissa.revibes.manage_users.data.model.CreateUserRequest
 import com.carissa.revibes.manage_users.data.model.PaginationData
+import com.carissa.revibes.manage_users.data.model.UpdateUserRequest
 import com.carissa.revibes.manage_users.data.remote.ManageUsersRemoteApi
 import com.carissa.revibes.manage_users.domain.model.UserDomain
 import org.koin.core.annotation.Single
@@ -102,7 +104,6 @@ class ManageUsersRepository(
         }
     }
 
-    // Dummy method for updating user - always returns success
     suspend fun updateUser(
         id: String,
         name: String,
@@ -111,14 +112,14 @@ class ManageUsersRepository(
         role: UserDomain.UserRole
     ): UserDomain {
         return execute {
-            val currentUser = getUserDetail(id)
-            currentUser.copy(
-                name = name,
+            val request = UpdateUserRequest(
+                displayName = name,
                 email = email,
-                phone = phone,
-                role = role,
-                updatedAt = "2024-01-01T00:00:00.000Z"
+                phoneNumber = phone,
+                role = role.toApiString()
             )
+            remoteApi.updateUser(id, request)
+            getUserDetail(id) // Fetch updated user details
         }
     }
 

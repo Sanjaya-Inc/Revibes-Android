@@ -78,10 +78,24 @@ class EditUserScreenViewModel(
 ) : BaseViewModel<EditUserScreenUiState, EditUserScreenUiEvent>(
     initialState = EditUserScreenUiState(),
     exceptionHandler = { syntax, throwable ->
-        if (throwable.message?.contains("user", ignoreCase = true) == true) {
-            exceptionHandler.onLoadUserError(syntax, throwable)
-        } else {
-            exceptionHandler.onAddPointsError(syntax, throwable)
+        when {
+            throwable.message?.contains("load", ignoreCase = true) == true ||
+                throwable.message?.contains("fetch", ignoreCase = true) == true -> {
+                exceptionHandler.onLoadUserError(syntax, throwable)
+            }
+
+            throwable.message?.contains("update", ignoreCase = true) == true ||
+                throwable.message?.contains("edit", ignoreCase = true) == true -> syntax.run {
+                postSideEffect(
+                    EditUserScreenUiEvent.OnEditUserFailed(
+                        throwable.message ?: "Failed to update user"
+                    )
+                )
+            }
+
+            else -> {
+                exceptionHandler.onAddPointsError(syntax, throwable)
+            }
         }
     }
 ) {
@@ -260,7 +274,11 @@ class EditUserScreenViewModel(
                     points.text.isBlank() -> "Points amount is required"
                     points.text.toIntOrNull() == null -> "Please enter a valid number"
                     points.text.toIntOrNull()!! <= 0 -> "Points must be greater than 0"
-                    points.text.toIntOrNull()!! > (state.user?.points ?: 0) -> "Cannot deduct more points than user has"
+                    points.text.toIntOrNull()!! > (
+                        state.user?.points
+                            ?: 0
+                        ) -> "Cannot deduct more points than user has"
+
                     else -> null
                 }
             )
@@ -352,7 +370,9 @@ class EditUserScreenViewModel(
                 editUserEmail = email,
                 editUserEmailError = when {
                     email.text.isBlank() -> "Email is required"
-                    !android.util.Patterns.EMAIL_ADDRESS.matcher(email.text).matches() -> "Please enter a valid email"
+                    !android.util.Patterns.EMAIL_ADDRESS.matcher(email.text)
+                        .matches() -> "Please enter a valid email"
+
                     else -> null
                 }
             )
@@ -395,6 +415,7 @@ class EditUserScreenViewModel(
                         !android.util.Patterns.EMAIL_ADDRESS.matcher(
                             state.editUserEmail.text
                         ).matches() -> "Please enter a valid email"
+
                         else -> state.editUserEmailError
                     },
                     editUserPhoneError = if (state.editUserPhone.text.isBlank()) {
@@ -409,28 +430,48 @@ class EditUserScreenViewModel(
 
         reduce { state.copy(isLoadingEditUser = true) }
 
-        // Dummy API call - always returns success
-        val updatedUser = repository.updateUser(
-            id = userId,
-            name = state.editUserName.text,
-            email = state.editUserEmail.text,
-            phone = state.editUserPhone.text,
-            role = state.editUserRole
-        )
+        try {
+            val updatedUser = repository.updateUser(
+                id = userId,
+                name = state.editUserName.text,
+                email = state.editUserEmail.text,
+                phone = state.editUserPhone.text,
+                role = state.editUserRole
+            )
 
-        reduce {
-            state.copy(
-                isLoadingEditUser = false,
-                user = updatedUser,
-                showEditUserDialog = false,
-                editUserName = TextFieldValue(),
-                editUserEmail = TextFieldValue(),
-                editUserPhone = TextFieldValue(),
-                editUserRole = UserDomain.UserRole.USER,
-                editUserNameError = null,
-                editUserEmailError = null,
-                editUserPhoneError = null,
-                isSuccess = true
+            reduce {
+                state.copy(
+                    isLoadingEditUser = false,
+                    user = updatedUser,
+                    showEditUserDialog = false,
+                    editUserName = TextFieldValue(),
+                    editUserEmail = TextFieldValue(),
+                    editUserPhone = TextFieldValue(),
+                    editUserRole = UserDomain.UserRole.USER,
+                    editUserNameError = null,
+                    editUserEmailError = null,
+                    editUserPhoneError = null,
+                    isSuccess = true
+                )
+            }
+        } catch (e: Exception) {
+            reduce {
+                state.copy(
+                    isLoadingEditUser = false,
+                    showEditUserDialog = false,
+                    editUserName = TextFieldValue(),
+                    editUserEmail = TextFieldValue(),
+                    editUserPhone = TextFieldValue(),
+                    editUserRole = UserDomain.UserRole.USER,
+                    editUserNameError = null,
+                    editUserEmailError = null,
+                    editUserPhoneError = null
+                )
+            }
+            postSideEffect(
+                EditUserScreenUiEvent.OnEditUserFailed(
+                    e.message ?: "Failed to update user"
+                )
             )
         }
     }
@@ -479,7 +520,11 @@ class EditUserScreenViewModel(
                     voucherToRedeem = null
                 )
             }
-            postSideEffect(EditUserScreenUiEvent.OnRedeemVoucherFailed(e.message ?: "Failed to redeem voucher"))
+            postSideEffect(
+                EditUserScreenUiEvent.OnRedeemVoucherFailed(
+                    e.message ?: "Failed to redeem voucher"
+                )
+            )
         }
     }
 }
