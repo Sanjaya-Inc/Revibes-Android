@@ -33,6 +33,11 @@ sealed interface ManageVoucherScreenUiEvent {
     data class ShowDeleteDialog(val voucher: VoucherDomain) : ManageVoucherScreenUiEvent
     data object HideDeleteDialog : ManageVoucherScreenUiEvent
     data object ConfirmDelete : ManageVoucherScreenUiEvent
+    data class ToggleVoucherStatus(val voucher: VoucherDomain) : ManageVoucherScreenUiEvent
+
+    // Side effects
+    data class OnToggleStatusSuccess(val message: String) : ManageVoucherScreenUiEvent
+    data class OnToggleStatusFailed(val message: String) : ManageVoucherScreenUiEvent
 }
 
 @KoinViewModel
@@ -57,6 +62,7 @@ class ManageVoucherScreenViewModel(
             is ManageVoucherScreenUiEvent.ShowDeleteDialog -> showDeleteDialog(event.voucher)
             is ManageVoucherScreenUiEvent.HideDeleteDialog -> hideDeleteDialog()
             is ManageVoucherScreenUiEvent.ConfirmDelete -> confirmDelete()
+            is ManageVoucherScreenUiEvent.ToggleVoucherStatus -> toggleVoucherStatus(event.voucher)
             else -> Unit
         }
     }
@@ -147,6 +153,57 @@ class ManageVoucherScreenViewModel(
                 filteredVouchers = filterVouchers(updatedVouchers, state.searchValue.text),
                 showDeleteDialog = false,
                 voucherToDelete = null
+            )
+        }
+    }
+
+    private fun toggleVoucherStatus(voucher: VoucherDomain) = intent {
+        val newStatus = !voucher.isAvailable
+
+        val updatedVouchers = state.vouchers.map { v ->
+            if (v.id == voucher.id) {
+                v.copy(isAvailable = newStatus)
+            } else {
+                v
+            }
+        }.toPersistentList()
+
+        reduce {
+            state.copy(
+                vouchers = updatedVouchers,
+                filteredVouchers = filterVouchers(updatedVouchers, state.searchValue.text)
+            )
+        }
+
+        try {
+            repository.updateVoucherStatus(voucher.id, newStatus)
+
+            val statusText = if (newStatus) "enabled" else "disabled"
+            postSideEffect(
+                ManageVoucherScreenUiEvent.OnToggleStatusSuccess(
+                    "Voucher ${voucher.name} has been $statusText"
+                )
+            )
+        } catch (e: Exception) {
+            val revertedVouchers = state.vouchers.map { v ->
+                if (v.id == voucher.id) {
+                    v.copy(isAvailable = !newStatus)
+                } else {
+                    v
+                }
+            }.toPersistentList()
+
+            reduce {
+                state.copy(
+                    vouchers = revertedVouchers,
+                    filteredVouchers = filterVouchers(revertedVouchers, state.searchValue.text)
+                )
+            }
+
+            postSideEffect(
+                ManageVoucherScreenUiEvent.OnToggleStatusFailed(
+                    "Failed to update voucher status: ${e.message.orEmpty()}"
+                )
             )
         }
     }

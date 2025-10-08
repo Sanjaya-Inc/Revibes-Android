@@ -5,6 +5,7 @@ import android.net.Uri
 import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.manage_voucher.data.mapper.toDomain
 import com.carissa.revibes.manage_voucher.data.model.PaginationData
+import com.carissa.revibes.manage_voucher.data.model.UpdateVoucherStatusRequest
 import com.carissa.revibes.manage_voucher.data.remote.ManageVoucherRemoteApi
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
@@ -119,5 +120,10 @@ class ManageVoucherRepository(
 
     suspend fun deleteVoucher(id: String) {
         execute { remoteApi.deleteVoucher(id) }
+    }
+
+    suspend fun updateVoucherStatus(id: String, isAvailable: Boolean) {
+        val request = UpdateVoucherStatusRequest(isAvailable = isAvailable)
+        remoteApi.updateVoucherStatus(id, request)
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +51,7 @@ import java.util.Locale
 fun VoucherItem(
     voucher: VoucherDomain,
     onDeleteClick: () -> Unit,
+    onToggleStatus: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDropdown by remember { mutableStateOf(false) }
@@ -120,45 +122,18 @@ fun VoucherItem(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
+                        if (voucher.inUse) {
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(
-                                        if (voucher.isAvailable) {
-                                            MaterialTheme.colorScheme.primaryContainer
-                                        } else {
-                                            MaterialTheme.colorScheme.errorContainer
-                                        }
-                                    )
+                                    .background(MaterialTheme.colorScheme.secondaryContainer)
                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                             ) {
                                 Text(
-                                    text = if (voucher.isAvailable) "Available" else "Unavailable",
+                                    text = "In Use",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = if (voucher.isAvailable) {
-                                        MaterialTheme.colorScheme.onPrimaryContainer
-                                    } else {
-                                        MaterialTheme.colorScheme.onErrorContainer
-                                    }
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
-                            }
-
-                            if (voucher.inUse) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                                ) {
-                                    Text(
-                                        text = "In Use",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-                                }
                             }
                         }
                     }
@@ -212,6 +187,38 @@ fun VoucherItem(
                             )
                         }
                     }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Availability toggle section
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Availability",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = if (voucher.isAvailable) "Available" else "Unavailable",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (voucher.isAvailable) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.error
+                            },
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Switch(
+                        checked = voucher.isAvailable,
+                        onCheckedChange = { onToggleStatus() }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

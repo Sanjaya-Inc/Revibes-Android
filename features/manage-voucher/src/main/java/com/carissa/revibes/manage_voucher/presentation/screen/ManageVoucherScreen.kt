@@ -1,5 +1,6 @@
 package com.carissa.revibes.manage_voucher.presentation.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -61,6 +63,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<ManageVoucherGraph>(start = true)
@@ -74,6 +77,19 @@ fun ManageVoucherScreen(
     val listState = rememberLazyListState()
     val pullToRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    viewModel.collectSideEffect { event ->
+        when (event) {
+            is ManageVoucherScreenUiEvent.OnToggleStatusSuccess -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+            is ManageVoucherScreenUiEvent.OnToggleStatusFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+            else -> Unit
+        }
+    }
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -251,6 +267,11 @@ fun ManageVoucherScreen(
                                         onDeleteClick = {
                                             viewModel.onEvent(
                                                 ManageVoucherScreenUiEvent.ShowDeleteDialog(voucher)
+                                            )
+                                        },
+                                        onToggleStatus = {
+                                            viewModel.onEvent(
+                                                ManageVoucherScreenUiEvent.ToggleVoucherStatus(voucher)
                                             )
                                         }
                                     )
