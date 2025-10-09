@@ -18,7 +18,7 @@ fun UserData.toUserDomain(): UserDomain {
         points = 0,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        isActive = false,
+        isActive = true,
         address = null,
         profileImage = null
     )
@@ -29,12 +29,12 @@ fun UserDetailData.toUserDomain(id: String): UserDomain {
         id = id,
         name = displayName,
         email = email,
-        phone = "-",
+        phone = phoneNumber,
         role = mapToUserRole(role),
         points = points,
         createdAt = createdAt,
         updatedAt = null,
-        isActive = false,
+        isActive = true,
         address = null,
         profileImage = null
     )

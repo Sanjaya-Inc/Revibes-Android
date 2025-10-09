@@ -337,7 +337,7 @@ private fun UserDetailCard(
                 )
                 UserDetailItem(
                     label = stringResource(R.string.phone_number),
-                    value = user.phone
+                    value = user.phone.ifBlank { "-" }
                 )
                 user.address?.let { address ->
                     UserDetailItem(

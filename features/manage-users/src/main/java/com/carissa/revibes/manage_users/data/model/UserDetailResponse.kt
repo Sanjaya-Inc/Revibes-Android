@@ -18,7 +18,7 @@ data class UserDetailData(
 //    val id: String,
     val displayName: String,
     val email: String,
-//    val phone: String,
+    val phoneNumber: String,
     val role: String,
     val points: Int,
     val createdAt: String,
