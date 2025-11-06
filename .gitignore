@@ -38,3 +38,9 @@ local.properties
 /.idea/graphql-settings.xml
 /.idea/codeStyles/Project.xml
 /release.keystore
+/app/release/app-release.aab
+/prod-key.keystore
+/.idea/copilot.data.migration.agent.xml
+/.idea/copilot.data.migration.edit.xml
+/.idea/markdown.xml
+/.vscode/settings.json
