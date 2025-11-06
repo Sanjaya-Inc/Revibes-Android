@@ -36,4 +36,8 @@
         <key>my_transactions_feature_flag</key>
         <value>true</value>
     </entry>
+    <entry>
+        <key>roles_editor_whitelist</key>
+        <value>root@revibe.com,claudiadjauhary@gmail.com,carissa.handrian@gmail.com</value>
+    </entry>
 </defaultsMap>

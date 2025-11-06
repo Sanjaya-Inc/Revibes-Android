@@ -1,10 +1,12 @@
 package com.carissa.revibes.manage_users.presentation.screen
 
+import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.exchange_points.domain.model.UserVoucher
 import com.carissa.revibes.manage_users.data.ManageUsersRepository
 import com.carissa.revibes.manage_users.domain.model.UserDomain
+import com.carissa.revibes.manage_users.domain.usecase.RolesEditorWhitelistedUseCase
 import com.carissa.revibes.manage_users.presentation.handler.ManageUsersExceptionHandler
 import io.ktor.client.utils.EmptyContent.status
 import kotlinx.collections.immutable.ImmutableList
@@ -33,6 +35,7 @@ data class EditUserScreenUiState(
     val showDeductPointsDialog: Boolean = false,
     val showEditUserDialog: Boolean = false,
     val showRedeemConfirmDialog: Boolean = false,
+    val canEditRoles: Boolean = false,
     val voucherToRedeem: UserVoucher? = null,
     val isSuccess: Boolean = false,
     val editUserName: TextFieldValue = TextFieldValue(),
@@ -79,9 +82,17 @@ sealed interface EditUserScreenUiEvent {
 @KoinViewModel
 class EditUserScreenViewModel(
     private val repository: ManageUsersRepository,
-    private val exceptionHandler: ManageUsersExceptionHandler
+    private val exceptionHandler: ManageUsersExceptionHandler,
+    private val rolesEditorWhitelistedUseCase: RolesEditorWhitelistedUseCase
 ) : BaseViewModel<EditUserScreenUiState, EditUserScreenUiEvent>(
     initialState = EditUserScreenUiState(),
+    onCreate = {
+        Log.d("ketai", "EditUserScreenViewModel onCreate")
+        val canEditRole = rolesEditorWhitelistedUseCase.execute()
+        it.reduce {
+            state.copy(canEditRoles = canEditRole)
+        }
+    },
     exceptionHandler = { syntax, throwable ->
         when {
             throwable.message?.contains("load", ignoreCase = true) == true ||

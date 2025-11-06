@@ -1,6 +1,7 @@
 package com.carissa.revibes.manage_users.presentation.screen
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -666,52 +667,54 @@ private fun EditUserDialog(
                     singleLine = true
                 )
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Role",
-                        style = RevibesTheme.typography.body1,
-                        color = RevibesTheme.colors.onSurface.copy(alpha = 0.7f)
-                    )
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                AnimatedVisibility(uiState.canEditRoles) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            RadioButton(
-                                selected = uiState.editUserRole == UserDomain.UserRole.USER,
-                                onClick = {
-                                    onEvent(
-                                        EditUserScreenUiEvent.EditUserRoleChanged(UserDomain.UserRole.USER)
-                                    )
-                                }
-                            )
-                            Text(
-                                text = stringResource(R.string.role_user),
-                                style = RevibesTheme.typography.body1
-                            )
-                        }
+                        Text(
+                            text = "Role",
+                            style = RevibesTheme.typography.body1,
+                            color = RevibesTheme.colors.onSurface.copy(alpha = 0.7f)
+                        )
 
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            RadioButton(
-                                selected = uiState.editUserRole == UserDomain.UserRole.ADMIN,
-                                onClick = {
-                                    onEvent(
-                                        EditUserScreenUiEvent.EditUserRoleChanged(UserDomain.UserRole.ADMIN)
-                                    )
-                                }
-                            )
-                            Text(
-                                text = stringResource(R.string.role_admin),
-                                style = RevibesTheme.typography.body1
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                RadioButton(
+                                    selected = uiState.editUserRole == UserDomain.UserRole.USER,
+                                    onClick = {
+                                        onEvent(
+                                            EditUserScreenUiEvent.EditUserRoleChanged(UserDomain.UserRole.USER)
+                                        )
+                                    }
+                                )
+                                Text(
+                                    text = stringResource(R.string.role_user),
+                                    style = RevibesTheme.typography.body1
+                                )
+                            }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                RadioButton(
+                                    selected = uiState.editUserRole == UserDomain.UserRole.ADMIN,
+                                    onClick = {
+                                        onEvent(
+                                            EditUserScreenUiEvent.EditUserRoleChanged(UserDomain.UserRole.ADMIN)
+                                        )
+                                    }
+                                )
+                                Text(
+                                    text = stringResource(R.string.role_admin),
+                                    style = RevibesTheme.typography.body1
+                                )
+                            }
                         }
                     }
                 }
