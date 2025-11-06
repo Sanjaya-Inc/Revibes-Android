@@ -6,9 +6,11 @@ import com.carissa.revibes.exchange_points.domain.model.UserVoucher
 import com.carissa.revibes.manage_users.data.ManageUsersRepository
 import com.carissa.revibes.manage_users.domain.model.UserDomain
 import com.carissa.revibes.manage_users.presentation.handler.ManageUsersExceptionHandler
+import io.ktor.client.utils.EmptyContent.status
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CancellationException
 import org.koin.android.annotation.KoinViewModel
 
 data class EditUserScreenUiState(
@@ -17,6 +19,7 @@ data class EditUserScreenUiState(
     val isLoadingDeductPoints: Boolean = false,
     val isLoadingEditUser: Boolean = false,
     val isLoadingVouchers: Boolean = false,
+    val isLoadingVerification: Boolean = false,
     val isRedeemingVoucher: Boolean = false,
     val user: UserDomain? = null,
     val userVouchers: ImmutableList<UserVoucher> = persistentListOf(),
@@ -63,6 +66,8 @@ sealed interface EditUserScreenUiEvent {
     data class EditUserEmailChanged(val email: TextFieldValue) : EditUserScreenUiEvent
     data class EditUserPhoneChanged(val phone: TextFieldValue) : EditUserScreenUiEvent
     data class EditUserRoleChanged(val role: UserDomain.UserRole) : EditUserScreenUiEvent
+    data object ToggledVerification : EditUserScreenUiEvent
+    data class ShowToast(val message: String) : EditUserScreenUiEvent
     data class OnLoadUserFailed(val message: String) : EditUserScreenUiEvent
     data class OnAddPointsFailed(val message: String) : EditUserScreenUiEvent
     data class OnDeductPointsFailed(val message: String) : EditUserScreenUiEvent
@@ -126,6 +131,7 @@ class EditUserScreenViewModel(
             is EditUserScreenUiEvent.EditUserEmailChanged -> onEditUserEmailChanged(event.email)
             is EditUserScreenUiEvent.EditUserPhoneChanged -> onEditUserPhoneChanged(event.phone)
             is EditUserScreenUiEvent.EditUserRoleChanged -> onEditUserRoleChanged(event.role)
+            is EditUserScreenUiEvent.ToggledVerification -> onToggleUserVerification()
             else -> Unit
         }
     }
@@ -385,6 +391,40 @@ class EditUserScreenViewModel(
                 editUserPhone = phone,
                 editUserPhoneError = if (phone.text.isBlank()) "Phone number is required" else null
             )
+        }
+    }
+
+    private fun onToggleUserVerification() {
+        intent {
+            val user = state.user ?: return@intent
+            val status = !user.verified
+            reduce {
+                state.copy(
+                    isLoadingVerification = true
+                )
+            }
+            repository.runCatching {
+                repository.updateVerifyStatue(user.id, status)
+            }.onFailure {
+                if (it is CancellationException) throw it
+                reduce {
+                    state.copy(
+                        isLoadingVerification = false
+                    )
+                }
+                postSideEffect(
+                    EditUserScreenUiEvent.ShowToast(
+                        it.message ?: "Failed to update verification status"
+                    )
+                )
+            }.onSuccess {
+                reduce {
+                    state.copy(
+                        user = user.copy(verified = status),
+                        isLoadingVerification = false
+                    )
+                }
+            }
         }
     }
 

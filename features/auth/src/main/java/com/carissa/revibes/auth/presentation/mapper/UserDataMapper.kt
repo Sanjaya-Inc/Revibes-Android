@@ -12,7 +12,8 @@ internal fun AuthUser.toUserDataWithEmail(email: String): UserData {
         coins = 0,
         role = role,
         createdAt = createdAt,
-        lastClaimedDate = null
+        lastClaimedDate = null,
+        verified = verified
     )
 }
 
@@ -25,6 +26,7 @@ internal fun AuthUser.toUserDataWithPhone(phone: String): UserData {
         coins = 0,
         role = role,
         createdAt = createdAt,
-        lastClaimedDate = null
+        lastClaimedDate = null,
+        verified = verified
     )
 }

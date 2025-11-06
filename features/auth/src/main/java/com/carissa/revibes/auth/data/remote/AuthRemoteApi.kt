@@ -51,6 +51,13 @@ interface AuthRemoteApi {
     )
 }
 
+// Cleanup / Change Tester Account
+// Role -> di atas admin
+// Untuk Ubah Role
+// Forgot Pass
+// Edit Point -> Direct
+// User -> Filter voucher disabled
+// Upload Foto ketika drop off
 @Single
 internal class AuthRemoteApiImpl(ktorfit: Ktorfit) :
     AuthRemoteApi by ktorfit.createAuthRemoteApi()

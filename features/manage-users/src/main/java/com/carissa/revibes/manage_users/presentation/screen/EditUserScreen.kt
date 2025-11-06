@@ -58,6 +58,7 @@ import com.carissa.revibes.exchange_points.domain.model.UserVoucher
 import com.carissa.revibes.exchange_points.presentation.component.UserVoucherItem
 import com.carissa.revibes.manage_users.R
 import com.carissa.revibes.manage_users.domain.model.UserDomain
+import com.carissa.revibes.manage_users.presentation.component.VerificationStatusCard
 import com.carissa.revibes.manage_users.presentation.navigation.ManageUsersGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -104,6 +105,10 @@ fun EditUserScreen(
             }
 
             is EditUserScreenUiEvent.OnRedeemVoucherFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is EditUserScreenUiEvent.ShowToast -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
@@ -184,6 +189,9 @@ private fun EditUserScreenContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     UserDetailCard(user = uiState.user)
+                    VerificationStatusCard(uiState.user, isLoading = uiState.isLoadingVerification) {
+                        onEvent(EditUserScreenUiEvent.ToggledVerification)
+                    }
 
                     Button(
                         text = stringResource(R.string.edit_user),

@@ -18,7 +18,8 @@ private fun com.carissa.revibes.auth.data.model.User.toDomain(): AuthUser {
         role = role,
         displayName = displayName,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        verified = verified
     )
 }
 

@@ -15,8 +15,12 @@ data class UserData(
     val coins: Int,
     val role: String,
     val createdAt: String,
-    val lastClaimedDate: String?
+    val lastClaimedDate: String?,
+    val verified: Boolean
 ) {
+
+    fun isAdmin() = role == "admin"
+
     companion object {
         fun dummy() = UserData(
             name = "John Doe",
@@ -26,7 +30,8 @@ data class UserData(
             coins = 100,
             role = "user",
             createdAt = "2025-06-25T10:37:17.180Z",
-            lastClaimedDate = null
+            lastClaimedDate = null,
+            verified = false
         )
     }
 }

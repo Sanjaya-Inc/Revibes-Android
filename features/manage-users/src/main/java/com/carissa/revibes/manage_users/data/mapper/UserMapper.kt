@@ -20,7 +20,8 @@ fun UserData.toUserDomain(): UserDomain {
         updatedAt = updatedAt,
         isActive = true,
         address = null,
-        profileImage = null
+        profileImage = null,
+        verified = verified
     )
 }
 
@@ -36,7 +37,8 @@ fun UserDetailData.toUserDomain(id: String): UserDomain {
         updatedAt = null,
         isActive = true,
         address = null,
-        profileImage = null
+        profileImage = null,
+        verified = verified
     )
 }
 

@@ -7,6 +7,7 @@ import com.carissa.revibes.manage_users.data.model.CreateUserRequest
 import com.carissa.revibes.manage_users.data.model.CreateUserResponse
 import com.carissa.revibes.manage_users.data.model.UpdateUserRequest
 import com.carissa.revibes.manage_users.data.model.UpdateUserResponse
+import com.carissa.revibes.manage_users.data.model.UpdateVerificationRequest
 import com.carissa.revibes.manage_users.data.model.UserDetailResponse
 import com.carissa.revibes.manage_users.data.model.UserListResponse
 import de.jensklingenberg.ktorfit.Ktorfit
@@ -68,6 +69,13 @@ interface ManageUsersRemoteApi {
         @Path("id") id: String,
         @Body request: UpdateUserRequest
     ): UpdateUserResponse
+
+    @PATCH("users/{id}/verify")
+    @Headers("Content-Type: application/json")
+    suspend fun updateVerifyStatus(
+        @Path("id") id: String,
+        @Body request: UpdateVerificationRequest
+    ): String
 }
 
 @Single

@@ -27,7 +27,8 @@ data class User(
     val role: String,
     val displayName: String,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val verified: Boolean
 )
 
 @Keep

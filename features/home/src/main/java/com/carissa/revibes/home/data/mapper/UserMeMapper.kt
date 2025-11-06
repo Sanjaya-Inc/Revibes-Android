@@ -12,6 +12,7 @@ internal fun UserMeResponse.toUserData(): UserData {
         coins = data.points,
         role = data.role,
         createdAt = data.createdAt,
-        lastClaimedDate = null
+        lastClaimedDate = null,
+        verified = data.verified
     )
 }

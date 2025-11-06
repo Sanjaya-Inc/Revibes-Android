@@ -11,6 +11,7 @@ import com.carissa.revibes.manage_users.data.model.AddPointsRequest
 import com.carissa.revibes.manage_users.data.model.CreateUserRequest
 import com.carissa.revibes.manage_users.data.model.PaginationData
 import com.carissa.revibes.manage_users.data.model.UpdateUserRequest
+import com.carissa.revibes.manage_users.data.model.UpdateVerificationRequest
 import com.carissa.revibes.manage_users.data.remote.ManageUsersRemoteApi
 import com.carissa.revibes.manage_users.domain.model.UserDomain
 import org.koin.core.annotation.Single
@@ -91,7 +92,8 @@ class ManageUsersRepository(
                 updatedAt = response.data.createdAt,
                 isActive = false,
                 address = null,
-                profileImage = null
+                profileImage = null,
+                verified = false
             )
         }
     }
@@ -133,6 +135,12 @@ class ManageUsersRepository(
     suspend fun redeemVoucher(userId: String, voucherId: String) {
         return execute {
             remoteApi.redeemVoucher(userId, voucherId)
+        }
+    }
+
+    suspend fun updateVerifyStatue(userId: String, isVerified: Boolean) {
+        return execute {
+            remoteApi.updateVerifyStatus(userId, UpdateVerificationRequest(isVerified))
         }
     }
 }

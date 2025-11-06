@@ -1,6 +1,7 @@
 package com.carissa.revibes.core.data.utils
 
 import com.carissa.revibes.core.data.model.ErrorResponse
+import com.carissa.revibes.core.data.user.local.UserDataSourceGetter
 import com.carissa.revibes.core.domain.usecase.TokenExpiredUseCase
 import com.carissa.revibes.core.presentation.util.AppDispatchers
 import io.ktor.client.plugins.ClientRequestException
@@ -16,7 +17,8 @@ abstract class BaseRepository(
     private val shouldKickWhenAuthFailed: Boolean = true,
     private val json: Json = KoinJavaComponent.getKoin().get(),
     private val appDispatchers: AppDispatchers = KoinJavaComponent.getKoin().get(),
-    private val tokenExpiredUseCase: TokenExpiredUseCase = KoinJavaComponent.getKoin().get()
+    private val tokenExpiredUseCase: TokenExpiredUseCase = KoinJavaComponent.getKoin().get(),
+    private val userDataGetter: UserDataSourceGetter = KoinJavaComponent.getKoin().get(),
 ) {
     @Suppress("ThrowsCount")
     protected suspend fun <T> execute(
@@ -44,10 +46,19 @@ abstract class BaseRepository(
         val body = runCatching { response.bodyAsText() }.getOrNull()
         val dto = runCatching { json.decodeFromString<ErrorResponse>(body ?: "") }.getOrNull()
         return ApiException(response.status.value, dto, cause).also {
-            if (shouldKickWhenAuthFailed && it.statusCode == 401) {
+            if (shouldKickWhenAuthFailed && it.statusCode == 401 || it.isForbidden()) {
                 tokenExpiredUseCase()
             }
         }
+    }
+
+    private fun ApiException.isForbidden(): Boolean {
+        val isAdmin = userDataGetter.getUserValue().getOrNull()?.isAdmin() == true
+        if (!isAdmin) return false
+        return statusCode == 403 && (
+            errorResponse?.error?.contains("COMMON.FORBIDDEN") == true ||
+                errorResponse?.status?.contains("COMMON.FORBIDDEN") == true
+            )
     }
 }
 

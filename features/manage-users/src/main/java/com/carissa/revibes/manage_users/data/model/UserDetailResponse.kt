@@ -22,6 +22,7 @@ data class UserDetailData(
     val role: String,
     val points: Int,
     val createdAt: String,
+    val verified: Boolean,
 //    val updatedAt: String,
 //    val isActive: Boolean,
 //    val address: String? = null,

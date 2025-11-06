@@ -17,6 +17,7 @@ data class UserDomain(
     val createdAt: String,
     val updatedAt: String? = null,
     val isActive: Boolean,
+    val verified: Boolean,
     val address: String? = null,
     val profileImage: String? = null
 ) {
@@ -36,7 +37,8 @@ data class UserDomain(
             updatedAt = "2024-01-01T00:00:00.000Z",
             isActive = true,
             address = "123 Main St, City, Country",
-            profileImage = null
+            profileImage = null,
+            verified = false
         )
     }
 }
