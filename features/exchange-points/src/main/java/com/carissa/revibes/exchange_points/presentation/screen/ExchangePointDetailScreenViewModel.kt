@@ -1,6 +1,7 @@
 package com.carissa.revibes.exchange_points.presentation.screen
 
 import androidx.lifecycle.viewModelScope
+import com.carissa.revibes.core.data.user.local.UserDataSourceGetter
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
@@ -19,8 +20,8 @@ data class ExchangePointDetailScreenUiState(
     val title: String = "DISCOUNT 70%",
     val validUntil: String = "Valid until 31 December 2024",
     val description: String = "We are here for bigger offers. Especially for those " +
-        "of you shopping fans, " +
-        "get a 70% promo for every item worth a minimum of IDR 300 thousand at Revibes Store",
+            "of you shopping fans, " +
+            "get a 70% promo for every item worth a minimum of IDR 300 thousand at Revibes Store",
     val image: String = "https://gcdnb.pbrd.co/images/16vLvVICjqy3.webp",
     val showBottomSheet: Boolean = false,
     val quantity: Int = 1,
@@ -42,6 +43,7 @@ sealed interface ExchangePointDetailScreenUiEvent {
 class ExchangePointDetailScreenViewModel(
     private val repository: ExchangePointsRepository,
     private val userPointFlow: UserPointFlow,
+    private val userDataSourceGetter: UserDataSourceGetter,
     private val exceptionHandler: ExchangePointsExceptionHandler
 ) : BaseViewModel<ExchangePointDetailScreenUiState, ExchangePointDetailScreenUiEvent>(
     initialState = ExchangePointDetailScreenUiState(),
@@ -62,24 +64,35 @@ class ExchangePointDetailScreenViewModel(
         }
     }
 
-    private fun purchaseVoucher(id: String, qty: Int) = intent {
-        reduce { state.copy(isLoading = true) }
-
-        val purchaseRequest = PurchaseRequest(
-            items = listOf(
-                PurchaseItem(
-                    id = id,
-                    qty = qty
+    private fun purchaseVoucher(id: String, qty: Int) {
+        intent {
+            reduce { state.copy(isLoading = true) }
+            val isVerified = userDataSourceGetter.getUserValue().getOrNull()?.verified == true
+            if (!isVerified) {
+                postSideEffect(
+                    ExchangePointDetailScreenUiEvent.ShowToast(
+                        "Please verify your account to admin first!"
+                    )
                 )
-            ),
-            paymentMethod = "point",
-            currency = "revibe-point"
-        )
-        repository.purchaseVoucher(purchaseRequest)
+                reduce { state.copy(isLoading = true) }
+                return@intent
+            }
+            val purchaseRequest = PurchaseRequest(
+                items = listOf(
+                    PurchaseItem(
+                        id = id,
+                        qty = qty
+                    )
+                ),
+                paymentMethod = "point",
+                currency = "revibe-point"
+            )
+            repository.purchaseVoucher(purchaseRequest)
 
-        reduce { state.copy(isLoading = false) }
-        userPointFlow.update()
-        postSideEffect(ExchangePointDetailScreenUiEvent.ShowToast("Voucher purchased successfully"))
-        onEvent(ExchangePointDetailScreenUiEvent.NavigateToConfirmation)
+            reduce { state.copy(isLoading = false) }
+            userPointFlow.update()
+            postSideEffect(ExchangePointDetailScreenUiEvent.ShowToast("Voucher purchased successfully"))
+            onEvent(ExchangePointDetailScreenUiEvent.NavigateToConfirmation)
+        }
     }
 }
