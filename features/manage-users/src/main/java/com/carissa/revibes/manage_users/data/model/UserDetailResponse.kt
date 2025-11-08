@@ -20,7 +20,7 @@ data class UserDetailData(
     val email: String,
     val phoneNumber: String,
     val role: String,
-    val points: Int,
+    val points: Long,
     val createdAt: String,
     val verified: Boolean,
 //    val updatedAt: String,

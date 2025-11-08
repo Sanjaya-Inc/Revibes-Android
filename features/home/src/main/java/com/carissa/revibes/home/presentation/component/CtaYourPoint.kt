@@ -25,7 +25,7 @@ import com.carissa.revibes.home.R
 
 @Composable
 fun CtaYourPoint(
-    yourPoint: Int,
+    yourPoint: Long,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {

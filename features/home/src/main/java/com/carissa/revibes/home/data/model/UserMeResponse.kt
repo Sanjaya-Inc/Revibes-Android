@@ -20,6 +20,6 @@ data class UserMeData(
     val displayName: String,
     val email: String,
     val phoneNumber: String,
-    val points: Int,
+    val points: Long,
     val verified: Boolean
 )

@@ -81,7 +81,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenContent(
-    coins: Int,
+    coins: Long,
     uiState: HomeScreenUiState,
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<HomeScreenUiEvent> = EventReceiver { }

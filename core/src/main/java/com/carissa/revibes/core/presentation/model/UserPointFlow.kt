@@ -17,17 +17,17 @@ class UserPointFlow(
     @Provided private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val userDataSource: UserDataSource,
     private val appScope: AppScope,
-    private val upstream: MutableStateFlow<Int> = MutableStateFlow(
-        userDataSource.getUserValue().getOrNull()?.coins ?: 0
+    private val upstream: MutableStateFlow<Long> = MutableStateFlow(
+        userDataSource.getUserValue().getOrNull()?.coins ?: 0L
     )
-) : StateFlow<Int> by upstream {
+) : StateFlow<Long> by upstream {
 
     fun update() = appScope.launch {
         val userData = updateUserDataUseCase.getAndUpdate()
         upstream.update { userData.coins }
     }
 
-    fun update(point: Int) {
+    fun update(point: Long) {
         upstream.update { point }
     }
 }

@@ -13,7 +13,7 @@ data class UserDomain(
     val email: String,
     val phone: String,
     val role: UserRole,
-    val points: Int,
+    val points: Long,
     val createdAt: String,
     val updatedAt: String? = null,
     val isActive: Boolean,

@@ -27,7 +27,8 @@ data class UserData(
     val displayName: String,
     val createdAt: String,
     val updatedAt: String,
-    val verified: Boolean
+    val verified: Boolean,
+    val points: Long,
 )
 
 @Keep

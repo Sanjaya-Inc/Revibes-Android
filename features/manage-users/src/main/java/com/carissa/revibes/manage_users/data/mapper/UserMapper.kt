@@ -15,7 +15,7 @@ fun UserData.toUserDomain(): UserDomain {
         email = "-",
         phone = "-",
         role = mapToUserRole(role),
-        points = 0,
+        points = points,
         createdAt = createdAt,
         updatedAt = updatedAt,
         isActive = true,

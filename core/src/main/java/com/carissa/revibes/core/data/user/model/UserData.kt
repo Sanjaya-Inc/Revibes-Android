@@ -12,7 +12,7 @@ data class UserData(
     val email: String,
     val phoneNumber: String,
     val profilePictureUrl: String,
-    val coins: Int,
+    val coins: Long,
     val role: String,
     val createdAt: String,
     val lastClaimedDate: String?,

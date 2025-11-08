@@ -84,7 +84,7 @@ fun ExchangePointsScreen(
 
 @Composable
 private fun ExchangePointsScreenContent(
-    coins: Int,
+    coins: Long,
     uiState: ExchangePointsScreenUiState,
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<ExchangePointsScreenUiEvent> = EventReceiver { }

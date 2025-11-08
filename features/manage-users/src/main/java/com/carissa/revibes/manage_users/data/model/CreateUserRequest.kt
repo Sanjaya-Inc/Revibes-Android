@@ -29,6 +29,6 @@ data class CreateUserData(
     val email: String,
     val phoneNumber: String,
     val role: String,
-    val points: Int,
+    val points: Long,
     val createdAt: String,
 )

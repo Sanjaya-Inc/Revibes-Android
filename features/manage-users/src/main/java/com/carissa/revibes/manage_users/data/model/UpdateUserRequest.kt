@@ -10,7 +10,7 @@ data class UpdateUserRequest(
     val displayName: String? = null,
     val phoneNumber: String? = null,
     val role: String? = null,
-    val points: Int? = null
+    val points: Long? = null
 )
 
 @Keep
