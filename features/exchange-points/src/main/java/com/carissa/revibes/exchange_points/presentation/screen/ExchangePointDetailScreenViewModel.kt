@@ -20,8 +20,8 @@ data class ExchangePointDetailScreenUiState(
     val title: String = "DISCOUNT 70%",
     val validUntil: String = "Valid until 31 December 2024",
     val description: String = "We are here for bigger offers. Especially for those " +
-            "of you shopping fans, " +
-            "get a 70% promo for every item worth a minimum of IDR 300 thousand at Revibes Store",
+        "of you shopping fans, " +
+        "get a 70% promo for every item worth a minimum of IDR 300 thousand at Revibes Store",
     val image: String = "https://gcdnb.pbrd.co/images/16vLvVICjqy3.webp",
     val showBottomSheet: Boolean = false,
     val quantity: Int = 1,
