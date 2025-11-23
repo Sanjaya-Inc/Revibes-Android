@@ -48,7 +48,15 @@ fun ProfileMain(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(userData.name, style = RevibesTheme.typography.h1)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(userData.name, style = RevibesTheme.typography.h1)
+                    if (userData.verified) {
+                        Text("✅", style = RevibesTheme.typography.body1)
+                    }
+                }
                 Text(userData.email, style = RevibesTheme.typography.body1)
                 Text(userData.phoneNumber, style = RevibesTheme.typography.body1)
                 Spacer(modifier = Modifier.height(32.dp))

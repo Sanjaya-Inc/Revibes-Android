@@ -68,12 +68,20 @@ internal fun UserItem(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(
-                    text = user.name,
-                    style = RevibesTheme.typography.h3,
-                    color = RevibesTheme.colors.onSurface,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = user.name,
+                        style = RevibesTheme.typography.h3,
+                        color = RevibesTheme.colors.onSurface,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    if (user.verified) {
+                        Text("✅", style = RevibesTheme.typography.body2)
+                    }
+                }
                 Text(
                     text = user.email,
                     style = RevibesTheme.typography.body2,
