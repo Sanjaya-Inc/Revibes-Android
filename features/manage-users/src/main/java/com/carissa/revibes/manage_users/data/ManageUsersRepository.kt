@@ -60,8 +60,7 @@ class ManageUsersRepository(
         return execute {
             val request = AddPointsRequest(amount = points)
             remoteApi.addPointsToUser(id, request)
-                .also { println("ketai: Added points to user $id: $points") }
-            getUserDetail(id).also { println("ketai: User after adding points: $it") }
+            getUserDetail(id)
         }
     }
 

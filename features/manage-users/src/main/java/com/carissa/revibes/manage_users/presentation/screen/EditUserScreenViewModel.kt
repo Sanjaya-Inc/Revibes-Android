@@ -1,6 +1,5 @@
 package com.carissa.revibes.manage_users.presentation.screen
 
-import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.exchange_points.domain.model.UserVoucher
@@ -87,8 +86,7 @@ class EditUserScreenViewModel(
 ) : BaseViewModel<EditUserScreenUiState, EditUserScreenUiEvent>(
     initialState = EditUserScreenUiState(),
     onCreate = {
-        Log.d("ketai", "EditUserScreenViewModel onCreate")
-        val canEditRole = rolesEditorWhitelistedUseCase.execute()
+        val canEditRole = rolesEditorWhitelistedUseCase()
         it.reduce {
             state.copy(canEditRoles = canEditRole)
         }
@@ -249,8 +247,6 @@ class EditUserScreenViewModel(
             id = userId,
             points = pointsAmount,
         )
-        println("ketai: User after adding points: $updatedUser")
-
         reduce {
             state.copy(
                 isLoadingAddPoints = false,

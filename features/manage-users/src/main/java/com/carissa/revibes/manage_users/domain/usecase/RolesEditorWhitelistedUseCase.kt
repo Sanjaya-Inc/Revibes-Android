@@ -11,10 +11,12 @@ class RolesEditorWhitelistedUseCase(
     private val remoteConfigSource: RemoteConfigSource
 ) : BaseUseCase() {
 
-    suspend fun execute(): Boolean = execute {
-        try {
-            val user = userDataSourceGetter.getUserValue().getOrNull() ?: return@execute false
+    operator fun invoke(): Boolean {
+        return try {
+            val user = userDataSourceGetter.getUserValue().getOrNull() ?: return false
             val whitelistRaw = remoteConfigSource.getString(KEY)
+
+            if (whitelistRaw.isBlank()) return false
 
             val whitelist = whitelistRaw
                 .split(',')
@@ -22,12 +24,10 @@ class RolesEditorWhitelistedUseCase(
                 .filter { it.isNotBlank() }
                 .toSet()
 
-            val email = user.email.lowercase().trim()
-            val phone = user.phoneNumber
+            val email = user.email.trim().lowercase()
+            val phone = user.phoneNumber.trim()
 
-            val isWhitelisted = email in whitelist || phone in whitelist
-
-            isWhitelisted
+            email in whitelist || phone in whitelist
         } catch (_: Exception) {
             false
         }

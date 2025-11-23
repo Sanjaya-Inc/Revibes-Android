@@ -52,7 +52,6 @@ class ManageTransactionScreenViewModel internal constructor(
     }
 ) {
     override fun onEvent(event: ManageTransactionScreenUiEvent) {
-        println("ketai: ManageTransactionScreenViewModel.onEvent $event")
         when (event) {
             is ManageTransactionScreenUiEvent.OnSearchQueryChanged -> onSearchQueryChanged(event.query)
             is ManageTransactionScreenUiEvent.OnStatusFilterChanged -> onStatusFilterChanged(event.status)
