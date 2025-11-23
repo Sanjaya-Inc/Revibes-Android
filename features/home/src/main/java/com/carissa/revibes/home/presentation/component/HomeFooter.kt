@@ -49,10 +49,9 @@ data class FooterItem(
     companion object {
         fun default(supportData: SupportData) = persistentListOf(
             FooterItem(R.drawable.ic_location, "Jakarta, Indonesia", Color.Red),
-            FooterItem(R.drawable.ic_phone, "${supportData.phoneNumber} (Hotline)"),
-            FooterItem(R.drawable.ic_fax, supportData.faxNumber),
-            FooterItem(R.drawable.ic_whatsapp, supportData.whatsappNumber),
+            FooterItem(R.drawable.ic_phone, supportData.phoneNumber),
             FooterItem(R.drawable.ic_email, supportData.supportEmail),
+            FooterItem(R.drawable.ic_whatsapp, supportData.whatsappNumber),
         )
     }
 }
@@ -89,10 +88,18 @@ fun HomeFooter(
                     style = RevibesTheme.typography.h2
                 )
             }
-            items(items) { item ->
-                HomeFooterItem(item)
+            items.take(2).forEach { item ->
+                item {
+                    HomeFooterItem(item)
+                }
             }
-            item {
+            item(span = { GridItemSpan(2) }) {
+                HomeFooterItem(items[2])
+            }
+            item(span = { GridItemSpan(2) }) {
+                HomeFooterItem(items[3])
+            }
+            item(span = { GridItemSpan(2) }) {
                 val context = LocalContext.current
                 Button(
                     variant = ButtonVariant.SecondaryOutlined,
