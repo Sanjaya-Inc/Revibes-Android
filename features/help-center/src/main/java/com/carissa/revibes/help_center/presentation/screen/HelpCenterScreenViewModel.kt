@@ -4,18 +4,20 @@
 package com.carissa.revibes.help_center.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
+import com.carissa.revibes.core.domain.supportdata.GetSupportDataUseCase
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.help_center.presentation.model.HelpCenterChildData
 import com.carissa.revibes.help_center.presentation.model.HelpCenterRootData
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import org.koin.android.annotation.KoinViewModel
 
 data class HelpCenterScreenUiState(
     val isLoading: Boolean = false,
     val searchValue: TextFieldValue = TextFieldValue(),
-    val items: PersistentList<HelpCenterRootData> = HelpCenterRootData.default()
+    val items: PersistentList<HelpCenterRootData> = persistentListOf()
 ) {
     val filteredItems
         get() = if (searchValue.text.isNotBlank()) {
@@ -47,8 +49,18 @@ sealed interface HelpCenterScreenUiEvent {
 }
 
 @KoinViewModel
-class HelpCenterScreenViewModel :
-    BaseViewModel<HelpCenterScreenUiState, HelpCenterScreenUiEvent>(HelpCenterScreenUiState()) {
+class HelpCenterScreenViewModel(
+    private val getSupportDataUseCase: GetSupportDataUseCase
+) : BaseViewModel<HelpCenterScreenUiState, HelpCenterScreenUiEvent>(HelpCenterScreenUiState()) {
+
+    init {
+        intent {
+            val supportData = getSupportDataUseCase.getSupportData()
+            reduce {
+                state.copy(items = HelpCenterRootData.default(supportData))
+            }
+        }
+    }
 
     override fun onEvent(event: HelpCenterScreenUiEvent) {
         super.onEvent(event)
