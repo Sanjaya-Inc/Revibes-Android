@@ -26,6 +26,7 @@ data class ManageVoucherScreenUiState(
 
 sealed interface ManageVoucherScreenUiEvent {
     data object NavigateToAddVoucher : NavigationEvent, ManageVoucherScreenUiEvent
+    data class NavigateToEditVoucher(val voucher: VoucherDomain) : NavigationEvent, ManageVoucherScreenUiEvent
     data object Initialize : ManageVoucherScreenUiEvent
     data object LoadMore : ManageVoucherScreenUiEvent
     data object Refresh : ManageVoucherScreenUiEvent

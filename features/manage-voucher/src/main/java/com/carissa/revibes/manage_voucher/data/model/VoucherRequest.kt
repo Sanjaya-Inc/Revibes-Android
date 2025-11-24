@@ -23,19 +23,14 @@ data class CreateVoucherRequest(
 @Serializable
 @Keep
 data class UpdateVoucherRequest(
-    val code: String,
     val name: String,
     val description: String,
-    val type: String,
-    val amount: Double,
-    val currency: String,
-    val conditions: VoucherConditionsRequest,
-    val claimPeriodStart: String,
-    val claimPeriodEnd: String,
-    val imageUrl: String? = null,
-    val isActive: Boolean,
-    val termConditions: List<String> = emptyList(),
-    val guides: List<String> = emptyList()
+    val code: String? = null,
+    val conditions: VoucherConditionsRequest? = null,
+    val claimPeriodStart: String? = null,
+    val claimPeriodEnd: String? = null,
+    val termConditions: List<String>? = null,
+    val guides: List<String>? = null
 )
 
 @Serializable

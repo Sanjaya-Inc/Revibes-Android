@@ -273,6 +273,11 @@ fun ManageVoucherScreen(
                                             viewModel.onEvent(
                                                 ManageVoucherScreenUiEvent.ToggleVoucherStatus(voucher)
                                             )
+                                        },
+                                        onEditClick = {
+                                            viewModel.onEvent(
+                                                ManageVoucherScreenUiEvent.NavigateToEditVoucher(voucher)
+                                            )
                                         }
                                     )
                                 }

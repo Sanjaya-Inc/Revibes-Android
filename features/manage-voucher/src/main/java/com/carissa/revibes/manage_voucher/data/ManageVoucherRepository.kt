@@ -126,4 +126,41 @@ class ManageVoucherRepository(
         val request = UpdateVoucherStatusRequest(isAvailable = isAvailable)
         remoteApi.updateVoucherStatus(id, request)
     }
+
+    suspend fun updateVoucher(
+        id: String,
+        name: String,
+        description: String,
+        code: String? = null,
+        conditions: VoucherConditions? = null,
+        claimPeriodStart: String? = null,
+        claimPeriodEnd: String? = null,
+        termConditions: List<String>? = null,
+        guides: List<String>? = null
+    ) {
+        execute {
+            val conditionsRequest = conditions?.let {
+                com.carissa.revibes.manage_voucher.data.model.VoucherConditionsRequest(
+                    maxClaim = it.maxClaim,
+                    maxUsage = it.maxUsage,
+                    minOrderItem = it.minOrderItem,
+                    minOrderAmount = it.minOrderAmount.toDouble(),
+                    maxDiscountAmount = it.maxDiscountAmount.toDouble()
+                )
+            }
+
+            val request = com.carissa.revibes.manage_voucher.data.model.UpdateVoucherRequest(
+                name = name,
+                description = description,
+                code = code,
+                conditions = conditionsRequest,
+                claimPeriodStart = claimPeriodStart,
+                claimPeriodEnd = claimPeriodEnd,
+                termConditions = termConditions,
+                guides = guides
+            )
+
+            remoteApi.updateVoucher(id, request)
+        }
+    }
 }

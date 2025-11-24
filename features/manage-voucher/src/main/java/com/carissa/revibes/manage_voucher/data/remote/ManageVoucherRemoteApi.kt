@@ -1,6 +1,7 @@
 package com.carissa.revibes.manage_voucher.data.remote
 
 import com.carissa.revibes.manage_voucher.data.model.BaseResponse
+import com.carissa.revibes.manage_voucher.data.model.UpdateVoucherRequest
 import com.carissa.revibes.manage_voucher.data.model.UpdateVoucherStatusRequest
 import com.carissa.revibes.manage_voucher.data.model.VoucherDetailResponse
 import com.carissa.revibes.manage_voucher.data.model.VoucherListResponse
@@ -11,6 +12,7 @@ import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.Headers
 import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -47,6 +49,13 @@ interface ManageVoucherRemoteApi {
     suspend fun updateVoucherStatus(
         @Path("id") id: String,
         @Body request: UpdateVoucherStatusRequest
+    ): BaseResponse
+
+    @PUT("vouchers/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateVoucher(
+        @Path("id") id: String,
+        @Body request: UpdateVoucherRequest
     ): BaseResponse
 }
 

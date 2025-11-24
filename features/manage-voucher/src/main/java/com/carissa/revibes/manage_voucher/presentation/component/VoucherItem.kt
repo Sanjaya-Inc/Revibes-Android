@@ -1,6 +1,5 @@
 package com.carissa.revibes.manage_voucher.presentation.component
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,6 +51,7 @@ fun VoucherItem(
     voucher: VoucherDomain,
     onDeleteClick: () -> Unit,
     onToggleStatus: () -> Unit,
+    onEditClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDropdown by remember { mutableStateOf(false) }
@@ -158,11 +158,7 @@ fun VoucherItem(
                                 text = { Text("Edit") },
                                 onClick = {
                                     showDropdown = false
-                                    Toast.makeText(
-                                        context,
-                                        "Edit feature is coming soon!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    onEditClick()
                                 },
                                 leadingIcon = {
                                     Icon(
