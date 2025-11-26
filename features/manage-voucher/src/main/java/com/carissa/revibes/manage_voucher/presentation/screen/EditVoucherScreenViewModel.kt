@@ -36,6 +36,20 @@ data class EditVoucherScreenUiState(
     val showTermConditionsSection: Boolean = true,
     val showGuidesSection: Boolean = true,
     val isInClaimPeriod: Boolean = false,
+    // Original values for change detection
+    val originalName: String = "",
+    val originalDescription: String = "",
+    val originalCode: String = "",
+    val originalMaxClaim: Int = 0,
+    val originalMaxUsage: Int = 0,
+    val originalMinOrderItem: Int = 0,
+    val originalMinOrderAmount: Long = 0L,
+    val originalMaxDiscountAmount: Long = 0L,
+    val originalClaimPeriodStart: String = "",
+    val originalClaimPeriodEnd: String = "",
+    val originalTermConditions: ImmutableList<String> = persistentListOf(),
+    val originalGuides: ImmutableList<String> = persistentListOf(),
+    // Errors
     val nameError: String? = null,
     val descriptionError: String? = null,
     val codeError: String? = null,
@@ -62,7 +76,9 @@ sealed interface EditVoucherScreenUiEvent {
     data class MaxUsageChanged(val maxUsage: TextFieldValue) : EditVoucherScreenUiEvent
     data class MinOrderItemChanged(val minOrderItem: TextFieldValue) : EditVoucherScreenUiEvent
     data class MinOrderAmountChanged(val minOrderAmount: TextFieldValue) : EditVoucherScreenUiEvent
-    data class MaxDiscountAmountChanged(val maxDiscountAmount: TextFieldValue) : EditVoucherScreenUiEvent
+    data class MaxDiscountAmountChanged(val maxDiscountAmount: TextFieldValue) :
+        EditVoucherScreenUiEvent
+
     data class ClaimPeriodStartChanged(val date: String) : EditVoucherScreenUiEvent
     data class ClaimPeriodEndChanged(val date: String) : EditVoucherScreenUiEvent
     data object ToggleConditionsSection : EditVoucherScreenUiEvent
@@ -108,7 +124,11 @@ class EditVoucherScreenViewModel(
             EditVoucherScreenUiEvent.ToggleGuidesSection -> toggleGuidesSection()
             is EditVoucherScreenUiEvent.AddTermCondition -> addTermCondition(event.condition)
             is EditVoucherScreenUiEvent.RemoveTermCondition -> removeTermCondition(event.index)
-            is EditVoucherScreenUiEvent.UpdateTermCondition -> updateTermCondition(event.index, event.condition)
+            is EditVoucherScreenUiEvent.UpdateTermCondition -> updateTermCondition(
+                event.index,
+                event.condition
+            )
+
             is EditVoucherScreenUiEvent.AddGuide -> addGuide(event.guide)
             is EditVoucherScreenUiEvent.RemoveGuide -> removeGuide(event.index)
             is EditVoucherScreenUiEvent.UpdateGuide -> updateGuide(event.index, event.guide)
@@ -130,26 +150,49 @@ class EditVoucherScreenViewModel(
                 maxClaim = TextFieldValue(voucher.conditions?.maxClaim?.toString() ?: ""),
                 maxUsage = TextFieldValue(voucher.conditions?.maxUsage?.toString() ?: ""),
                 minOrderItem = TextFieldValue(voucher.conditions?.minOrderItem?.toString() ?: ""),
-                minOrderAmount = TextFieldValue(voucher.conditions?.minOrderAmount?.toString() ?: ""),
-                maxDiscountAmount = TextFieldValue(voucher.conditions?.maxDiscountAmount?.toString() ?: ""),
+                minOrderAmount = TextFieldValue(
+                    voucher.conditions?.minOrderAmount?.toString() ?: ""
+                ),
+                maxDiscountAmount = TextFieldValue(
+                    voucher.conditions?.maxDiscountAmount?.toString() ?: ""
+                ),
                 claimPeriodStart = voucher.claimPeriodStart,
                 claimPeriodEnd = voucher.claimPeriodEnd,
                 imageUrl = voucher.imageUri,
                 termConditions = voucher.termConditions.toImmutableList(),
                 guides = voucher.guides.toImmutableList(),
-                isInClaimPeriod = isInClaimPeriod
+                isInClaimPeriod = isInClaimPeriod,
+                // Store original values
+                originalName = voucher.name,
+                originalDescription = voucher.description,
+                originalCode = voucher.code,
+                originalMaxClaim = voucher.conditions?.maxClaim ?: 0,
+                originalMaxUsage = voucher.conditions?.maxUsage ?: 0,
+                originalMinOrderItem = voucher.conditions?.minOrderItem ?: 0,
+                originalMinOrderAmount = voucher.conditions?.minOrderAmount ?: 0L,
+                originalMaxDiscountAmount = voucher.conditions?.maxDiscountAmount ?: 0L,
+                originalClaimPeriodStart = voucher.claimPeriodStart,
+                originalClaimPeriodEnd = voucher.claimPeriodEnd,
+                originalTermConditions = voucher.termConditions.toImmutableList(),
+                originalGuides = voucher.guides.toImmutableList()
             )
         }
     }
 
     private fun checkIfInClaimPeriod(claimPeriodStart: String): Boolean {
         return try {
-            val formatter = DateTimeFormatter.ISO_DATE
-            val startDate = LocalDate.parse(claimPeriodStart, formatter)
+            val startDate = if (claimPeriodStart.contains("T")) {
+                val dateTime = java.time.ZonedDateTime.parse(claimPeriodStart)
+                dateTime.toLocalDate()
+            } else {
+                LocalDate.parse(claimPeriodStart, DateTimeFormatter.ISO_DATE)
+            }
             val currentDate = LocalDate.now()
-            currentDate >= startDate
+            val isInPeriod = currentDate >= startDate
+
+            isInPeriod
         } catch (e: Exception) {
-            Log.e(TAG, "Error parsing claim period start date", e)
+            Log.e(TAG, "Error parsing claim period start date: $claimPeriodStart", e)
             false
         }
     }
@@ -296,7 +339,8 @@ class EditVoucherScreenViewModel(
         if (!state.isInClaimPeriod && index in state.termConditions.indices) {
             reduce {
                 state.copy(
-                    termConditions = state.termConditions.toMutableList().apply { removeAt(index) }.toImmutableList()
+                    termConditions = state.termConditions.toMutableList().apply { removeAt(index) }
+                        .toImmutableList()
                 )
             }
         }
@@ -329,7 +373,10 @@ class EditVoucherScreenViewModel(
     private fun removeGuide(index: Int) = intent {
         if (!state.isInClaimPeriod && index in state.guides.indices) {
             reduce {
-                state.copy(guides = state.guides.toMutableList().apply { removeAt(index) }.toImmutableList())
+                state.copy(
+                    guides = state.guides.toMutableList().apply { removeAt(index) }
+                        .toImmutableList()
+                )
             }
         }
     }
@@ -338,7 +385,8 @@ class EditVoucherScreenViewModel(
         if (!state.isInClaimPeriod && index in state.guides.indices) {
             reduce {
                 state.copy(
-                    guides = state.guides.toMutableList().apply { set(index, guide) }.toImmutableList(),
+                    guides = state.guides.toMutableList().apply { set(index, guide) }
+                        .toImmutableList(),
                     guidesError = null
                 )
             }
@@ -348,11 +396,42 @@ class EditVoucherScreenViewModel(
     private fun saveVoucher() = intent {
         val isFormValid = validateForm(state)
         if (isFormValid) {
+            // Check if anything has changed
+            val hasNameChanged = state.name.text != state.originalName
+            val hasDescriptionChanged = state.description.text != state.originalDescription
+
+            val hasCodeChanged = !state.isInClaimPeriod && state.code.text != state.originalCode
+            val hasConditionsChanged = !state.isInClaimPeriod && (
+                state.maxClaim.text.toIntOrNull() != state.originalMaxClaim ||
+                    state.maxUsage.text.toIntOrNull() != state.originalMaxUsage ||
+                    state.minOrderItem.text.toIntOrNull() != state.originalMinOrderItem ||
+                    state.minOrderAmount.text.toLongOrNull() != state.originalMinOrderAmount ||
+                    state.maxDiscountAmount.text.toLongOrNull() != state.originalMaxDiscountAmount
+                )
+            val hasClaimPeriodStartChanged = !state.isInClaimPeriod &&
+                state.claimPeriodStart != state.originalClaimPeriodStart
+            val hasClaimPeriodEndChanged = !state.isInClaimPeriod &&
+                state.claimPeriodEnd != state.originalClaimPeriodEnd
+            val hasTermConditionsChanged = !state.isInClaimPeriod &&
+                state.termConditions != state.originalTermConditions
+            val hasGuidesChanged = !state.isInClaimPeriod &&
+                state.guides != state.originalGuides
+
+            // If nothing changed, just navigate back
+            if (!hasNameChanged && !hasDescriptionChanged && !hasCodeChanged &&
+                !hasConditionsChanged && !hasClaimPeriodStartChanged &&
+                !hasClaimPeriodEndChanged && !hasTermConditionsChanged && !hasGuidesChanged
+            ) {
+                postSideEffect(EditVoucherScreenUiEvent.OnVoucherUpdatedSuccessfully)
+                return@intent
+            }
+
             reduce { state.copy(isLoading = true) }
 
             try {
-                val code = if (!state.isInClaimPeriod) state.code.text else null
-                val conditions = if (!state.isInClaimPeriod) {
+                // Only send changed fields
+                val code = if (hasCodeChanged) state.code.text else null
+                val conditions = if (hasConditionsChanged) {
                     VoucherConditions(
                         maxClaim = state.maxClaim.text.toIntOrNull() ?: 0,
                         maxUsage = state.maxUsage.text.toIntOrNull() ?: 0,
@@ -363,10 +442,11 @@ class EditVoucherScreenViewModel(
                 } else {
                     null
                 }
-                val claimPeriodStart = if (!state.isInClaimPeriod) state.claimPeriodStart else null
-                val claimPeriodEnd = if (!state.isInClaimPeriod) state.claimPeriodEnd else null
-                val termConditions = if (!state.isInClaimPeriod) state.termConditions else null
-                val guides = if (!state.isInClaimPeriod) state.guides else null
+                val claimPeriodStart =
+                    if (hasClaimPeriodStartChanged) state.claimPeriodStart else null
+                val claimPeriodEnd = if (hasClaimPeriodEndChanged) state.claimPeriodEnd else null
+                val termConditions = if (hasTermConditionsChanged) state.termConditions else null
+                val guides = if (hasGuidesChanged) state.guides else null
 
                 repository.updateVoucher(
                     id = state.voucherId,
@@ -384,7 +464,11 @@ class EditVoucherScreenViewModel(
                 postSideEffect(EditVoucherScreenUiEvent.OnVoucherUpdatedSuccessfully)
             } catch (e: Exception) {
                 reduce { state.copy(isLoading = false) }
-                postSideEffect(EditVoucherScreenUiEvent.OnUpdateVoucherFailed(e.message ?: "Update failed"))
+                postSideEffect(
+                    EditVoucherScreenUiEvent.OnUpdateVoucherFailed(
+                        e.message ?: "Update failed"
+                    )
+                )
             }
         } else {
             Log.e(TAG, "Form validation failed")
