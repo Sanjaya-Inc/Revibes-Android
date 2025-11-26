@@ -42,7 +42,9 @@ data class VoucherData(
     val isAvailable: Boolean,
     val inUse: Boolean = false,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val termConditions: List<String> = emptyList(),
+    val guides: List<String> = emptyList()
 )
 
 @Serializable
@@ -60,7 +62,9 @@ data class VoucherItemData(
     val isAvailable: Boolean,
     val inUse: Boolean,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val termConditions: List<String> = emptyList(),
+    val guides: List<String> = emptyList()
 )
 
 @Serializable

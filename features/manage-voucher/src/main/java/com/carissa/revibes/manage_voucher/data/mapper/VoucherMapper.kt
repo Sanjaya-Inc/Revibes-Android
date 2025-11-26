@@ -24,7 +24,9 @@ fun VoucherData.toDomain(): VoucherDomain {
         isAvailable = this.isAvailable,
         inUse = this.inUse,
         createdAt = this.createdAt,
-        updatedAt = this.updatedAt
+        updatedAt = this.updatedAt,
+        termConditions = this.termConditions,
+        guides = this.guides
     )
 }
 
@@ -63,7 +65,9 @@ fun VoucherItemData.toDomain(): VoucherDomain {
         isAvailable = this.isAvailable,
         inUse = this.inUse,
         createdAt = this.createdAt,
-        updatedAt = this.updatedAt
+        updatedAt = this.updatedAt,
+        termConditions = this.termConditions,
+        guides = this.guides
     )
 }
 
