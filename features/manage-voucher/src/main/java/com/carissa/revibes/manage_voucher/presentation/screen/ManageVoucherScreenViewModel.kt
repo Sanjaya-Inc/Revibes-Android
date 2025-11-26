@@ -21,7 +21,10 @@ data class ManageVoucherScreenUiState(
     val pagination: PaginationData? = null,
     val error: String? = null,
     val showDeleteDialog: Boolean = false,
-    val voucherToDelete: VoucherDomain? = null
+    val voucherToDelete: VoucherDomain? = null,
+    val showExchangeDialog: Boolean = false,
+    val voucherToExchange: VoucherDomain? = null,
+    val isCreatingExchange: Boolean = false
 )
 
 sealed interface ManageVoucherScreenUiEvent {
@@ -35,16 +38,28 @@ sealed interface ManageVoucherScreenUiEvent {
     data object HideDeleteDialog : ManageVoucherScreenUiEvent
     data object ConfirmDelete : ManageVoucherScreenUiEvent
     data class ToggleVoucherStatus(val voucher: VoucherDomain) : ManageVoucherScreenUiEvent
+    data class ShowExchangeDialog(val voucher: VoucherDomain) : ManageVoucherScreenUiEvent
+    data object HideExchangeDialog : ManageVoucherScreenUiEvent
+    data class CreateExchange(
+        val amount: Int,
+        val description: String,
+        val quota: Int,
+        val endedAt: String?
+    ) : ManageVoucherScreenUiEvent
 
     // Side effects
     data class OnToggleStatusSuccess(val message: String) : ManageVoucherScreenUiEvent
     data class OnToggleStatusFailed(val message: String) : ManageVoucherScreenUiEvent
+    data class OnExchangeSuccess(val message: String) : ManageVoucherScreenUiEvent
+    data class OnExchangeFailed(val message: String) : ManageVoucherScreenUiEvent
 }
 
 @KoinViewModel
 class ManageVoucherScreenViewModel(
     private val repository: ManageVoucherRepository,
-    private val exceptionHandler: ManageVoucherExceptionHandler
+    private val exceptionHandler: ManageVoucherExceptionHandler,
+    private val createExchangeVoucherUseCase:
+    com.carissa.revibes.manage_voucher.domain.usecase.CreateExchangeVoucherUseCase
 ) : BaseViewModel<ManageVoucherScreenUiState, ManageVoucherScreenUiEvent>(
     initialState = ManageVoucherScreenUiState(),
     onCreate = { onEvent(ManageVoucherScreenUiEvent.Initialize) },
@@ -64,6 +79,14 @@ class ManageVoucherScreenViewModel(
             is ManageVoucherScreenUiEvent.HideDeleteDialog -> hideDeleteDialog()
             is ManageVoucherScreenUiEvent.ConfirmDelete -> confirmDelete()
             is ManageVoucherScreenUiEvent.ToggleVoucherStatus -> toggleVoucherStatus(event.voucher)
+            is ManageVoucherScreenUiEvent.ShowExchangeDialog -> showExchangeDialog(event.voucher)
+            is ManageVoucherScreenUiEvent.HideExchangeDialog -> hideExchangeDialog()
+            is ManageVoucherScreenUiEvent.CreateExchange -> createExchange(
+                event.amount,
+                event.description,
+                event.quota,
+                event.endedAt
+            )
             else -> Unit
         }
     }
@@ -88,7 +111,9 @@ class ManageVoucherScreenViewModel(
         val newVouchers = if (refresh) {
             result.vouchers.toPersistentList()
         } else {
-            (state.vouchers + result.vouchers).toPersistentList()
+            val existingIds = state.vouchers.map { it.id }.toSet()
+            val uniqueNewVouchers = result.vouchers.filter { it.id !in existingIds }
+            (state.vouchers + uniqueNewVouchers).toPersistentList()
         }
 
         reduce {
@@ -204,6 +229,67 @@ class ManageVoucherScreenViewModel(
             postSideEffect(
                 ManageVoucherScreenUiEvent.OnToggleStatusFailed(
                     "Failed to update voucher status: ${e.message.orEmpty()}"
+                )
+            )
+        }
+    }
+
+    private fun showExchangeDialog(voucher: VoucherDomain) = intent {
+        reduce {
+            state.copy(
+                showExchangeDialog = true,
+                voucherToExchange = voucher
+            )
+        }
+    }
+
+    private fun hideExchangeDialog() = intent {
+        reduce {
+            state.copy(
+                showExchangeDialog = false,
+                voucherToExchange = null,
+                isCreatingExchange = false
+            )
+        }
+    }
+
+    private fun createExchange(amount: Int, description: String, quota: Int, endedAt: String?) = intent {
+        val voucher = state.voucherToExchange ?: return@intent
+
+        reduce { state.copy(isCreatingExchange = true) }
+
+        try {
+            createExchangeVoucherUseCase(
+                sourceId = voucher.id,
+                amount = amount,
+                description = description,
+                quota = quota,
+                endedAt = endedAt
+            )
+
+            reduce {
+                state.copy(
+                    showExchangeDialog = false,
+                    voucherToExchange = null,
+                    isCreatingExchange = false
+                )
+            }
+
+            postSideEffect(
+                ManageVoucherScreenUiEvent.OnExchangeSuccess(
+                    "Exchange setup successfully for ${voucher.name}"
+                )
+            )
+        } catch (e: Throwable) {
+            reduce {
+                state.copy(
+                    isCreatingExchange = false
+                )
+            }
+
+            postSideEffect(
+                ManageVoucherScreenUiEvent.OnExchangeFailed(
+                    "Failed to setup exchange: ${e.message.orEmpty()}"
                 )
             )
         }

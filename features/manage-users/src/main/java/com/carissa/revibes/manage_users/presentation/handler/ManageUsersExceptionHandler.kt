@@ -16,6 +16,16 @@ class ManageUsersExceptionHandler {
         syntax: Syntax<ManageUsersScreenUiState, ManageUsersScreenUiEvent>,
         throwable: Throwable
     ) = syntax.run {
+        if (throwable is kotlinx.coroutines.CancellationException) {
+            reduce {
+                state.copy(
+                    isLoading = false,
+                    isLoadingMore = false
+                )
+            }
+            return@run
+        }
+
         reduce {
             state.copy(
                 isLoading = false,

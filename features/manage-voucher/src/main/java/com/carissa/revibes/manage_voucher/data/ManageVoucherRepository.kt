@@ -4,9 +4,14 @@ import android.content.Context
 import android.net.Uri
 import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.manage_voucher.data.mapper.toDomain
+import com.carissa.revibes.manage_voucher.data.model.CreateExchangeVoucherRequest
+import com.carissa.revibes.manage_voucher.data.model.ExchangePrice
 import com.carissa.revibes.manage_voucher.data.model.PaginationData
+import com.carissa.revibes.manage_voucher.data.model.UpdateVoucherRequest
 import com.carissa.revibes.manage_voucher.data.model.UpdateVoucherStatusRequest
+import com.carissa.revibes.manage_voucher.data.model.VoucherConditionsRequest
 import com.carissa.revibes.manage_voucher.data.remote.ManageVoucherRemoteApi
+import com.carissa.revibes.manage_voucher.domain.model.ExchangeVoucherDomain
 import com.carissa.revibes.manage_voucher.domain.model.VoucherConditions
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -140,7 +145,7 @@ class ManageVoucherRepository(
     ) {
         execute {
             val conditionsRequest = conditions?.let {
-                com.carissa.revibes.manage_voucher.data.model.VoucherConditionsRequest(
+                VoucherConditionsRequest(
                     maxClaim = it.maxClaim,
                     maxUsage = it.maxUsage,
                     minOrderItem = it.minOrderItem,
@@ -149,7 +154,7 @@ class ManageVoucherRepository(
                 )
             }
 
-            val request = com.carissa.revibes.manage_voucher.data.model.UpdateVoucherRequest(
+            val request = UpdateVoucherRequest(
                 name = name,
                 description = description,
                 code = code,
@@ -161,6 +166,26 @@ class ManageVoucherRepository(
             )
 
             remoteApi.updateVoucher(id, request)
+        }
+    }
+
+    suspend fun createExchangeVoucher(
+        sourceId: String,
+        amount: Int,
+        description: String = "",
+        quota: Int = -1,
+        endedAt: String? = null
+    ): ExchangeVoucherDomain {
+        return execute {
+            val request = CreateExchangeVoucherRequest(
+                sourceId = sourceId,
+                description = description,
+                prices = listOf(ExchangePrice(amount = amount)),
+                quota = quota,
+                endedAt = endedAt
+            )
+            val response = remoteApi.createExchangeVoucher(request)
+            response.data.toDomain()
         }
     }
 }

@@ -58,6 +58,7 @@ import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
 import com.carissa.revibes.core.presentation.compose.components.RevibesEmptyState
+import com.carissa.revibes.manage_voucher.presentation.component.SetupExchangeDialog
 import com.carissa.revibes.manage_voucher.presentation.component.VoucherItem
 import com.carissa.revibes.manage_voucher.presentation.navigation.ManageVoucherGraph
 import com.ramcosta.composedestinations.annotation.Destination
@@ -101,6 +102,14 @@ fun ManageVoucherScreen(
 
             is ManageVoucherScreenUiEvent.OnToggleStatusFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is ManageVoucherScreenUiEvent.OnExchangeSuccess -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+            }
+
+            is ManageVoucherScreenUiEvent.OnExchangeFailed -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
             }
 
             else -> Unit
@@ -298,6 +307,11 @@ fun ManageVoucherScreen(
                                                     voucher
                                                 )
                                             )
+                                        },
+                                        onSetupExchangeClick = {
+                                            viewModel.onEvent(
+                                                ManageVoucherScreenUiEvent.ShowExchangeDialog(voucher)
+                                            )
                                         }
                                     )
                                 }
@@ -365,5 +379,27 @@ fun ManageVoucherScreen(
                 }
             }
         )
+    }
+
+    state.voucherToExchange?.let { voucher ->
+        if (state.showExchangeDialog) {
+            SetupExchangeDialog(
+                voucher = voucher,
+                isLoading = state.isCreatingExchange,
+                onDismiss = {
+                    viewModel.onEvent(ManageVoucherScreenUiEvent.HideExchangeDialog)
+                },
+                onConfirm = { amount, description, quota, endedAt ->
+                    viewModel.onEvent(
+                        ManageVoucherScreenUiEvent.CreateExchange(
+                            amount = amount,
+                            description = description,
+                            quota = quota,
+                            endedAt = endedAt
+                        )
+                    )
+                }
+            )
+        }
     }
 }

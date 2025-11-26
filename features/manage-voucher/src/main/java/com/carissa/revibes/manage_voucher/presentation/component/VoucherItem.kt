@@ -52,6 +52,7 @@ fun VoucherItem(
     onDeleteClick: () -> Unit,
     onToggleStatus: () -> Unit,
     onEditClick: () -> Unit,
+    onSetupExchangeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDropdown by remember { mutableStateOf(false) }
@@ -154,6 +155,19 @@ fun VoucherItem(
                             expanded = showDropdown,
                             onDismissRequest = { showDropdown = false }
                         ) {
+                            DropdownMenuItem(
+                                text = { Text("Setup Exchange") },
+                                onClick = {
+                                    showDropdown = false
+                                    onSetupExchangeClick()
+                                },
+                                leadingIcon = {
+                                    Text(
+                                        text = "🔄",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
+                            )
                             DropdownMenuItem(
                                 text = { Text("Edit") },
                                 onClick = {

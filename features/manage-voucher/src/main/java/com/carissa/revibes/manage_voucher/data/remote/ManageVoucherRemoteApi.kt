@@ -57,6 +57,12 @@ interface ManageVoucherRemoteApi {
         @Path("id") id: String,
         @Body request: UpdateVoucherRequest
     ): BaseResponse
+
+    @POST("exchanges")
+    @Headers("Content-Type: application/json")
+    suspend fun createExchangeVoucher(
+        @Body request: com.carissa.revibes.manage_voucher.data.model.CreateExchangeVoucherRequest
+    ): com.carissa.revibes.manage_voucher.data.model.CreateExchangeVoucherResponse
 }
 
 @Single
