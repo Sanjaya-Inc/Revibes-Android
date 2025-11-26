@@ -19,16 +19,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +59,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Destination<ManageUsersGraph>(start = true)
 @Composable
 fun ManageUsersScreen(
@@ -62,6 +69,19 @@ fun ManageUsersScreen(
 ) {
     val uiState by viewModel.collectAsState()
     val context = LocalContext.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                viewModel.onEvent(ManageUsersScreenUiEvent.Refresh)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     viewModel.collectSideEffect { event ->
         when (event) {
@@ -88,6 +108,7 @@ fun ManageUsersScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ManageUsersScreenContent(
     uiState: ManageUsersScreenUiState,
@@ -95,6 +116,8 @@ private fun ManageUsersScreenContent(
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
+    val pullToRefreshState = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -109,6 +132,18 @@ private fun ManageUsersScreenContent(
     LaunchedEffect(shouldLoadMore) {
         if (shouldLoadMore && !uiState.isLoadingMore) {
             onEvent(ManageUsersScreenUiEvent.LoadMore)
+        }
+    }
+
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) {
+            onEvent(ManageUsersScreenUiEvent.Refresh)
+        }
+    }
+
+    LaunchedEffect(uiState.isLoading) {
+        if (!uiState.isLoading) {
+            isRefreshing = false
         }
     }
 
@@ -142,86 +177,95 @@ private fun ManageUsersScreenContent(
             }
         }
     ) { paddingValues ->
-        Column(
+        PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
+                .padding(paddingValues),
+            isRefreshing = isRefreshing,
+            onRefresh = { isRefreshing = true },
+            state = pullToRefreshState,
+            contentAlignment = Alignment.TopCenter
         ) {
-            OutlinedTextField(
-                value = uiState.searchValue,
-                onValueChange = { onEvent(ManageUsersScreenUiEvent.SearchValueChanged(it)) },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(
-                        text = stringResource(R.string.search_users),
-                        style = RevibesTheme.typography.body1,
-                        color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
-                    )
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = RevibesTheme.colors.primary,
-                    unfocusedBorderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f)
-                ),
-                singleLine = true
-            )
-
-            ContentStateSwitcher(
-                uiState.isLoading && uiState.users.isEmpty(),
-                error = uiState.error,
-                actionButton = "Refresh" to {
-                    onEvent(ManageUsersScreenUiEvent.Refresh)
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
             ) {
-                if (uiState.filteredUsers.isEmpty() && uiState.searchValue.text.isNotBlank()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                OutlinedTextField(
+                    value = uiState.searchValue,
+                    onValueChange = { onEvent(ManageUsersScreenUiEvent.SearchValueChanged(it)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
                         Text(
-                            text = stringResource(R.string.no_users_found),
+                            text = stringResource(R.string.search_users),
                             style = RevibesTheme.typography.body1,
                             color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
                         )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = RevibesTheme.colors.primary,
+                        unfocusedBorderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f)
+                    ),
+                    singleLine = true
+                )
+
+                ContentStateSwitcher(
+                    uiState.isLoading && uiState.users.isEmpty(),
+                    error = uiState.error,
+                    actionButton = "Refresh" to {
+                        onEvent(ManageUsersScreenUiEvent.Refresh)
                     }
-                } else {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(
-                            items = uiState.filteredUsers,
-                            key = { it.id }
-                        ) { user ->
-                            UserItem(
-                                user = user,
-                                onUserClick = { userId ->
-                                    onEvent(ManageUsersScreenUiEvent.NavigateToEditUser(userId))
-                                }
+                ) {
+                    if (uiState.filteredUsers.isEmpty() && uiState.searchValue.text.isNotBlank()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.no_users_found),
+                                style = RevibesTheme.typography.body1,
+                                color = RevibesTheme.colors.onSurface.copy(alpha = 0.6f)
                             )
                         }
+                    } else {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(vertical = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(
+                                items = uiState.filteredUsers,
+                                key = { it.id }
+                            ) { user ->
+                                UserItem(
+                                    user = user,
+                                    onUserClick = { userId ->
+                                        onEvent(ManageUsersScreenUiEvent.NavigateToEditUser(userId))
+                                    }
+                                )
+                            }
 
-                        if (uiState.isLoadingMore) {
-                            item {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        color = RevibesTheme.colors.primary
-                                    )
+                            if (uiState.isLoadingMore) {
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            color = RevibesTheme.colors.primary
+                                        )
+                                    }
                                 }
                             }
                         }
