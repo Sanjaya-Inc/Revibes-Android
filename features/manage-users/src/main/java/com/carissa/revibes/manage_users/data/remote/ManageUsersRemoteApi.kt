@@ -28,7 +28,8 @@ interface ManageUsersRemoteApi {
         @Query("sortBy") sortBy: String = "createdAt",
         @Query("sortOrder") sortOrder: String = "desc",
         @Query("lastDocId") lastDocId: String? = null,
-        @Query("direction") direction: String = "next"
+        @Query("direction") direction: String = "next",
+        @Query("search") search: String? = null
     ): UserListResponse
 
     @GET("users/{id}")

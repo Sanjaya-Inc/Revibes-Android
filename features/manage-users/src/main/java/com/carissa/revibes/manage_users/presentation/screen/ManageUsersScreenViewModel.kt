@@ -10,6 +10,8 @@ import com.carissa.revibes.manage_users.presentation.handler.ManageUsersExceptio
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import org.koin.android.annotation.KoinViewModel
 
 data class ManageUsersScreenUiState(
@@ -17,10 +19,21 @@ data class ManageUsersScreenUiState(
     val isLoadingMore: Boolean = false,
     val searchValue: TextFieldValue = TextFieldValue(),
     val users: PersistentList<UserDomain> = persistentListOf(),
-    val filteredUsers: PersistentList<UserDomain> = persistentListOf(),
     val pagination: PaginationData? = null,
-    val error: String? = null
-)
+    val error: String? = null,
+    val sortBy: SortType = SortType.CREATED_AT,
+    val sortOrder: SortOrder = SortOrder.DESC
+) {
+    enum class SortType(val apiValue: String, val label: String) {
+        DISPLAY_NAME("displayName", "Name"),
+        CREATED_AT("createdAt", "Date")
+    }
+
+    enum class SortOrder(val apiValue: String, val label: String) {
+        ASC("asc", "Ascending"),
+        DESC("desc", "Descending")
+    }
+}
 
 sealed interface ManageUsersScreenUiEvent {
     data class NavigateToEditUser(val userId: String) : NavigationEvent, ManageUsersScreenUiEvent
@@ -29,6 +42,8 @@ sealed interface ManageUsersScreenUiEvent {
     data object LoadMore : ManageUsersScreenUiEvent
     data object Refresh : ManageUsersScreenUiEvent
     data class SearchValueChanged(val searchValue: TextFieldValue) : ManageUsersScreenUiEvent
+    data class SortByChanged(val sortBy: ManageUsersScreenUiState.SortType) : ManageUsersScreenUiEvent
+    data class SortOrderChanged(val sortOrder: ManageUsersScreenUiState.SortOrder) : ManageUsersScreenUiEvent
     data class OnLoadUsersFailed(val message: String) : ManageUsersScreenUiEvent
 }
 
@@ -43,6 +58,7 @@ class ManageUsersScreenViewModel(
         exceptionHandler.onManageUsersError(syntax, throwable)
     }
 ) {
+    private var searchJob: Job? = null
 
     override fun onEvent(event: ManageUsersScreenUiEvent) {
         super.onEvent(event)
@@ -51,6 +67,8 @@ class ManageUsersScreenViewModel(
             ManageUsersScreenUiEvent.LoadMore -> loadMoreUsers()
             ManageUsersScreenUiEvent.Refresh -> onRefresh()
             is ManageUsersScreenUiEvent.SearchValueChanged -> onSearchValueChanged(event.searchValue)
+            is ManageUsersScreenUiEvent.SortByChanged -> onSortByChanged(event.sortBy)
+            is ManageUsersScreenUiEvent.SortOrderChanged -> onSortOrderChanged(event.sortOrder)
             else -> Unit
         }
     }
@@ -65,11 +83,15 @@ class ManageUsersScreenViewModel(
         }
 
         val lastDocId = if (refresh) null else state.pagination?.lastDocId
+        val searchQuery = state.searchValue.text.trim()
 
         val result = repository.getUserList(
             limit = DATA_PER_PAGE,
+            sortBy = state.sortBy.apiValue,
+            sortOrder = state.sortOrder.apiValue,
             lastDocId = lastDocId,
-            direction = "next"
+            direction = "next",
+            search = searchQuery.ifBlank { null }
         )
 
         val newUsers = if (refresh) {
@@ -83,7 +105,6 @@ class ManageUsersScreenViewModel(
                 isLoading = false,
                 isLoadingMore = false,
                 users = newUsers,
-                filteredUsers = filterUsers(newUsers, state.searchValue.text),
                 pagination = result.pagination,
                 error = null
             )
@@ -97,12 +118,26 @@ class ManageUsersScreenViewModel(
     }
 
     private fun onSearchValueChanged(searchValue: TextFieldValue) = intent {
-        val filteredUsers = filterUsers(state.users, searchValue.text)
-        reduce {
-            state.copy(
-                searchValue = searchValue,
-                filteredUsers = filteredUsers
-            )
+        reduce { state.copy(searchValue = searchValue) }
+
+        searchJob?.cancel()
+        searchJob = intent {
+            delay(SEARCH_DEBOUNCE_MILLIS)
+            loadUsers(refresh = true)
+        }
+    }
+
+    private fun onSortByChanged(sortBy: ManageUsersScreenUiState.SortType) = intent {
+        if (state.sortBy != sortBy) {
+            reduce { state.copy(sortBy = sortBy) }
+            loadUsers(refresh = true)
+        }
+    }
+
+    private fun onSortOrderChanged(sortOrder: ManageUsersScreenUiState.SortOrder) = intent {
+        if (state.sortOrder != sortOrder) {
+            reduce { state.copy(sortOrder = sortOrder) }
+            loadUsers(refresh = true)
         }
     }
 
@@ -110,23 +145,8 @@ class ManageUsersScreenViewModel(
         loadUsers(refresh = true)
     }
 
-    private fun filterUsers(
-        users: PersistentList<UserDomain>,
-        searchQuery: String
-    ): PersistentList<UserDomain> {
-        return if (searchQuery.isBlank()) {
-            users
-        } else {
-            users.filter { user ->
-                user.name.contains(searchQuery, ignoreCase = true) ||
-                    user.email.contains(searchQuery, ignoreCase = true) ||
-                    user.phone.contains(searchQuery, ignoreCase = true) ||
-                    user.role.name.contains(searchQuery, ignoreCase = true)
-            }.toPersistentList()
-        }
-    }
-
     companion object {
         private const val DATA_PER_PAGE = 20
+        private const val SEARCH_DEBOUNCE_MILLIS = 500L
     }
 }

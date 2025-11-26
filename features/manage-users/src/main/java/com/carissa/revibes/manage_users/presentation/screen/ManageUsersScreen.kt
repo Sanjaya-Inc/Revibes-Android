@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -217,6 +220,102 @@ private fun ManageUsersScreenContent(
                     singleLine = true
                 )
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Sort by:",
+                        style = RevibesTheme.typography.body2,
+                        color = RevibesTheme.colors.onSurface,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    LazyRow(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(ManageUsersScreenUiState.SortType.entries) { sortType ->
+                            FilterChip(
+                                selected = uiState.sortBy == sortType,
+                                onClick = { onEvent(ManageUsersScreenUiEvent.SortByChanged(sortType)) },
+                                label = {
+                                    Text(
+                                        text = sortType.label,
+                                        style = RevibesTheme.typography.body2,
+                                        fontWeight = if (uiState.sortBy == sortType) {
+                                            FontWeight.SemiBold
+                                        } else {
+                                            FontWeight.Normal
+                                        }
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = RevibesTheme.colors.primary,
+                                    selectedLabelColor = RevibesTheme.colors.onPrimary,
+                                    containerColor = RevibesTheme.colors.surface,
+                                    labelColor = RevibesTheme.colors.onSurface
+                                ),
+                                border = FilterChipDefaults.filterChipBorder(
+                                    enabled = true,
+                                    selected = uiState.sortBy == sortType,
+                                    borderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f),
+                                    selectedBorderColor = RevibesTheme.colors.primary,
+                                    borderWidth = 1.dp,
+                                    selectedBorderWidth = 1.dp
+                                )
+                            )
+                        }
+
+                        items(ManageUsersScreenUiState.SortOrder.entries) { sortOrder ->
+                            FilterChip(
+                                selected = uiState.sortOrder == sortOrder,
+                                onClick = {
+                                    onEvent(
+                                        ManageUsersScreenUiEvent.SortOrderChanged(
+                                            sortOrder
+                                        )
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = "${
+                                            if (sortOrder == ManageUsersScreenUiState.SortOrder.ASC) {
+                                                "⬆️"
+                                            } else {
+                                                "⬇️"
+                                            }
+                                        } ${sortOrder.label}",
+                                        style = RevibesTheme.typography.body2,
+                                        fontWeight = if (uiState.sortOrder == sortOrder) {
+                                            FontWeight.SemiBold
+                                        } else {
+                                            FontWeight.Normal
+                                        }
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = RevibesTheme.colors.primary,
+                                    selectedLabelColor = RevibesTheme.colors.onPrimary,
+                                    containerColor = RevibesTheme.colors.surface,
+                                    labelColor = RevibesTheme.colors.onSurface
+                                ),
+                                border = FilterChipDefaults.filterChipBorder(
+                                    enabled = true,
+                                    selected = uiState.sortOrder == sortOrder,
+                                    borderColor = RevibesTheme.colors.onSurface.copy(alpha = 0.2f),
+                                    selectedBorderColor = RevibesTheme.colors.primary,
+                                    borderWidth = 1.dp,
+                                    selectedBorderWidth = 1.dp
+                                )
+                            )
+                        }
+                    }
+                }
+
                 ContentStateSwitcher(
                     uiState.isLoading && uiState.users.isEmpty(),
                     error = uiState.error,
@@ -224,7 +323,7 @@ private fun ManageUsersScreenContent(
                         onEvent(ManageUsersScreenUiEvent.Refresh)
                     }
                 ) {
-                    if (uiState.filteredUsers.isEmpty() && uiState.searchValue.text.isNotBlank()) {
+                    if (uiState.users.isEmpty()) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -243,7 +342,7 @@ private fun ManageUsersScreenContent(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(
-                                items = uiState.filteredUsers,
+                                items = uiState.users,
                                 key = { it.id }
                             ) { user ->
                                 UserItem(
@@ -283,11 +382,6 @@ private fun ManageUsersScreenPreview() {
         ManageUsersScreenContent(
             uiState = ManageUsersScreenUiState(
                 users = persistentListOf(
-                    UserDomain.dummy(),
-                    UserDomain.dummy()
-                        .copy(id = "2", name = "Jane Smith", email = "jane@example.com")
-                ),
-                filteredUsers = persistentListOf(
                     UserDomain.dummy(),
                     UserDomain.dummy()
                         .copy(id = "2", name = "Jane Smith", email = "jane@example.com")

@@ -31,7 +31,8 @@ class ManageUsersRepository(
         sortBy: String = "createdAt",
         sortOrder: String = "desc",
         lastDocId: String? = null,
-        direction: String = "next"
+        direction: String = "next",
+        search: String? = null
     ): UserListResult {
         return execute {
             val response = remoteApi.getUserList(
@@ -39,7 +40,8 @@ class ManageUsersRepository(
                 sortBy = sortBy,
                 sortOrder = sortOrder,
                 lastDocId = lastDocId,
-                direction = direction
+                direction = direction,
+                search = search
             )
 
             UserListResult(
