@@ -39,6 +39,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -78,15 +79,30 @@ fun ManageVoucherScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                viewModel.onEvent(ManageVoucherScreenUiEvent.Refresh)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     viewModel.collectSideEffect { event ->
         when (event) {
             is ManageVoucherScreenUiEvent.OnToggleStatusSuccess -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
+
             is ManageVoucherScreenUiEvent.OnToggleStatusFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
+
             else -> Unit
         }
     }
@@ -271,12 +287,16 @@ fun ManageVoucherScreen(
                                         },
                                         onToggleStatus = {
                                             viewModel.onEvent(
-                                                ManageVoucherScreenUiEvent.ToggleVoucherStatus(voucher)
+                                                ManageVoucherScreenUiEvent.ToggleVoucherStatus(
+                                                    voucher
+                                                )
                                             )
                                         },
                                         onEditClick = {
                                             viewModel.onEvent(
-                                                ManageVoucherScreenUiEvent.NavigateToEditVoucher(voucher)
+                                                ManageVoucherScreenUiEvent.NavigateToEditVoucher(
+                                                    voucher
+                                                )
                                             )
                                         }
                                     )
