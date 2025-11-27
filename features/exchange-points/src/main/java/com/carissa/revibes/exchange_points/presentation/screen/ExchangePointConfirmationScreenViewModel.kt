@@ -9,15 +9,17 @@ import org.koin.android.annotation.KoinViewModel
 
 data class ExchangePointConfirmationScreenUiState(
     val isLoading: Boolean = false,
-    val paymentDate: String = "26 Maret 2025", // Will be populated from string resources or API
-    val paymentStatus: String = "Success", // Will be populated from string resources or API
-    // Will be populated from string resources or API
-    val couponImage: String = "https://gcdnb.pbrd.co/images/16vLvVICjqy3.webp",
-    val couponName: String = "Shopee coupon 70% off", // Will be populated from string resources or API
-    val couponValidUntil: String = "Valid until March 2026", // Will be populated from string resources or API
-    val couponPrice: Int = 10,
-    val couponQuantity: Int = 2,
-    val totalAmount: Int = 20
+    val paymentDate: String = java.text.SimpleDateFormat(
+        "dd MMMM yyyy",
+        java.util.Locale.getDefault()
+    ).format(java.util.Date()),
+    val paymentStatus: String = "Success",
+    val couponImage: String = "",
+    val couponName: String = "",
+    val couponValidUntil: String = "",
+    val couponPrice: Int = 0,
+    val couponQuantity: Int = 0,
+    val totalAmount: Int = 0
 )
 
 sealed interface ExchangePointConfirmationScreenUiEvent {

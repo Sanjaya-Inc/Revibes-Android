@@ -22,7 +22,16 @@ class ExchangePointDetailScreenNavigationHandler : NavigationEventHandler() {
             )
 
             is ExchangePointDetailScreenUiEvent.NavigateToConfirmation -> {
-                navigator.navigate(ExchangePointConfirmationScreenDestination)
+                navigator.navigate(
+                    ExchangePointConfirmationScreenDestination(
+                        voucherId = event.voucherId,
+                        voucherName = event.voucherName,
+                        voucherImage = event.voucherImage,
+                        voucherValidUntil = event.voucherValidUntil,
+                        voucherPrice = event.voucherPrice,
+                        quantity = event.quantity
+                    )
+                )
             }
         }
     }

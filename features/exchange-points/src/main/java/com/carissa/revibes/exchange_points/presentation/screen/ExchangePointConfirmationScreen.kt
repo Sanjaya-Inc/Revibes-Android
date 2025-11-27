@@ -54,12 +54,26 @@ import org.orbitmvi.orbit.compose.collectAsState
 @Destination<ExchangePointsGraph>()
 @Composable
 fun ExchangePointConfirmationScreen(
+    voucherId: String,
+    voucherName: String,
+    voucherImage: String,
+    voucherValidUntil: String,
+    voucherPrice: Int,
+    quantity: Int,
     modifier: Modifier = Modifier,
     viewModel: ExchangePointConfirmationScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
+
     ExchangePointConfirmationScreenContent(
-        uiState = state,
+        uiState = state.copy(
+            couponImage = voucherImage,
+            couponName = voucherName,
+            couponValidUntil = voucherValidUntil,
+            couponPrice = voucherPrice,
+            couponQuantity = quantity,
+            totalAmount = voucherPrice * quantity
+        ),
         modifier = modifier,
         eventReceiver = viewModel
     )

@@ -8,6 +8,7 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.exchange_points.data.ExchangePointsRepository
 import com.carissa.revibes.exchange_points.data.model.PurchaseItem
 import com.carissa.revibes.exchange_points.data.model.PurchaseRequest
+import com.carissa.revibes.exchange_points.domain.model.Voucher
 import com.carissa.revibes.exchange_points.presentation.handler.ExchangePointsExceptionHandler
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -29,7 +30,15 @@ data class ExchangePointDetailScreenUiState(
 
 sealed interface ExchangePointDetailScreenUiEvent {
     data object NavigateToProfile : ExchangePointDetailScreenUiEvent, NavigationEvent
-    data object NavigateToConfirmation : ExchangePointDetailScreenUiEvent, NavigationEvent
+
+    data class NavigateToConfirmation(
+        val voucherId: String,
+        val voucherName: String,
+        val voucherImage: String,
+        val voucherValidUntil: String,
+        val voucherPrice: Int,
+        val quantity: Int
+    ) : ExchangePointDetailScreenUiEvent, NavigationEvent
 
     data class PurchaseVoucher(
         val id: String,
@@ -52,6 +61,13 @@ class ExchangePointDetailScreenViewModel(
     }
 ) {
     val coins = userPointFlow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000L), 0)
+
+    private var currentVoucher: Voucher? = null
+
+    fun setVoucher(voucher: Voucher) {
+        currentVoucher = voucher
+    }
+
     override fun onEvent(event: ExchangePointDetailScreenUiEvent) {
         super.onEvent(event)
         when (event) {
@@ -74,7 +90,7 @@ class ExchangePointDetailScreenViewModel(
                         "Please verify your account to admin first!"
                     )
                 )
-                reduce { state.copy(isLoading = true) }
+                reduce { state.copy(isLoading = false) }
                 return@intent
             }
             val purchaseRequest = PurchaseRequest(
@@ -92,7 +108,19 @@ class ExchangePointDetailScreenViewModel(
             reduce { state.copy(isLoading = false) }
             userPointFlow.update()
             postSideEffect(ExchangePointDetailScreenUiEvent.ShowToast("Voucher purchased successfully"))
-            onEvent(ExchangePointDetailScreenUiEvent.NavigateToConfirmation)
+
+            currentVoucher?.let { voucher ->
+                onEvent(
+                    ExchangePointDetailScreenUiEvent.NavigateToConfirmation(
+                        voucherId = voucher.id,
+                        voucherName = voucher.name,
+                        voucherImage = voucher.imageUri,
+                        voucherValidUntil = voucher.validUntil,
+                        voucherPrice = voucher.point,
+                        quantity = qty
+                    )
+                )
+            }
         }
     }
 }

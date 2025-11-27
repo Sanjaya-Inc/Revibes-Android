@@ -29,6 +29,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -83,12 +84,18 @@ fun ExchangePointDetailScreen(
     var quantity by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
 
+    LaunchedEffect(voucher) {
+        viewModel.setVoucher(voucher)
+    }
+
     viewModel.collectSideEffect {
         when (it) {
             is ExchangePointDetailScreenUiEvent.ShowToast -> {
                 Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
-
+            is ExchangePointDetailScreenUiEvent.NavigateToConfirmation -> {
+                showBottomSheet = false
+            }
             else -> Unit
         }
     }
@@ -103,7 +110,11 @@ fun ExchangePointDetailScreen(
 
     if (showBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
+            onDismissRequest = {
+                if (!state.isLoading) {
+                    showBottomSheet = false
+                }
+            },
             sheetState = bottomSheetState,
             dragHandle = { },
             containerColor = RevibesTheme.colors.primary,
@@ -111,7 +122,11 @@ fun ExchangePointDetailScreen(
             CouponConfirmationBottomSheet(
                 voucher = voucher,
                 quantity = quantity,
-                onDismiss = { showBottomSheet = false },
+                onDismiss = {
+                    if (!state.isLoading) {
+                        showBottomSheet = false
+                    }
+                },
                 onQuantityChanged = { quantity = it },
                 onConfirm = {
                     viewModel.onEvent(
@@ -121,7 +136,8 @@ fun ExchangePointDetailScreen(
                         )
                     )
                 },
-                isConfirmEnabled = voucher.point * quantity <= coins,
+                isConfirmEnabled = voucher.point * quantity <= coins && !state.isLoading,
+                isLoading = state.isLoading,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp)
@@ -291,6 +307,7 @@ private fun CouponConfirmationBottomSheet(
     onQuantityChanged: (Int) -> Unit,
     onConfirm: () -> Unit,
     isConfirmEnabled: Boolean,
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -379,14 +396,14 @@ private fun CouponConfirmationBottomSheet(
                         modifier = Modifier
                             .size(36.dp)
                             .background(
-                                color = if (quantity > 1) {
+                                color = if (quantity > 1 && !isLoading) {
                                     RevibesTheme.colors.background
                                 } else {
                                     RevibesTheme.colors.background.copy(alpha = 0.3f)
                                 },
                                 shape = CircleShape
                             )
-                            .clickable(enabled = quantity > 1) {
+                            .clickable(enabled = quantity > 1 && !isLoading) {
                                 onQuantityChanged(quantity - 1)
                             },
                         contentAlignment = Alignment.Center
@@ -416,10 +433,14 @@ private fun CouponConfirmationBottomSheet(
                         modifier = Modifier
                             .size(36.dp)
                             .background(
-                                color = RevibesTheme.colors.background,
+                                color = if (!isLoading) {
+                                    RevibesTheme.colors.background
+                                } else {
+                                    RevibesTheme.colors.background.copy(alpha = 0.3f)
+                                },
                                 shape = CircleShape
                             )
-                            .clickable {
+                            .clickable(enabled = !isLoading) {
                                 onQuantityChanged(quantity + 1)
                             },
                         contentAlignment = Alignment.Center
@@ -441,6 +462,7 @@ private fun CouponConfirmationBottomSheet(
                 variant = ButtonVariant.PrimaryOutlined,
                 onClick = onConfirm,
                 enabled = isConfirmEnabled,
+                loading = isLoading,
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .clip(RoundedCornerShape(56.dp))
@@ -493,7 +515,8 @@ private fun CouponConfirmationBottomSheetPreview() {
                 onDismiss = {},
                 onQuantityChanged = {},
                 onConfirm = {},
-                isConfirmEnabled = true
+                isConfirmEnabled = true,
+                isLoading = false
             )
         }
     }
