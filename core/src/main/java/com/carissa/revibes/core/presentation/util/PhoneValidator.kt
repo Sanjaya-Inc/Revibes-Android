@@ -1,7 +1,7 @@
 package com.carissa.revibes.core.presentation.util
 
 object PhoneValidator {
-    private const val INDONESIA_PHONE_REGEX = "^(\\+62|62|0)8[1-9][0-9]{6,9}$"
+    private const val INDONESIA_PHONE_REGEX = "^(\\+62|62|0)8[1-9][0-9]{6,15}$"
 
     fun validate(phone: String): String? {
         return when {

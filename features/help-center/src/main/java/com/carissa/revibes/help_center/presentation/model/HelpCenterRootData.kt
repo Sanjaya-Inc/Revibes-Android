@@ -41,12 +41,12 @@ data class HelpCenterRootData(
                         HelpCenterChildData(
                             false,
                             "How long the points will be expired?",
-                            "All points collected through the app will expire on December 31, 2025."
+                            "All points collected through the app will expire every year on 31 Dec"
                         ),
                         HelpCenterChildData(
                             false,
                             "What can I do with the points I've collected?",
-                            "You can redeem your points basic goods that are available in the app. " +
+                            "You can redeem your points for basic goods that are available in the app. " +
                                 "Currently, we have Rice and Sugar available in our apps.\n\n" +
                                 "After redeeming, you may choose to take home the items home or donate it to a " +
                                 "community in need through our Revibes partner programs."

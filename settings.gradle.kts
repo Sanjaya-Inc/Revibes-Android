@@ -28,6 +28,9 @@ dependencyResolutionManagement {
 rootProject.name = "Revibes"
 include(":app", ":features")
 include(":core")
+include(":core:network")
+include(":core:local")
+include(":core:pref")
 include(":features:auth")
 include(":features:onboarding")
 include(":features:home")
