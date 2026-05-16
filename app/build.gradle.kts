@@ -2,7 +2,6 @@ plugins {
     alias(sjy.plugins.buildlogic.app)
     alias(sjy.plugins.buildlogic.compose)
     alias(sjy.plugins.buildlogic.firebase)
-    alias(sjy.plugins.buildlogic.test)
 }
 
 android {

@@ -48,7 +48,7 @@ dependencies {
     implementation(platform(sjy.firebase.bom))
     implementation(sjy.firebase.messaging)
 
-    testApi(libs.junit)
-    androidTestApi(libs.androidx.junit)
-    androidTestApi(libs.androidx.espresso.core)
+//    testApi(libs.junit)
+//    androidTestApi(libs.androidx.junit)
+//    androidTestApi(libs.androidx.espresso.core)
 }

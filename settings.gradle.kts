@@ -12,6 +12,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -28,9 +31,9 @@ dependencyResolutionManagement {
 rootProject.name = "Revibes"
 include(":app", ":features")
 include(":core")
-include(":core:network")
-include(":core:local")
-include(":core:pref")
+//include(":core:network")
+//include(":core:local")
+//include(":core:pref")
 include(":features:auth")
 include(":features:onboarding")
 include(":features:home")
