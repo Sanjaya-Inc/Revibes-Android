@@ -17,8 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.compose.components.ComingSoon
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
+import com.carissa.revibes.core.presentation.compose.components.ComingSoon
 import com.carissa.revibes.core.presentation.compose.components.CommonHeader
 import com.carissa.revibes.core.presentation.compose.components.SearchConfig
 import com.carissa.revibes.pick_up.R

@@ -9,8 +9,8 @@ import androidx.annotation.StringRes
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.onboarding.R
-import org.koin.core.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
 data class OnboardingPageUiState(
     @param:StringRes val text: Int = -1,

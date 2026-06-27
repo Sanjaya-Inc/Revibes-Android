@@ -25,13 +25,13 @@ import com.carissa.revibes.auth.R
 import com.carissa.revibes.auth.presentation.components.AuthScreenLayout
 import com.carissa.revibes.auth.presentation.navigation.AuthGraph
 import com.carissa.revibes.core.presentation.EventReceiver
+import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.auth.AuthActionButton
 import com.carissa.revibes.core.presentation.compose.auth.AuthNavigationRow
 import com.carissa.revibes.core.presentation.compose.auth.AuthTextField
 import com.carissa.revibes.core.presentation.compose.auth.EmailField
 import com.carissa.revibes.core.presentation.compose.auth.PasswordField
 import com.carissa.revibes.core.presentation.compose.auth.PhoneField
-import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.components.Text
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.auth.destinations.LoginScreenDestination

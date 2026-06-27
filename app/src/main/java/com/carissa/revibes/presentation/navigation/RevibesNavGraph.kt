@@ -11,15 +11,15 @@ import com.ramcosta.composedestinations.generated.helpcenter.navgraphs.HelpCente
 import com.ramcosta.composedestinations.generated.home.navgraphs.HomeNavGraph
 import com.ramcosta.composedestinations.generated.homeadmin.navgraphs.HomeAdminNavGraph
 import com.ramcosta.composedestinations.generated.manageclaimedvouchers.navgraphs.ManageClaimedVouchersNavGraph
-import com.ramcosta.composedestinations.generated.manageusers.navgraphs.ManageUsersNavGraph
 import com.ramcosta.composedestinations.generated.managetransaction.navgraphs.ManageTransactionNavGraph
+import com.ramcosta.composedestinations.generated.manageusers.navgraphs.ManageUsersNavGraph
 import com.ramcosta.composedestinations.generated.managevoucher.navgraphs.ManageVoucherNavGraph
 import com.ramcosta.composedestinations.generated.onboarding.navgraphs.OnboardingNavGraph
 import com.ramcosta.composedestinations.generated.pickup.navgraphs.PickUpNavGraph
 import com.ramcosta.composedestinations.generated.point.navgraphs.PointNavGraph
 import com.ramcosta.composedestinations.generated.profile.navgraphs.ProfileNavGraph
-import com.ramcosta.composedestinations.generated.transactionhistory.navgraphs.TransactionHistoryNavGraph
 import com.ramcosta.composedestinations.generated.shop.navgraphs.ShopNavGraph
+import com.ramcosta.composedestinations.generated.transactionhistory.navgraphs.TransactionHistoryNavGraph
 
 @NavHostGraph(defaultTransitions = RevibesHostNavigationStyle::class)
 annotation class RevibesNavGraph {

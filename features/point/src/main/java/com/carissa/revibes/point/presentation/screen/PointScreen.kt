@@ -47,13 +47,13 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.data.main.model.FeatureName
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
-import com.carissa.revibes.core.presentation.compose.components.MaintenanceChecker
 import com.carissa.revibes.core.presentation.compose.PointGoldBg
 import com.carissa.revibes.core.presentation.compose.PointModalBg
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.components.Button
 import com.carissa.revibes.core.presentation.compose.components.CommonHeader
+import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
+import com.carissa.revibes.core.presentation.compose.components.MaintenanceChecker
 import com.carissa.revibes.core.presentation.compose.components.RevibesLoading
 import com.carissa.revibes.core.presentation.compose.components.SearchConfig
 import com.carissa.revibes.core.presentation.compose.components.Text

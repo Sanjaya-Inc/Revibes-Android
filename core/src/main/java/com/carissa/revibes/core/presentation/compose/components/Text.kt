@@ -20,12 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.compose.LocalContentColor
 import com.carissa.revibes.core.presentation.compose.LocalTextStyle
 import com.carissa.revibes.core.presentation.compose.LocalTypography
-import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentMapOf
 

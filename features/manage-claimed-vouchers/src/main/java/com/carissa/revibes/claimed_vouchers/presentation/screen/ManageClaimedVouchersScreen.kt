@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,7 +41,6 @@ import com.carissa.revibes.claimed_vouchers.R
 import com.carissa.revibes.claimed_vouchers.presentation.component.ClaimedVoucherItem
 import com.carissa.revibes.claimed_vouchers.presentation.navigation.ManageClaimedVouchersGraph
 import com.carissa.revibes.core.presentation.EventReceiver
-import androidx.compose.material3.MaterialTheme
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
 import com.ramcosta.composedestinations.annotation.Destination

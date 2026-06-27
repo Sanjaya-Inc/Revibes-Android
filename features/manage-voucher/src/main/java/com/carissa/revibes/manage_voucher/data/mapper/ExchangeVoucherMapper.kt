@@ -1,8 +1,8 @@
 package com.carissa.revibes.manage_voucher.data.mapper
 
 import com.carissa.revibes.manage_voucher.data.model.ExchangeVoucherData
-import com.carissa.revibes.manage_voucher.domain.model.ExchangeVoucherDomain
 import com.carissa.revibes.manage_voucher.domain.model.ExchangePriceDomain
+import com.carissa.revibes.manage_voucher.domain.model.ExchangeVoucherDomain
 
 fun ExchangeVoucherData.toDomain(): ExchangeVoucherDomain {
     return ExchangeVoucherDomain(

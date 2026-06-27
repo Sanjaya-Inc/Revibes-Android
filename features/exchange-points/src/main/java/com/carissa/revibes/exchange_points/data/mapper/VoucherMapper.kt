@@ -2,8 +2,8 @@ package com.carissa.revibes.exchange_points.data.mapper
 
 import com.carissa.revibes.exchange_points.data.model.ExchangeItem
 import com.carissa.revibes.exchange_points.data.model.UserVoucherItem
-import com.carissa.revibes.exchange_points.domain.model.Voucher
 import com.carissa.revibes.exchange_points.domain.model.UserVoucher
+import com.carissa.revibes.exchange_points.domain.model.Voucher
 
 fun ExchangeItem.toVoucher(): Voucher {
     return Voucher(

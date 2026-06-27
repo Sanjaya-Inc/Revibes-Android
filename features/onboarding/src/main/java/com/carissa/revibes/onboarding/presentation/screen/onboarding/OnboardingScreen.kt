@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.carissa.revibes.core.presentation.EventReceiver
-import com.carissa.revibes.onboarding.presentation.navigation.OnboardingGraph
 import com.carissa.revibes.core.presentation.compose.components.PagerIndicator
+import com.carissa.revibes.onboarding.presentation.navigation.OnboardingGraph
 import com.carissa.revibes.onboarding.presentation.screen.onboarding.component.page.OnboardingPage
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel
