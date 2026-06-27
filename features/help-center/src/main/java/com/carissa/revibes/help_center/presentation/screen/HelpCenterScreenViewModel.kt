@@ -12,7 +12,7 @@ import com.carissa.revibes.help_center.presentation.model.HelpCenterRootData
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class HelpCenterScreenUiState(
     val isLoading: Boolean = false,

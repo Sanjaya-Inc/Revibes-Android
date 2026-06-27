@@ -9,7 +9,7 @@ import com.carissa.revibes.core.presentation.util.PhoneValidator
 import com.carissa.revibes.manage_users.data.ManageUsersRepository
 import com.carissa.revibes.manage_users.domain.model.UserDomain
 import com.carissa.revibes.manage_users.presentation.handler.ManageUsersExceptionHandler
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class AddUserScreenUiState(
     val isLoading: Boolean = false,

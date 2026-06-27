@@ -3,7 +3,7 @@ package com.carissa.revibes.presentation.screen.splash
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.presentation.screen.splash.handler.SplashNavigationHandler
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class SplashScreenUiState(val isLoading: Boolean = false)
 

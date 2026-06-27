@@ -10,7 +10,7 @@ import com.carissa.revibes.manage_voucher.presentation.handler.ManageVoucherExce
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

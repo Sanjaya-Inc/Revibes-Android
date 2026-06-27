@@ -7,7 +7,7 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.point.data.PointRepository
 import com.carissa.revibes.point.domain.model.Mission
 import com.carissa.revibes.point.presentation.handler.PointExceptionHandler
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class PointScreenUiState(
     val isLoading: Boolean = false,

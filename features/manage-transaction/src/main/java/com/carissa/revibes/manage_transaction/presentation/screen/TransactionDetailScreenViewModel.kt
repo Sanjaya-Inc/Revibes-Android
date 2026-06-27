@@ -4,7 +4,7 @@ import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.manage_transaction.data.ManageTransactionRepository
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
 import com.carissa.revibes.manage_transaction.presentation.handler.ManageTransactionExceptionHandler
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 sealed interface TransactionDetailScreenUiEvent {
     data class LoadTransactionDetail(val transactionId: String) : TransactionDetailScreenUiEvent

@@ -5,7 +5,7 @@ package com.carissa.revibes.onboarding.presentation.screen.onboarding
 
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.onboarding.data.local.IsOnboardingFinishedDataSource
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class OnboardingScreenUiState(val initialPage: Int = 0, val pageCount: Int = 3)
 

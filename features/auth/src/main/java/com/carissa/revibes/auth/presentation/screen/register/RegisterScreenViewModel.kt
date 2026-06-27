@@ -12,7 +12,7 @@ import com.carissa.revibes.core.presentation.util.EmailValidator
 import com.carissa.revibes.core.presentation.util.FullNameValidator
 import com.carissa.revibes.core.presentation.util.PasswordValidator
 import com.carissa.revibes.core.presentation.util.PhoneValidator
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class RegisterScreenUiState(
     val isLoading: Boolean = false,

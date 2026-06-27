@@ -6,7 +6,6 @@ import com.carissa.revibes.core.data.main.local.LocalDataSource
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import org.koin.ksp.generated.module
 
 class KoinInitializer : Initializer<Unit> {
     override fun create(context: Context) {
@@ -14,7 +13,7 @@ class KoinInitializer : Initializer<Unit> {
         startKoin {
             androidLogger()
             androidContext(context)
-            modules(listOf(CoreModule.module))
+            modules(listOf(CoreModule.module()))
         }
     }
 

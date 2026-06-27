@@ -14,7 +14,7 @@ import com.carissa.revibes.transaction_history.presentation.handler.TransactionH
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class TransactionHistoryScreenUiState(
     val isLoading: Boolean = false,

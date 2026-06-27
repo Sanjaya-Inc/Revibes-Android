@@ -8,7 +8,7 @@ import com.carissa.revibes.manage_transaction.presentation.handler.ManageTransac
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 sealed interface ManageTransactionScreenUiEvent {
     data class OnSearchQueryChanged(val query: String) : ManageTransactionScreenUiEvent

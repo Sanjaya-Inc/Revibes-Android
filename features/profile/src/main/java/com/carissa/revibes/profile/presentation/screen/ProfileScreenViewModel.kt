@@ -13,7 +13,7 @@ import com.carissa.revibes.profile.R
 import com.carissa.revibes.profile.presentation.screen.handler.LogoutHandler
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class ProfileScreenUiState(
     val isLoading: Boolean = false,

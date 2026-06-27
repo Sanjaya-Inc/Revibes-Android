@@ -8,11 +8,10 @@ import android.content.Context
 import androidx.startup.Initializer
 import com.carissa.revibes.core.di.KoinInitializer
 import org.koin.core.context.loadKoinModules
-import org.koin.ksp.generated.module
 
 class HelpCenterModuleInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        loadKoinModules(HelpCenterModule.module)
+        loadKoinModules(HelpCenterModule.module())
     }
 
     override fun dependencies(): List<Class<out Initializer<*>?>?> {

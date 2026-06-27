@@ -6,7 +6,7 @@ package com.carissa.revibes.pick_up.presentation.screen
 
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class PickUpScreenUiState(
     val isLoading: Boolean = false

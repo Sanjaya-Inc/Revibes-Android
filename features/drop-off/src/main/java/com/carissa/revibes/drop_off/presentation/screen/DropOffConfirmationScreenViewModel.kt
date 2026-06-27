@@ -10,7 +10,7 @@ import com.carissa.revibes.drop_off.data.EstimatePointItemData
 import com.carissa.revibes.drop_off.data.SubmitOrderItemData
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.handler.DropOffExceptionHandler
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class DropOffConfirmationScreenUiState(
     val isLoading: Boolean = false,

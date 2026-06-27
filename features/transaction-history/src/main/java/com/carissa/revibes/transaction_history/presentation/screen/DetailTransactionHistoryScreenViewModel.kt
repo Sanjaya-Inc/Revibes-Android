@@ -7,7 +7,7 @@ import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.transaction_history.data.TransactionHistoryRepository
 import com.carissa.revibes.transaction_history.domain.model.TransactionDetail
 import com.carissa.revibes.transaction_history.presentation.handler.DetailTransactionHistoryExceptionHandler
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class DetailTransactionHistoryScreenUiState(
     val isLoading: Boolean = false,

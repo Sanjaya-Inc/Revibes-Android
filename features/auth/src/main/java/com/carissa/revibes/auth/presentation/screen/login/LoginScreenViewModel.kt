@@ -11,7 +11,7 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.core.presentation.util.EmailValidator
 import com.carissa.revibes.core.presentation.util.PasswordValidator
 import com.carissa.revibes.core.presentation.util.PhoneValidator
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class LoginScreenUiState(
     val isLoading: Boolean = false,

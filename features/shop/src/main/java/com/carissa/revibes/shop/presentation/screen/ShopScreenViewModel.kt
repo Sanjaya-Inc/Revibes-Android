@@ -5,7 +5,7 @@ package com.carissa.revibes.shop.presentation.screen
 
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class ShopScreenUiState(val isLoading: Boolean = false)
 

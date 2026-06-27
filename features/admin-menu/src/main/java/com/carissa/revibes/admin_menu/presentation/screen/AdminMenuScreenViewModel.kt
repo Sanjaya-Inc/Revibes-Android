@@ -6,7 +6,7 @@ package com.carissa.revibes.admin_menu.presentation.screen
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class AdminMenuScreenUiState(
     val isLoading: Boolean = false,

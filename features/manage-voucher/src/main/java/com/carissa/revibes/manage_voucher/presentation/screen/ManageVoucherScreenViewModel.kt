@@ -10,7 +10,7 @@ import com.carissa.revibes.manage_voucher.presentation.handler.ManageVoucherExce
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 data class ManageVoucherScreenUiState(
     val isLoading: Boolean = false,
