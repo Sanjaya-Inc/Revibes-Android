@@ -44,3 +44,6 @@ local.properties
 /.idea/copilot.data.migration.edit.xml
 /.idea/markdown.xml
 /.vscode/settings.json
+/keeystore
+/.serena/**
+

@@ -1,0 +1,28 @@
+{
+  "code-discovery-gate": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command|default_api:run_command|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /.agents/scripts/code-discovery-gate.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "session-init": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -n --rawfile content /.agents/workflow/init.md '{ \"systemMessage\": \"Project tooling constraints loaded\", \"hookSpecificOutput\": { \"hookEventName\": \"SessionStart\", \"additionalContext\": $content } }'",
+            "statusMessage": "Loading project tooling constraints..."
+          }
+        ]
+      }
+    ]
+  }
+}
