@@ -2,6 +2,7 @@ package com.carissa.revibes.presentation.navigation.handler
 
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.home_admin.presentation.screen.HomeAdminScreenUiEvent
+import com.ramcosta.composedestinations.generated.homeadmin.destinations.ManageNewsScreenDestination
 import com.ramcosta.composedestinations.generated.manageclaimedvouchers.destinations.ManageClaimedVouchersScreenDestination
 import com.ramcosta.composedestinations.generated.managetransaction.destinations.ManageTransactionScreenDestination
 import com.ramcosta.composedestinations.generated.manageusers.destinations.ManageUsersScreenDestination
@@ -18,6 +19,7 @@ class HomeAdminScreenNavigationHandler : NavigationEventHandler() {
             event is HomeAdminScreenUiEvent.NavigateToManageVouchers ||
             event is HomeAdminScreenUiEvent.NavigateToManageTransactions ||
             event is HomeAdminScreenUiEvent.NavigateToClaimedVouchers ||
+            event is HomeAdminScreenUiEvent.NavigateToManageNews ||
             event is HomeAdminScreenUiEvent.NavigateToProfile
     }
 
@@ -34,6 +36,9 @@ class HomeAdminScreenNavigationHandler : NavigationEventHandler() {
             )
             is HomeAdminScreenUiEvent.NavigateToClaimedVouchers -> navigator.navigate(
                 ManageClaimedVouchersScreenDestination
+            )
+            is HomeAdminScreenUiEvent.NavigateToManageNews -> navigator.navigate(
+                ManageNewsScreenDestination
             )
             is HomeAdminScreenUiEvent.NavigateToProfile -> navigator.navigate(
                 ProfileScreenDestination

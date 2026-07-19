@@ -27,7 +27,7 @@ class PointExceptionHandler(
 
         val errorEvent = if (isClaimingReward) {
             if (throwable is ClientRequestException && throwable.response.status.value == 403) {
-                reduce { state.copy(allowedToClaimReward = false) }
+                reduce { state.copy(isAlreadyCheckedInToday = true) }
                 PointScreenUiEvent.OnClaimDailyRewardFailed(getMessage(true, throwable))
             } else {
                 PointScreenUiEvent.OnClaimDailyRewardFailed(getMessage(true, throwable))

@@ -195,6 +195,14 @@ private fun AdminMenuSection(
                     eventReceiver.onEvent(HomeAdminScreenUiEvent.NavigateToClaimedVouchers)
                 }
             )
+
+            AdminMenuCard(
+                title = "Manage Daily News",
+                description = "Create and update daily check-in news for users",
+                onClick = {
+                    eventReceiver.onEvent(HomeAdminScreenUiEvent.NavigateToManageNews)
+                }
+            )
         }
     }
 }

@@ -214,11 +214,11 @@ private fun PointScreenContent(
                             textAlign = TextAlign.Center
                         )
                         Button(
-                            text = "CHECK-IN TODAY",
+                            text = if (uiState.isAlreadyCheckedInToday) "CHECKED IN TODAY" else "CHECK-IN TODAY",
                             onClick = { eventReceiver.onEvent(PointScreenUiEvent.ClaimDailyReward) },
                             modifier = Modifier.fillMaxWidth(),
                             loading = uiState.isClaimingReward,
-                            enabled = uiState.allowedToClaimReward && !uiState.isClaimingReward,
+                            enabled = uiState.allowedToClaimReward,
                         )
                     }
 

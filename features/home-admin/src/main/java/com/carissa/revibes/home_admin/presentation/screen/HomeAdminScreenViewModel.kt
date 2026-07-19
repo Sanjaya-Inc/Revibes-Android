@@ -15,6 +15,7 @@ sealed interface HomeAdminScreenUiEvent {
     data object NavigateToManageVouchers : HomeAdminScreenUiEvent, NavigationEvent
     data object NavigateToManageTransactions : HomeAdminScreenUiEvent, NavigationEvent
     data object NavigateToClaimedVouchers : HomeAdminScreenUiEvent, NavigationEvent
+    data object NavigateToManageNews : HomeAdminScreenUiEvent, NavigationEvent
     data object NavigateToProfile : HomeAdminScreenUiEvent, NavigationEvent
     data object LoadAdminData : HomeAdminScreenUiEvent
 }

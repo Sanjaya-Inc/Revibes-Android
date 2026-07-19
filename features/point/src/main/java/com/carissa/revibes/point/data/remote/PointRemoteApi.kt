@@ -1,6 +1,7 @@
 package com.carissa.revibes.point.data.remote
 
 import com.carissa.revibes.point.data.model.DailyRewardResponse
+import com.carissa.revibes.point.data.model.NewsResponse
 import com.carissa.revibes.point.data.remote.response.MissionResponse
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.GET
@@ -20,6 +21,9 @@ interface PointRemoteApi {
 
     @PATCH("me/missions/{id}")
     suspend fun claimMission(@Path("id") id: String)
+
+    @GET("news")
+    suspend fun getDailyNews(): NewsResponse
 }
 
 @Single

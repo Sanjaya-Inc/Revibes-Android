@@ -13,14 +13,16 @@ data class PointScreenUiState(
     val isLoading: Boolean = false,
     val isMaintenance: Boolean = false,
     val isClaimingReward: Boolean = false,
-    val allowedToClaimReward: Boolean = true,
+    val isAlreadyCheckedInToday: Boolean = false,
     val dailyRewards: List<DailyReward> = emptyList(),
     val missions: List<Mission> = emptyList(),
     val isMissionsLoading: Boolean = false,
     val claimingMissionId: String? = null,
     val missionError: String? = null,
     val missionSuccess: String? = null,
-)
+) {
+    val allowedToClaimReward: Boolean get() = !isAlreadyCheckedInToday && !isClaimingReward
+}
 
 data class DailyReward(
     val id: String,
@@ -32,6 +34,7 @@ data class DailyReward(
 sealed interface PointScreenUiEvent {
     data object NavigateBack : PointScreenUiEvent
     data object NavigateToProfile : PointScreenUiEvent, NavigationEvent
+    data object NavigateToDailyCheckInNews : PointScreenUiEvent, NavigationEvent
     data object Initialize : PointScreenUiEvent
     data object ClaimDailyReward : PointScreenUiEvent
     data object GetMissions : PointScreenUiEvent
@@ -70,7 +73,7 @@ class PointScreenViewModel(
             }
 
             PointScreenUiEvent.Initialize -> loadDailyRewards()
-            PointScreenUiEvent.ClaimDailyReward -> claimDailyReward()
+            PointScreenUiEvent.ClaimDailyReward -> handleCheckInClicked()
             PointScreenUiEvent.GetMissions -> getMissions()
             is PointScreenUiEvent.ClaimMission -> claimMission(event.missionId)
             PointScreenUiEvent.ClearMissionMessage -> clearMissionMessage()
@@ -82,28 +85,53 @@ class PointScreenViewModel(
         intent {
             reduce { state.copy(isLoading = true) }
             val dailyRewards = pointRepository.getDailyRewards()
+            val alreadyCheckedIn = checkIsAlreadyCheckedInToday(dailyRewards)
             reduce {
                 state.copy(
                     isLoading = false,
-                    dailyRewards = dailyRewards
+                    dailyRewards = dailyRewards,
+                    isAlreadyCheckedInToday = alreadyCheckedIn
                 )
             }
         }
     }
 
-    private fun claimDailyReward() {
+    private fun handleCheckInClicked() {
         intent {
+            if (state.isAlreadyCheckedInToday || state.isClaimingReward) return@intent
+
             reduce { state.copy(isClaimingReward = true) }
-            pointRepository.claimDailyReward()
-            val updatedDailyRewards = pointRepository.getDailyRewards()
-            userPointFlow.update()
-            reduce {
-                state.copy(
-                    isClaimingReward = false,
-                    dailyRewards = updatedDailyRewards
-                )
+            val news = runCatching { pointRepository.getDailyNews() }.getOrNull()
+
+            if (news != null && news.title.isNotBlank() && news.content.isNotBlank()) {
+                reduce { state.copy(isClaimingReward = false) }
+                postSideEffect(PointScreenUiEvent.NavigateToDailyCheckInNews)
+            } else {
+                runCatching {
+                    pointRepository.claimDailyReward()
+                }.onSuccess {
+                    val updatedDailyRewards = pointRepository.getDailyRewards()
+                    userPointFlow.update()
+                    reduce {
+                        state.copy(
+                            isClaimingReward = false,
+                            dailyRewards = updatedDailyRewards,
+                            isAlreadyCheckedInToday = checkIsAlreadyCheckedInToday(updatedDailyRewards)
+                        )
+                    }
+                }.onFailure { ex ->
+                    reduce { state.copy(isClaimingReward = false) }
+                    postSideEffect(PointScreenUiEvent.OnClaimDailyRewardFailed(ex.message ?: "Failed to claim reward"))
+                }
             }
         }
+    }
+
+    private fun checkIsAlreadyCheckedInToday(rewards: List<DailyReward>): Boolean {
+        val lastClaimed = rewards.lastOrNull { !it.claimedAt.isNullOrBlank() } ?: return false
+        val claimedAtStr = lastClaimed.claimedAt ?: return false
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        return claimedAtStr.startsWith(todayStr.take(10))
     }
 
     private fun getMissions() {
