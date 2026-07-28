@@ -1,12 +1,10 @@
 package com.carissa.revibes.point.presentation.screen
 
-import androidx.lifecycle.viewModelScope
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.point.data.PointRepository
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 data class DailyCheckInNewsScreenUiState(
@@ -51,14 +49,12 @@ class DailyCheckInNewsScreenViewModel(
     }
 
     private fun startCountdownTimer() {
-        viewModelScope.launch {
+        intent {
             for (sec in 5 downTo 1) {
-                intent { reduce { state.copy(timerSeconds = sec) } }
+                reduce { state.copy(timerSeconds = sec) }
                 delay(1000L)
             }
-            intent {
-                reduce { state.copy(timerSeconds = 0, isTimerFinished = true) }
-            }
+            reduce { state.copy(timerSeconds = 0, isTimerFinished = true) }
         }
     }
 

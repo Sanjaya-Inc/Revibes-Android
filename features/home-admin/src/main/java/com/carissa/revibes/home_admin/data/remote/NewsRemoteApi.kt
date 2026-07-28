@@ -5,6 +5,7 @@ import com.carissa.revibes.home_admin.data.model.NewsResponse
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Headers
 import de.jensklingenberg.ktorfit.http.POST
 import org.koin.core.annotation.Single
 
@@ -13,6 +14,7 @@ interface NewsRemoteApi {
     suspend fun getDailyNews(): NewsResponse
 
     @POST("news")
+    @Headers("Content-Type: application/json")
     suspend fun createNews(@Body request: CreateNewsRequest): NewsResponse
 }
 

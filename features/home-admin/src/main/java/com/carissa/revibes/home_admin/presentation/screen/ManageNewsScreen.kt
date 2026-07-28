@@ -20,10 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -42,6 +39,9 @@ import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.components.Button
 import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
+import com.carissa.revibes.core.presentation.compose.components.Text
+import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextField
+import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextFieldDefaults
 import com.carissa.revibes.home_admin.presentation.navigation.HomeAdminGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel
@@ -200,11 +200,11 @@ private fun ManageNewsScreenContent(
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
+                                colors = OutlinedTextFieldDefaults.colors().copy(
                                     focusedContainerColor = Color.White,
                                     unfocusedContainerColor = Color.White,
-                                    focusedBorderColor = RevibesTheme.colors.primary,
-                                    unfocusedBorderColor = RevibesTheme.colors.outline,
+                                    focusedOutlineColor = RevibesTheme.colors.primary,
+                                    unfocusedOutlineColor = RevibesTheme.colors.outline,
                                     focusedTextColor = RevibesTheme.colors.onSurface,
                                     unfocusedTextColor = RevibesTheme.colors.onSurface,
                                 )
@@ -219,11 +219,11 @@ private fun ManageNewsScreenContent(
                                 maxLines = 8,
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
+                                colors = OutlinedTextFieldDefaults.colors().copy(
                                     focusedContainerColor = Color.White,
                                     unfocusedContainerColor = Color.White,
-                                    focusedBorderColor = RevibesTheme.colors.primary,
-                                    unfocusedBorderColor = RevibesTheme.colors.outline,
+                                    focusedOutlineColor = RevibesTheme.colors.primary,
+                                    unfocusedOutlineColor = RevibesTheme.colors.outline,
                                     focusedTextColor = RevibesTheme.colors.onSurface,
                                     unfocusedTextColor = RevibesTheme.colors.onSurface,
                                 )
