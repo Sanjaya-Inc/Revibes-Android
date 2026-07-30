@@ -56,12 +56,15 @@ internal class Authenticator(
 
 All repository network requests must extend **`BaseRepository`** to leverage unified error handling:
 
+### `KtorfitCreator` Configuration
+To prevent raw unintercepted `ClientRequestException` crashes, `KtorfitCreator` sets `expectSuccess = false` and uses an `HttpResponseValidator` to catch non-2xx responses and throw `ResponseException`.
+
 ### `BaseRepository` Execution Wrapper
 `BaseRepository` provides an `execute` function that:
 1. Runs code on `appDispatchers.io` thread context.
-2. Catches Ktor exceptions (`ClientRequestException`, `ServerResponseException`, `RedirectResponseException`).
-3. Decodes error payloads using `Json` and throws `ApiException`.
-4. Triggers `TokenExpiredUseCase` on 401 Unauthorized response (or 403 Forbidden under specific conditions) to log the user out.
+2. Catches `ResponseException` and `ApiException`.
+3. Parses error JSON payloads into `ApiException` with formatted friendly fallback messages (e.g. `Requested endpoint not found (404)`, `Unauthorized access. Please login again. (401)`, `Server error (500)`).
+4. Triggers `TokenExpiredUseCase` on 401 Unauthorized response to clear session state.
 
 ```kotlin
 abstract class BaseRepository(
@@ -72,8 +75,13 @@ abstract class BaseRepository(
         return withContext(appDispatchers.io) {
             try {
                 block()
-            } catch (e: ClientRequestException) {
-                throw parseAndWrap(e.response, e)
+            } catch (e: ResponseException) {
+                val statusCode = e.response.status.value
+                val errorResponse = parseErrorResponse(e.response)
+                if (shouldKickWhenAuthFailed && statusCode == 401) {
+                    tokenExpiredUseCase()
+                }
+                throw ApiException(statusCode, errorResponse, e)
             } catch (e: Exception) {
                 throw ApiException(-1, null, e)
             }
@@ -81,6 +89,7 @@ abstract class BaseRepository(
     }
 }
 ```
+
 
 ### Preserving Coroutine Cancellation
 When catching exceptions or mapping results with `runCatching`, always propagate cancellation so coroutines cancel properly:

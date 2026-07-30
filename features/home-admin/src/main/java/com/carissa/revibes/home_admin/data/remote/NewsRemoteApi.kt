@@ -2,11 +2,15 @@ package com.carissa.revibes.home_admin.data.remote
 
 import com.carissa.revibes.home_admin.data.model.CreateNewsRequest
 import com.carissa.revibes.home_admin.data.model.NewsResponse
+import com.carissa.revibes.home_admin.data.model.UpdateNewsRequest
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.Headers
 import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.PUT
+import de.jensklingenberg.ktorfit.http.Path
 import org.koin.core.annotation.Single
 
 interface NewsRemoteApi {
@@ -16,7 +20,18 @@ interface NewsRemoteApi {
     @POST("news")
     @Headers("Content-Type: application/json")
     suspend fun createNews(@Body request: CreateNewsRequest): NewsResponse
+
+    @PUT("news/{id}")
+    @Headers("Content-Type: application/json")
+    suspend fun updateNews(
+        @Path("id") id: String,
+        @Body request: UpdateNewsRequest
+    ): NewsResponse
+
+    @DELETE("news/{id}")
+    suspend fun deleteNews(@Path("id") id: String): NewsResponse
 }
+
 
 @Single
 internal class NewsRemoteApiImpl(ktorfit: Ktorfit) :

@@ -4,9 +4,7 @@ import com.carissa.revibes.core.data.model.ErrorResponse
 import com.carissa.revibes.core.data.user.local.UserDataSourceGetter
 import com.carissa.revibes.core.domain.usecase.TokenExpiredUseCase
 import com.carissa.revibes.core.presentation.util.AppDispatchers
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.RedirectResponseException
-import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.withContext
@@ -27,12 +25,10 @@ abstract class BaseRepository(
         return withContext(appDispatchers.io) {
             try {
                 block()
-            } catch (e: ClientRequestException) {
+            } catch (e: ResponseException) {
                 throw parseAndWrap(e.response, e)
-            } catch (e: ServerResponseException) {
-                throw parseAndWrap(e.response, e)
-            } catch (e: RedirectResponseException) {
-                throw parseAndWrap(e.response, e)
+            } catch (e: ApiException) {
+                throw e
             } catch (e: Exception) {
                 throw ApiException(-1, null, e)
             }
@@ -66,4 +62,23 @@ class ApiException(
     val statusCode: Int,
     val errorResponse: ErrorResponse?,
     cause: Throwable? = null
-) : Throwable(errorResponse?.error ?: cause?.message, cause)
+) : Throwable(formatErrorMessage(statusCode, errorResponse, cause), cause) {
+    companion object {
+        private fun formatErrorMessage(
+            statusCode: Int,
+            errorResponse: ErrorResponse?,
+            cause: Throwable?
+        ): String {
+            errorResponse?.error?.takeIf { it.isNotBlank() }?.let { return it }
+            errorResponse?.status?.takeIf { it.isNotBlank() }?.let { return it }
+            return when (statusCode) {
+                404 -> "Requested endpoint not found (404)"
+                401 -> "Unauthorized access. Please login again."
+                403 -> "Access denied. You do not have permission."
+                400 -> "Bad request. Please check input data."
+                in 500..599 -> "Server error ($statusCode). Please try again later."
+                else -> "HTTP $statusCode error"
+            }
+        }
+    }
+}

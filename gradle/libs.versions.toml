@@ -1,8 +1,9 @@
 [versions]
 compile-sdk = "37"
 min-sdk = "24"
-version-code = "21"
-version-name = "1.0.21"
+target-sdk = "37"
+version-code = "22"
+version-name = "1.0.22"
 java-version = "21"
 junit = "4.13.2"
 junitVersion = "1.3.0"

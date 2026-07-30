@@ -28,3 +28,11 @@ data class CreateNewsRequest(
     val title: String,
     val content: String
 )
+
+@Keep
+@Serializable
+data class UpdateNewsRequest(
+    val title: String,
+    val content: String
+)
+

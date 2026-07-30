@@ -11,6 +11,10 @@ data class ManageNewsScreenUiState(
     val contentInput: TextFieldValue = TextFieldValue(""),
     val isLoading: Boolean = false,
     val isSubmitting: Boolean = false,
+    val isDeleting: Boolean = false,
+    val isEditing: Boolean = false,
+    val showDeleteDialog: Boolean = false,
+    val currentNewsId: String? = null,
     val currentNewsTitle: String? = null,
     val currentNewsContent: String? = null,
     val successMessage: String? = null,
@@ -22,6 +26,11 @@ sealed interface ManageNewsScreenUiEvent {
     data class OnTitleChange(val title: TextFieldValue) : ManageNewsScreenUiEvent
     data class OnContentChange(val content: TextFieldValue) : ManageNewsScreenUiEvent
     data object SubmitNews : ManageNewsScreenUiEvent
+    data object OnEditClick : ManageNewsScreenUiEvent
+    data object OnCancelEdit : ManageNewsScreenUiEvent
+    data object OnDeleteClick : ManageNewsScreenUiEvent
+    data object OnDismissDeleteDialog : ManageNewsScreenUiEvent
+    data object OnConfirmDelete : ManageNewsScreenUiEvent
     data object ClearMessage : ManageNewsScreenUiEvent
     data object LoadCurrentNews : ManageNewsScreenUiEvent
 }
@@ -49,6 +58,11 @@ class ManageNewsScreenViewModel(
             }
             ManageNewsScreenUiEvent.LoadCurrentNews -> loadCurrentNews()
             ManageNewsScreenUiEvent.SubmitNews -> submitNews()
+            ManageNewsScreenUiEvent.OnEditClick -> startEditing()
+            ManageNewsScreenUiEvent.OnCancelEdit -> cancelEditing()
+            ManageNewsScreenUiEvent.OnDeleteClick -> intent { reduce { state.copy(showDeleteDialog = true) } }
+            ManageNewsScreenUiEvent.OnDismissDeleteDialog -> intent { reduce { state.copy(showDeleteDialog = false) } }
+            ManageNewsScreenUiEvent.OnConfirmDelete -> deleteNews()
             ManageNewsScreenUiEvent.ClearMessage -> clearMessage()
         }
     }
@@ -62,6 +76,7 @@ class ManageNewsScreenViewModel(
                 reduce {
                     state.copy(
                         isLoading = false,
+                        currentNewsId = news?.id,
                         currentNewsTitle = news?.title,
                         currentNewsContent = news?.content,
                         titleInput = news?.title?.let { TextFieldValue(it) } ?: state.titleInput,
@@ -70,6 +85,32 @@ class ManageNewsScreenViewModel(
                 }
             }.onFailure {
                 reduce { state.copy(isLoading = false) }
+            }
+        }
+    }
+
+    private fun startEditing() {
+        intent {
+            val title = state.currentNewsTitle.orEmpty()
+            val content = state.currentNewsContent.orEmpty()
+            reduce {
+                state.copy(
+                    isEditing = true,
+                    titleInput = TextFieldValue(title),
+                    contentInput = TextFieldValue(content)
+                )
+            }
+        }
+    }
+
+    private fun cancelEditing() {
+        intent {
+            reduce {
+                state.copy(
+                    isEditing = false,
+                    titleInput = TextFieldValue(""),
+                    contentInput = TextFieldValue("")
+                )
             }
         }
     }
@@ -84,22 +125,64 @@ class ManageNewsScreenViewModel(
             }
 
             reduce { state.copy(isSubmitting = true, errorMessage = null, successMessage = null) }
+            
+            val isEditingMode = state.isEditing && !state.currentNewsId.isNullOrEmpty()
             runCatching {
-                newsRepository.createNews(title, content)
+                if (isEditingMode) {
+                    newsRepository.updateNews(state.currentNewsId!!, title, content)
+                } else {
+                    newsRepository.createNews(title, content)
+                }
             }.onSuccess {
                 reduce {
                     state.copy(
                         isSubmitting = false,
+                        isEditing = false,
                         currentNewsTitle = title,
                         currentNewsContent = content,
-                        successMessage = "Daily news published successfully!"
+                        successMessage = if (isEditingMode) "Daily news updated successfully!" else "Daily news published successfully!"
                     )
                 }
             }.onFailure { ex ->
                 reduce {
                     state.copy(
                         isSubmitting = false,
-                        errorMessage = ex.message ?: "Failed to publish daily news"
+                        errorMessage = ex.message ?: "Failed to save daily news"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun deleteNews() {
+        intent {
+            val newsId = state.currentNewsId
+            if (newsId.isNullOrBlank()) {
+                reduce { state.copy(showDeleteDialog = false, errorMessage = "No active news to delete") }
+                return@intent
+            }
+
+            reduce { state.copy(isDeleting = true, showDeleteDialog = false, errorMessage = null, successMessage = null) }
+            runCatching {
+                newsRepository.deleteNews(newsId)
+            }.onSuccess {
+                reduce {
+                    state.copy(
+                        isDeleting = false,
+                        isEditing = false,
+                        currentNewsId = null,
+                        currentNewsTitle = null,
+                        currentNewsContent = null,
+                        titleInput = TextFieldValue(""),
+                        contentInput = TextFieldValue(""),
+                        successMessage = "Daily news deleted successfully!"
+                    )
+                }
+            }.onFailure { ex ->
+                reduce {
+                    state.copy(
+                        isDeleting = false,
+                        errorMessage = ex.message ?: "Failed to delete daily news"
                     )
                 }
             }

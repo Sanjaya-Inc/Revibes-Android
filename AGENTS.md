@@ -42,6 +42,8 @@ Prefix all command line operations with `rtk`:
 Consult these custom skills for specific tasks:
 - `revibes-architecture` — Guidelines and architectural specifications for the Revibes Android application (modularity system, networking, local storage, DI, Orbit MVI, and utilities).
 - `revibes-design-system` — Source of truth for styling, colors/typography mappings, custom components (Button, Text, TextFields), and NavigationEventBus patterns.
+- `revibes-backend-knowledge` — Guidelines, specifications, and full knowledge graph mapping for the Revibes Node.js/TypeScript Express & Firebase Cloud Functions backend service.
+
 - `compose-component-expert` — Guidelines for custom modifiers, slot APIs, Modifier.Node, and stability optimization.
 - `compose-m3-theme-expert` — Material 3 custom theme overrides, wallpaper Monet schemes, and CompositionLocal setups.
 - `koin-expert` — Koin compile-time DI, compiler annotation settings.

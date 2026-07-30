@@ -46,4 +46,4 @@ local.properties
 /.vscode/settings.json
 /keeystore
 /.serena/**
-
+/app/release/**

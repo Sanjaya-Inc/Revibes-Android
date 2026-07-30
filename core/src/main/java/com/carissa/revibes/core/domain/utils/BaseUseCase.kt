@@ -27,7 +27,7 @@ class GeneralErrorMapper {
     fun mapError(e: ApiException): Throwable {
         return when (e.statusCode) {
             -1 -> Throwable("Network error, please check your connection", e)
-            else -> Throwable("Unknown error, please contact our support", e)
+            else -> Throwable(e.message ?: "Unknown error, please contact our support", e)
         }
     }
 }

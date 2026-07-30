@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,13 +15,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -33,7 +40,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.carissa.revibes.core.R
 import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
@@ -95,6 +101,39 @@ private fun ManageNewsScreenContent(
     modifier: Modifier = Modifier,
     eventReceiver: EventReceiver<ManageNewsScreenUiEvent> = EventReceiver { }
 ) {
+    if (uiState.showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { eventReceiver.onEvent(ManageNewsScreenUiEvent.OnDismissDeleteDialog) },
+            title = {
+                Text(
+                    text = "Delete Active News",
+                    fontWeight = FontWeight.Bold,
+                    color = RevibesTheme.colors.primary
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to delete the current active news? This action cannot be undone.",
+                    color = RevibesTheme.colors.onSurface
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { eventReceiver.onEvent(ManageNewsScreenUiEvent.OnConfirmDelete) }
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { eventReceiver.onEvent(ManageNewsScreenUiEvent.OnDismissDeleteDialog) }
+                ) {
+                    Text("Cancel", color = RevibesTheme.colors.onSurface)
+                }
+            }
+        )
+    }
+
     Scaffold(
         modifier = modifier,
         containerColor = Color.Transparent,
@@ -152,12 +191,38 @@ private fun ManageNewsScreenContent(
                                 modifier = Modifier.padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
-                                Text(
-                                    text = "Current Active News",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = RevibesTheme.colors.primary
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Current Active News",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = RevibesTheme.colors.primary
+                                    )
+                                    Row {
+                                        IconButton(
+                                            onClick = { eventReceiver.onEvent(ManageNewsScreenUiEvent.OnEditClick) }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Edit News",
+                                                tint = RevibesTheme.colors.primary
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = { eventReceiver.onEvent(ManageNewsScreenUiEvent.OnDeleteClick) }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Delete News",
+                                                tint = MaterialTheme.colorScheme.error
+                                            )
+                                        }
+                                    }
+                                }
                                 Text(
                                     text = uiState.currentNewsTitle,
                                     style = MaterialTheme.typography.bodyMedium,
@@ -186,7 +251,7 @@ private fun ManageNewsScreenContent(
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             Text(
-                                text = "Publish New Check-In News",
+                                text = if (uiState.isEditing) "Edit Active News" else "Publish New Check-In News",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = RevibesTheme.colors.primary
@@ -233,13 +298,28 @@ private fun ManageNewsScreenContent(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Button(
-                        text = "PUBLISH DAILY NEWS",
-                        onClick = { eventReceiver.onEvent(ManageNewsScreenUiEvent.SubmitNews) },
-                        loading = uiState.isSubmitting,
-                        enabled = !uiState.isSubmitting,
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
-                    )
+                    ) {
+                        Button(
+                            text = if (uiState.isEditing) "UPDATE DAILY NEWS" else "PUBLISH DAILY NEWS",
+                            onClick = { eventReceiver.onEvent(ManageNewsScreenUiEvent.SubmitNews) },
+                            loading = uiState.isSubmitting || uiState.isDeleting,
+                            enabled = !uiState.isSubmitting && !uiState.isDeleting,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        if (uiState.isEditing) {
+                            OutlinedButton(
+                                onClick = { eventReceiver.onEvent(ManageNewsScreenUiEvent.OnCancelEdit) },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(100.dp)
+                            ) {
+                                Text("CANCEL EDIT", color = RevibesTheme.colors.primary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
                 }
             }
         }

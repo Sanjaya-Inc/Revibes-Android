@@ -7,6 +7,7 @@ plugins {
     alias(sjy.plugins.buildlogic.firebase)
     alias(sjy.plugins.lumo)
     alias(sjy.plugins.buildlogic.detekt)
+    alias(sjy.plugins.buildlogic.test)
 }
 
 val localProperties = Properties().apply {
