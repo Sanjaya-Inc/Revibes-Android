@@ -14,9 +14,9 @@ class ApiErrorValidator(private val json: Json) {
         try {
             // Check if the response body contains an error model
             val responseText = response.bodyAsText()
-            if (responseText.contains("\"error\"") || responseText.contains("\"status\"")) {
+            if (responseText.contains("\"error\"") || responseText.contains("\"status\"") || responseText.contains("\"message\"")) {
                 val errorModel = json.decodeFromString<ErrorModel>(responseText)
-                if (errorModel.error.isNotEmpty()) {
+                if (errorModel.displayMessage.isNotEmpty()) {
                     throw ApiException(errorModel, response.status.value)
                 }
             }

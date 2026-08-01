@@ -47,11 +47,16 @@ When creating networking code in Revibes Android (e.g. Ktorfit interfaces, repos
 4. **Timestamp Mapping**:
    - Backend returns ISO 8601 strings or Firestore Timestamps (`_seconds`, `_nanoseconds`). Format appropriately in Kotlin.
 5. **Error Contract**:
-   - Backend errors follow:
+   - Backend errors follow a uniform JSON response structure returned by `AppResponse`:
      ```json
      {
-       "status": "error",
-       "message": "Error description message",
-       "code": 400
+       "status": "failed",
+       "code": 400,
+       "error": "COMMON.BAD_REQUEST",
+       "message": "FCM token is required",
+       "reasons": [
+         "FCM token is required"
+       ]
      }
      ```
+   - `AppError` translates error codes and Zod validation reasons via i18n (`locales/en/`). If top-level error code is a container like `"COMMON.BAD_REQUEST"`, `AppError` automatically promotes specific humanized validation reasons (e.g. `"FCM token is required"`) to `message`.

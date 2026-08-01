@@ -29,6 +29,40 @@ class ApiExceptionTest {
     }
 
     @Test
+    fun `uses error response message field when provided`() {
+        val errorResponse = ErrorResponse(status = "failed", code = 400, error = "NEWS.INVALID_TITLE", message = "Invalid news title")
+        val exception = ApiException(
+            statusCode = 400,
+            errorResponse = errorResponse
+        )
+
+        assertEquals("Invalid news title", exception.message)
+    }
+
+    @Test
+    fun `ErrorModel displayMessage uses message field when present`() {
+        val errorModel = com.carissa.revibes.core.data.main.model.ErrorModel(
+            status = "error",
+            error = "AUTH.INVALID_CREDENTIALS",
+            message = "Invalid email or password"
+        )
+        val exception = com.carissa.revibes.core.data.main.remote.ApiException(errorModel)
+
+        assertEquals("Invalid email or password", exception.message)
+    }
+
+    @Test
+    fun `ErrorModel displayMessage falls back to humanized error code when message is empty`() {
+        val errorModel = com.carissa.revibes.core.data.main.model.ErrorModel(
+            status = "error",
+            error = "AUTH.INVALID_CREDENTIALS"
+        )
+        val exception = com.carissa.revibes.core.data.main.remote.ApiException(errorModel)
+
+        assertEquals("Auth Invalid Credentials", exception.message)
+    }
+
+    @Test
     fun `formats 401 status code cleanly when error response is empty`() {
         val exception = ApiException(
             statusCode = 401,

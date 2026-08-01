@@ -63,7 +63,7 @@ To prevent raw unintercepted `ClientRequestException` crashes, `KtorfitCreator` 
 `BaseRepository` provides an `execute` function that:
 1. Runs code on `appDispatchers.io` thread context.
 2. Catches `ResponseException` and `ApiException`.
-3. Parses error JSON payloads into `ApiException` with formatted friendly fallback messages (e.g. `Requested endpoint not found (404)`, `Unauthorized access. Please login again. (401)`, `Server error (500)`).
+3. Parses error JSON payloads into `ApiException` with `message` field support and intelligent `displayMessage` fallback humanization (e.g. `message.ifBlank { reasons.firstOrNull() ?: humanizeErrorCode(error) }`).
 4. Triggers `TokenExpiredUseCase` on 401 Unauthorized response to clear session state.
 
 ```kotlin

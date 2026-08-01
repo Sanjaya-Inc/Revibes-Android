@@ -61,14 +61,20 @@ class ApiErrorHandler(private val json: Json) {
     private fun parseErrorResponse(response: HttpResponse, errorBody: String): ErrorModel {
         val errorMap = parseErrorBody(errorBody)
 
-        // Extract fields from the parsed map
         val status = errorMap["status"]?.toString()?.replace("\"", "")
             ?: response.status.value.toString()
         val error = errorMap["error"]?.toString()?.replace("\"", "")
             ?: response.status.description
+        val message = errorMap["message"]?.toString()?.replace("\"", "")
+            ?: ""
         val reasons = parseReasons(errorMap, errorBody)
 
-        return ErrorModel(status = status, error = error, reasons = reasons)
+        return ErrorModel(
+            status = status,
+            error = error,
+            message = message,
+            reasons = reasons
+        )
     }
 
     /**
@@ -106,6 +112,7 @@ class ApiErrorHandler(private val json: Json) {
         return ErrorModel(
             status = response.status.value.toString(),
             error = response.status.description,
+            message = errorBody.takeIf { it.isNotBlank() && !it.startsWith("{") } ?: response.status.description,
             reasons = listOf(errorBody.take(100))
         )
     }
@@ -117,6 +124,7 @@ class ApiErrorHandler(private val json: Json) {
         return ErrorModel(
             status = "Unknown",
             error = exception.message ?: "Unknown error",
+            message = exception.message ?: "Unknown error",
             reasons = listOf("Request to ${request.url} failed")
         )
     }
@@ -128,6 +136,7 @@ class ApiErrorHandler(private val json: Json) {
         return ErrorModel(
             status = "Unknown",
             error = exception.message ?: "Unknown error",
+            message = exception.message ?: "Failed to process error response",
             reasons = listOf("Failed to process error response")
         )
     }

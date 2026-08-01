@@ -69,6 +69,7 @@ class ApiException(
             errorResponse: ErrorResponse?,
             cause: Throwable?
         ): String {
+            errorResponse?.message?.takeIf { it.isNotBlank() }?.let { return it }
             errorResponse?.error?.takeIf { it.isNotBlank() }?.let { return it }
             errorResponse?.status?.takeIf { it.isNotBlank() }?.let { return it }
             return when (statusCode) {
