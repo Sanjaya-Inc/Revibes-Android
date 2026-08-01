@@ -60,3 +60,16 @@ When creating networking code in Revibes Android (e.g. Ktorfit interfaces, repos
      }
      ```
    - `AppError` translates error codes and Zod validation reasons via i18n (`locales/en/`). If top-level error code is a container like `"COMMON.BAD_REQUEST"`, `AppError` automatically promotes specific humanized validation reasons (e.g. `"FCM token is required"`) to `message`.
+
+---
+
+## 4. Firebase Storage URL Resolution & Testing
+
+### Storage URL Resolution
+- `FileStorage` checks active emulator environment variables (`STORAGE_EMULATOR_HOST`, `FIREBASE_STORAGE_EMULATOR_HOST`, or `FUNCTIONS_EMULATOR === "true"`) to decide whether to construct emulator URLs (`http://localhost:9199/...`) or production cloud URLs (`https://firebasestorage.googleapis.com/...`).
+- Prevents bundled `.env` files (`ENV=local`) in Cloud Functions deployments from serving `localhost` URLs in production.
+
+### Backend Unit Testing
+- Unit tests use Node native test runner (`node --test`) with `node:assert` and AAA structure.
+- Executed via `npm test` script (`tsc && node --test lib/**/*.test.js`).
+
