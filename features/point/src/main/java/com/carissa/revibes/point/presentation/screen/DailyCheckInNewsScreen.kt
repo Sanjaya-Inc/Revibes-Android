@@ -93,7 +93,11 @@ private fun DailyCheckInNewsScreenContent(
             )
         }
     ) { contentPadding ->
-        ContentStateSwitcher(isLoading = uiState.isLoading) {
+        ContentStateSwitcher(
+            isLoading = uiState.isLoading,
+            error = uiState.error,
+            actionButton = "Retry" to { eventReceiver.onEvent(DailyCheckInNewsScreenUiEvent.LoadDailyNews) }
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()

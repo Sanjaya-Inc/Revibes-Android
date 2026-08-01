@@ -1,5 +1,6 @@
 package com.carissa.revibes.point.presentation.screen
 
+import androidx.lifecycle.viewModelScope
 import com.carissa.revibes.core.data.main.remote.config.ConfigRepository
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.model.UserPointFlow
@@ -7,6 +8,7 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.point.data.PointRepository
 import com.carissa.revibes.point.domain.model.Mission
 import com.carissa.revibes.point.presentation.handler.PointExceptionHandler
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 data class PointScreenUiState(
@@ -65,6 +67,13 @@ class PointScreenViewModel(
         pointExceptionHandler.onPointError(syntax, exception)
     },
 ) {
+    init {
+        viewModelScope.launch {
+            userPointFlow.collect {
+                loadDailyRewards()
+            }
+        }
+    }
     override fun onEvent(event: PointScreenUiEvent) {
         super.onEvent(event)
         when (event) {
@@ -105,7 +114,7 @@ class PointScreenViewModel(
 
             if (news != null && news.title.isNotBlank() && news.content.isNotBlank()) {
                 reduce { state.copy(isClaimingReward = false) }
-                postSideEffect(PointScreenUiEvent.NavigateToDailyCheckInNews)
+                onEvent(PointScreenUiEvent.NavigateToDailyCheckInNews)
             } else {
                 runCatching {
                     pointRepository.claimDailyReward()

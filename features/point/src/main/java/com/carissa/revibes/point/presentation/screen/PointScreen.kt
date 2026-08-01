@@ -62,6 +62,7 @@ import com.carissa.revibes.point.domain.model.Mission
 import com.carissa.revibes.point.domain.model.MissionType
 import com.carissa.revibes.point.presentation.navigation.PointGraph
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.generated.point.destinations.DailyCheckInNewsScreenDestination
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -81,6 +82,7 @@ fun PointScreen(
             is PointScreenUiEvent.NavigateBack -> {
                 navigator.navigateUp()
             }
+
             is PointScreenUiEvent.OnLoadDailyRewardsFailed -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }

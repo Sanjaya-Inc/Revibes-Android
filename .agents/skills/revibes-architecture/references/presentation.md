@@ -55,3 +55,13 @@ Screen entry and exit animations are managed by **`RevibesHostNavigationStyle`**
 
 For the full detailed specification on the decoupled navigation architecture, how to implement event-driven routing, the `NavigationEventBus`, and how to register handlers, refer to:
 - `/revibes-design-system`'s [navigation.md](.agents/skills/revibes-design-system/references/navigation.md)
+
+---
+
+## 5. Orbit MVI Best Practices & Anti-Patterns
+
+- **No Long Delays inside `intent` blocks**: Never execute loops with `delay()` directly inside Orbit MVI `intent { ... }` blocks. Orbit processes `intent` blocks sequentially in a queue; holding an `intent` block locks the container queue and blocks subsequent state reductions. Launch timers in `viewModelScope.launch` and dispatch quick, non-blocking `intent { reduce { ... } }` blocks per tick.
+- **NavigationEvent Dispatching**: `postSideEffect` in Orbit MVI posts to the side-effect channel and does not invoke `BaseViewModel.onEvent(event)`. For `NavigationEvent` types, call `onEvent(event)` so `BaseViewModel` routes them to `NavigationEventBus`.
+- **Prevent Double Navigation**: Do not trigger both `onEvent(event)` (which routes to `NavigationEventBus`) AND manual `navigator.navigate(...)` in `collectSideEffect`.
+- **State Sync Across Backstack**: Parent ViewModels should collect global flows (e.g., `userPointFlow`) inside `init { viewModelScope.launch { ... } }` to refresh screen state when returning from sub-screens.
+- **No Fake Fallback Text**: Never display fake placeholder text when remote APIs return null or fail. Pass `error` to `ContentStateSwitcher` to show standard `GeneralError` with retry actions.

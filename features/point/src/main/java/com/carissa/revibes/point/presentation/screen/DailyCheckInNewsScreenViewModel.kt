@@ -1,16 +1,19 @@
 package com.carissa.revibes.point.presentation.screen
 
+import androidx.lifecycle.viewModelScope
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.point.data.PointRepository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 data class DailyCheckInNewsScreenUiState(
     val isLoading: Boolean = true,
-    val title: String = "Daily News",
-    val content: String = "No news today",
+    val error: String? = null,
+    val title: String = "",
+    val content: String = "",
     val timerSeconds: Int = 5,
     val isTimerFinished: Boolean = false,
     val isClaimingReward: Boolean = false,
@@ -49,36 +52,46 @@ class DailyCheckInNewsScreenViewModel(
     }
 
     private fun startCountdownTimer() {
-        intent {
+        viewModelScope.launch {
             for (sec in 5 downTo 1) {
-                reduce { state.copy(timerSeconds = sec) }
+                intent { reduce { state.copy(timerSeconds = sec) } }
                 delay(1000L)
             }
-            reduce { state.copy(timerSeconds = 0, isTimerFinished = true) }
+            intent {
+                reduce { state.copy(timerSeconds = 0, isTimerFinished = true) }
+            }
         }
     }
 
     private fun loadDailyNews() {
-        startCountdownTimer()
         intent {
-            reduce { state.copy(isLoading = true) }
+            reduce { state.copy(isLoading = true, error = null) }
             runCatching {
                 pointRepository.getDailyNews()
             }.onSuccess { news ->
-                reduce {
-                    state.copy(
-                        isLoading = false,
-                        title = news?.title?.ifBlank { "Eskalasi Konflik AS-Iran" } ?: "Eskalasi Konflik AS-Iran",
-                        content = news?.content?.ifBlank { "Eskalasi Konflik AS-Iran membuka risiko volatilitas minyak lanjutan. Harga Minyak kembali Naik +9,6% ke ~US$83/barrel" }
-                            ?: "Eskalasi Konflik AS-Iran membuka risiko volatilitas minyak lanjutan. Harga Minyak kembali Naik +9,6% ke ~US$83/barrel"
-                    )
+                if (news != null && news.title.isNotBlank() && news.content.isNotBlank()) {
+                    startCountdownTimer()
+                    reduce {
+                        state.copy(
+                            isLoading = false,
+                            error = null,
+                            title = news.title,
+                            content = news.content
+                        )
+                    }
+                } else {
+                    reduce {
+                        state.copy(
+                            isLoading = false,
+                            error = "No daily news available today."
+                        )
+                    }
                 }
-            }.onFailure {
+            }.onFailure { ex ->
                 reduce {
                     state.copy(
                         isLoading = false,
-                        title = "Eskalasi Konflik AS-Iran",
-                        content = "Eskalasi Konflik AS-Iran membuka risiko volatilitas minyak lanjutan. Harga Minyak kembali Naik +9,6% ke ~US$83/barrel"
+                        error = ex.message ?: "Failed to load daily news."
                     )
                 }
             }
