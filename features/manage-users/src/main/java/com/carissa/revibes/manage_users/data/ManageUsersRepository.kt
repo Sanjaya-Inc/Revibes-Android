@@ -14,6 +14,9 @@ import com.carissa.revibes.manage_users.data.model.UpdateUserRequest
 import com.carissa.revibes.manage_users.data.model.UpdateVerificationRequest
 import com.carissa.revibes.manage_users.data.remote.ManageUsersRemoteApi
 import com.carissa.revibes.manage_users.domain.model.UserDomain
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.annotation.Single
 
 data class UserListResult(
@@ -25,6 +28,13 @@ data class UserListResult(
 class ManageUsersRepository(
     private val remoteApi: ManageUsersRemoteApi
 ) : BaseRepository() {
+
+    private val usersChanged = MutableSharedFlow<Unit>()
+    val changes: SharedFlow<Unit> = usersChanged.asSharedFlow()
+
+    private fun notifyChanged() {
+        usersChanged.tryEmit(Unit)
+    }
 
     suspend fun getUserList(
         limit: Int = 2,
@@ -63,7 +73,7 @@ class ManageUsersRepository(
             val request = AddPointsRequest(amount = points)
             remoteApi.addPointsToUser(id, request)
             getUserDetail(id)
-        }
+        }.also { notifyChanged() }
     }
 
     suspend fun createUser(
@@ -96,7 +106,7 @@ class ManageUsersRepository(
                 profileImage = null,
                 verified = false
             )
-        }
+        }.also { notifyChanged() }
     }
 
     suspend fun deductPointsFromUser(id: String, points: Int): UserDomain {
@@ -104,7 +114,7 @@ class ManageUsersRepository(
             val request = AddPointsRequest(amount = -points) // Use negative value for deduction
             remoteApi.addPointsToUser(id, request)
             getUserDetail(id)
-        }
+        }.also { notifyChanged() }
     }
 
     suspend fun updateUser(
@@ -122,8 +132,8 @@ class ManageUsersRepository(
                 role = role.toApiString()
             )
             remoteApi.updateUser(id, request)
-            getUserDetail(id) // Fetch updated user details
-        }
+            getUserDetail(id)
+        }.also { notifyChanged() }
     }
 
     suspend fun getUserVouchers(id: String): List<UserVoucher> {
@@ -143,5 +153,6 @@ class ManageUsersRepository(
         return execute {
             remoteApi.updateVerifyStatus(userId, UpdateVerificationRequest(isVerified))
         }
+        notifyChanged()
     }
 }

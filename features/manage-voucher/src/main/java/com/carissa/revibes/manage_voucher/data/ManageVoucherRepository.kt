@@ -20,6 +20,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.utils.io.InternalAPI
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
 
@@ -32,6 +35,13 @@ data class VoucherListResult(
 class ManageVoucherRepository(
     private val remoteApi: ManageVoucherRemoteApi
 ) : BaseRepository() {
+
+    private val vouchersChanged = MutableSharedFlow<Unit>()
+    val changes: SharedFlow<Unit> = vouchersChanged.asSharedFlow()
+
+    private fun notifyChanged() {
+        vouchersChanged.tryEmit(Unit)
+    }
 
     suspend fun getVoucherList(
         limit: Int = 10,
@@ -121,6 +131,7 @@ class ManageVoucherRepository(
                 data = multipart
             )
         }
+        notifyChanged()
     }
 
     suspend fun deleteVoucher(id: String) {
@@ -167,6 +178,7 @@ class ManageVoucherRepository(
 
             remoteApi.updateVoucher(id, request)
         }
+        notifyChanged()
     }
 
     suspend fun createExchangeVoucher(

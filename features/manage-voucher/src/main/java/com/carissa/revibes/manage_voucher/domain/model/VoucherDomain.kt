@@ -1,6 +1,7 @@
 package com.carissa.revibes.manage_voucher.domain.model
 
 import androidx.annotation.Keep
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 
@@ -36,7 +37,7 @@ data class VoucherDomain(
 
 @Serializable
 @Keep
-@Stable
+@Immutable
 data class VoucherValue(
     val type: VoucherDomain.VoucherType,
     val amount: Double
@@ -44,7 +45,7 @@ data class VoucherValue(
 
 @Serializable
 @Keep
-@Stable
+@Immutable
 data class VoucherConditions(
     val maxClaim: Int,
     val maxUsage: Int,

@@ -1,6 +1,7 @@
 package com.carissa.revibes.manage_voucher.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.viewModelScope
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.manage_voucher.data.ManageVoucherRepository
@@ -10,6 +11,7 @@ import com.carissa.revibes.manage_voucher.presentation.handler.ManageVoucherExce
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 data class ManageVoucherScreenUiState(
@@ -67,6 +69,13 @@ class ManageVoucherScreenViewModel(
         exceptionHandler.onManageVoucherError(syntax, exception)
     }
 ) {
+    init {
+        viewModelScope.launch {
+            repository.changes.collect {
+                loadVouchers(refresh = true, silent = true)
+            }
+        }
+    }
 
     override fun onEvent(event: ManageVoucherScreenUiEvent) {
         super.onEvent(event)
@@ -91,13 +100,11 @@ class ManageVoucherScreenViewModel(
         }
     }
 
-    private fun loadVouchers(refresh: Boolean = false) = intent {
-        if (refresh) {
-            reduce { state.copy(isLoading = true, error = null) }
-        } else if (state.vouchers.isEmpty()) {
-            reduce { state.copy(isLoading = true, error = null) }
-        } else {
-            reduce { state.copy(isLoadingMore = true, error = null) }
+    private fun loadVouchers(refresh: Boolean = false, silent: Boolean = false) = intent {
+        when {
+            silent -> reduce { state.copy(error = null) }
+            refresh || state.vouchers.isEmpty() -> reduce { state.copy(isLoading = true, error = null) }
+            else -> reduce { state.copy(isLoadingMore = true, error = null) }
         }
 
         val lastDocId = if (refresh) null else state.pagination?.lastDocId

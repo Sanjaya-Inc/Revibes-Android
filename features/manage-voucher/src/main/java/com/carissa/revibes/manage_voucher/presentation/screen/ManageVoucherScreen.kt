@@ -39,7 +39,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -67,6 +66,8 @@ import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
+private const val VoucherItemContentType = "voucher"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<ManageVoucherGraph>(start = true)
 @Composable
@@ -80,19 +81,7 @@ fun ManageVoucherScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
-                viewModel.onEvent(ManageVoucherScreenUiEvent.Refresh)
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
+    val onVoucherEvent = remember(viewModel) { viewModel::onEvent }
 
     viewModel.collectSideEffect { event ->
         when (event) {
@@ -285,34 +274,13 @@ fun ManageVoucherScreen(
                             ) {
                                 items(
                                     items = state.filteredVouchers,
-                                    key = { it.id }
+                                    key = { it.id },
+                                    contentType = { VoucherItemContentType }
                                 ) { voucher ->
                                     VoucherItem(
                                         voucher = voucher,
-                                        onDeleteClick = {
-                                            viewModel.onEvent(
-                                                ManageVoucherScreenUiEvent.ShowDeleteDialog(voucher)
-                                            )
-                                        },
-                                        onToggleStatus = {
-                                            viewModel.onEvent(
-                                                ManageVoucherScreenUiEvent.ToggleVoucherStatus(
-                                                    voucher
-                                                )
-                                            )
-                                        },
-                                        onEditClick = {
-                                            viewModel.onEvent(
-                                                ManageVoucherScreenUiEvent.NavigateToEditVoucher(
-                                                    voucher
-                                                )
-                                            )
-                                        },
-                                        onSetupExchangeClick = {
-                                            viewModel.onEvent(
-                                                ManageVoucherScreenUiEvent.ShowExchangeDialog(voucher)
-                                            )
-                                        }
+                                        onEvent = onVoucherEvent,
+                                        modifier = Modifier.animateItem()
                                     )
                                 }
 

@@ -1,12 +1,12 @@
 package com.carissa.revibes.manage_users.domain.model
 
 import androidx.annotation.Keep
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
 @Serializable
 @Keep
-@Stable
+@Immutable
 data class UserDomain(
     val id: String,
     val name: String,

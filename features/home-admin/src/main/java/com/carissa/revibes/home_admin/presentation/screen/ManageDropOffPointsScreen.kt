@@ -23,8 +23,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,10 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.carissa.revibes.core.R
-import com.carissa.revibes.core.presentation.EventReceiver
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.components.Button
 import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
@@ -50,6 +48,9 @@ import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 
+private const val DropOffPointContentType = "drop-off-point"
+private val DropOffCardShape = RoundedCornerShape(16.dp)
+
 @Destination<HomeAdminGraph>
 @Composable
 fun ManageDropOffPointsScreen(
@@ -58,23 +59,12 @@ fun ManageDropOffPointsScreen(
 ) {
     val state = viewModel.collectAsState().value
     val navigator = RevibesTheme.navigator
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.onEvent(ManageDropOffPointsScreenUiEvent.LoadStores)
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
 
     ManageDropOffPointsScreenContent(
         uiState = state,
         onBackClick = { navigator.navigateUp() },
         modifier = modifier,
-        eventReceiver = viewModel
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -84,8 +74,10 @@ private fun ManageDropOffPointsScreenContent(
     uiState: ManageDropOffPointsScreenUiState,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    eventReceiver: EventReceiver<ManageDropOffPointsScreenUiEvent> = EventReceiver { }
+    onEvent: (ManageDropOffPointsScreenUiEvent) -> Unit = {}
 ) {
+    val pullToRefreshState = rememberPullToRefreshState()
+
     Scaffold(
         modifier = modifier,
         containerColor = Color.Transparent,
@@ -118,7 +110,7 @@ private fun ManageDropOffPointsScreenContent(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { eventReceiver.onEvent(ManageDropOffPointsScreenUiEvent.NavigateToAddDropOffPoint) },
+                onClick = { onEvent(ManageDropOffPointsScreenUiEvent.NavigateToAddDropOffPoint) },
                 containerColor = RevibesTheme.colors.primary,
                 contentColor = RevibesTheme.colors.onPrimary
             ) {
@@ -129,16 +121,23 @@ private fun ManageDropOffPointsScreenContent(
             }
         }
     ) { paddingValues ->
-        ContentStateSwitcher(
-            isLoading = uiState.isLoading,
-            error = uiState.error,
-            actionButton = "Retry" to {
-                eventReceiver.onEvent(ManageDropOffPointsScreenUiEvent.LoadStores)
-            },
+        PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = { onEvent(ManageDropOffPointsScreenUiEvent.Refresh) },
+            state = pullToRefreshState,
+            contentAlignment = Alignment.TopCenter
         ) {
+            ContentStateSwitcher(
+                isLoading = uiState.isLoading && uiState.stores.isEmpty(),
+                error = uiState.error,
+                actionButton = "Retry" to {
+                    onEvent(ManageDropOffPointsScreenUiEvent.Refresh)
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
             if (uiState.stores.isEmpty()) {
                 RevibesEmptyState(
                     title = "No drop-off points",
@@ -151,27 +150,19 @@ private fun ManageDropOffPointsScreenContent(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(uiState.stores, key = { it.id }) { store ->
+                    items(
+                        items = uiState.stores,
+                        key = { it.id },
+                        contentType = { DropOffPointContentType }
+                    ) { store ->
                         DropOffPointItem(
                             store = store,
-                            onEdit = {
-                                eventReceiver.onEvent(
-                                    ManageDropOffPointsScreenUiEvent.NavigateToEditDropOffPoint(
-                                        store
-                                    )
-                                )
-                            },
-                            onOpenMaps = { latitude, longitude ->
-                                eventReceiver.onEvent(
-                                    ManageDropOffPointsScreenUiEvent.OpenInGoogleMaps(
-                                        latitude,
-                                        longitude
-                                    )
-                                )
-                            }
+                            onEvent = onEvent,
+                            modifier = Modifier.animateItem()
                         )
                     }
                 }
+            }
             }
         }
     }
@@ -180,14 +171,13 @@ private fun ManageDropOffPointsScreenContent(
 @Composable
 private fun DropOffPointItem(
     store: StoreData,
-    onEdit: () -> Unit,
-    onOpenMaps: (Double, Double) -> Unit,
+    onEvent: (ManageDropOffPointsScreenUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val position = store.position
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = DropOffCardShape,
         colors = CardDefaults.cardColors(containerColor = RevibesTheme.colors.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -238,14 +228,23 @@ private fun DropOffPointItem(
             ) {
                 Button(
                     text = "Edit",
-                    onClick = onEdit,
+                    onClick = {
+                        onEvent(ManageDropOffPointsScreenUiEvent.NavigateToEditDropOffPoint(store))
+                    },
                     variant = ButtonVariant.SecondaryOutlined,
                     modifier = Modifier.weight(1f)
                 )
                 if (position != null) {
                     Button(
                         text = "Open Maps",
-                        onClick = { onOpenMaps(position.latitude, position.longitude) },
+                        onClick = {
+                            onEvent(
+                                ManageDropOffPointsScreenUiEvent.OpenInGoogleMaps(
+                                    position.latitude,
+                                    position.longitude
+                                )
+                            )
+                        },
                         variant = ButtonVariant.PrimaryOutlined,
                         modifier = Modifier.weight(1f)
                     )

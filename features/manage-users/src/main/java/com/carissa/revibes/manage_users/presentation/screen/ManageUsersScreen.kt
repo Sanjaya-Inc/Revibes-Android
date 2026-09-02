@@ -32,7 +32,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -64,6 +63,8 @@ import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
+private const val UserItemContentType = "user"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<ManageUsersGraph>(start = true)
 @Composable
@@ -74,19 +75,6 @@ fun ManageUsersScreen(
 ) {
     val uiState by viewModel.collectAsState()
     val context = LocalContext.current
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
-                viewModel.onEvent(ManageUsersScreenUiEvent.Refresh)
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
 
     viewModel.collectSideEffect { event ->
         when (event) {
@@ -123,6 +111,9 @@ private fun ManageUsersScreenContent(
     val listState = rememberLazyListState()
     val pullToRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
+    val onUserClick = remember(onEvent) {
+        { userId: String -> onEvent(ManageUsersScreenUiEvent.NavigateToEditUser(userId)) }
+    }
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -363,13 +354,13 @@ private fun ManageUsersScreenContent(
                         ) {
                             items(
                                 items = uiState.users,
-                                key = { it.id }
+                                key = { it.id },
+                                contentType = { UserItemContentType }
                             ) { user ->
                                 UserItem(
                                     user = user,
-                                    onUserClick = { userId ->
-                                        onEvent(ManageUsersScreenUiEvent.NavigateToEditUser(userId))
-                                    }
+                                    onUserClick = onUserClick,
+                                    modifier = Modifier.animateItem()
                                 )
                             }
 

@@ -1,6 +1,7 @@
 package com.carissa.revibes.home_admin.data.model
 
 import androidx.annotation.Keep
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
 @Keep
@@ -21,6 +22,7 @@ data class StoreDetailResponse(
     val status: String = ""
 )
 
+@Immutable
 @Keep
 @Serializable
 data class StoreData(
@@ -35,6 +37,7 @@ data class StoreData(
     val status: String = "active"
 )
 
+@Immutable
 @Keep
 @Serializable
 data class StorePositionData(

@@ -1,6 +1,7 @@
 package com.carissa.revibes.manage_users.presentation.screen
 
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.viewModelScope
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.manage_users.data.ManageUsersRepository
@@ -12,6 +13,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 data class ManageUsersScreenUiState(
@@ -60,6 +62,14 @@ class ManageUsersScreenViewModel(
 ) {
     private var searchJob: Job? = null
 
+    init {
+        viewModelScope.launch {
+            repository.changes.collect {
+                loadUsers(refresh = true, silent = true)
+            }
+        }
+    }
+
     override fun onEvent(event: ManageUsersScreenUiEvent) {
         super.onEvent(event)
         when (event) {
@@ -73,13 +83,11 @@ class ManageUsersScreenViewModel(
         }
     }
 
-    private fun loadUsers(refresh: Boolean = false) = intent {
-        if (refresh) {
-            reduce { state.copy(isLoading = true, error = null) }
-        } else if (state.users.isEmpty()) {
-            reduce { state.copy(isLoading = true, error = null) }
-        } else {
-            reduce { state.copy(isLoadingMore = true, error = null) }
+    private fun loadUsers(refresh: Boolean = false, silent: Boolean = false) = intent {
+        when {
+            silent -> reduce { state.copy(error = null) }
+            refresh || state.users.isEmpty() -> reduce { state.copy(isLoading = true, error = null) }
+            else -> reduce { state.copy(isLoadingMore = true, error = null) }
         }
 
         val lastDocId = if (refresh) null else state.pagination?.lastDocId

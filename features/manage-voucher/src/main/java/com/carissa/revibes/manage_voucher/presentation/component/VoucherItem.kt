@@ -43,16 +43,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.manage_voucher.domain.model.VoucherDomain
+import com.carissa.revibes.manage_voucher.presentation.screen.ManageVoucherScreenUiEvent
 import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
 fun VoucherItem(
     voucher: VoucherDomain,
-    onDeleteClick: () -> Unit,
-    onToggleStatus: () -> Unit,
-    onEditClick: () -> Unit,
-    onSetupExchangeClick: () -> Unit,
+    onEvent: (ManageVoucherScreenUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDropdown by remember { mutableStateOf(false) }
@@ -159,7 +157,7 @@ fun VoucherItem(
                                 text = { Text("Setup Exchange") },
                                 onClick = {
                                     showDropdown = false
-                                    onSetupExchangeClick()
+                                    onEvent(ManageVoucherScreenUiEvent.ShowExchangeDialog(voucher))
                                 },
                                 leadingIcon = {
                                     Text(
@@ -172,7 +170,7 @@ fun VoucherItem(
                                 text = { Text("Edit") },
                                 onClick = {
                                     showDropdown = false
-                                    onEditClick()
+                                    onEvent(ManageVoucherScreenUiEvent.NavigateToEditVoucher(voucher))
                                 },
                                 leadingIcon = {
                                     Icon(
@@ -185,7 +183,7 @@ fun VoucherItem(
                                 text = { Text("Delete") },
                                 onClick = {
                                     showDropdown = false
-                                    onDeleteClick()
+                                    onEvent(ManageVoucherScreenUiEvent.ShowDeleteDialog(voucher))
                                 },
                                 leadingIcon = {
                                     Icon(
@@ -227,7 +225,7 @@ fun VoucherItem(
 
                     Switch(
                         checked = voucher.isAvailable,
-                        onCheckedChange = { onToggleStatus() }
+                        onCheckedChange = { onEvent(ManageVoucherScreenUiEvent.ToggleVoucherStatus(voucher)) }
                     )
                 }
 
