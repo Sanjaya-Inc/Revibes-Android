@@ -18,7 +18,7 @@ interface DeeplinkHandler {
     fun openUrl(url: String)
 }
 
-@Single
+@Single(binds = [DeeplinkHandler::class])
 class DeeplinkHandlerImpl : DeeplinkHandler, KoinComponent {
 
     private val context: Context by inject()
@@ -53,4 +53,13 @@ fun Context.openWhatsAppChat(phoneNumber: String) {
 
 fun Context.openSupportWhatsApp() {
     openWhatsAppChat("08161805621")
+}
+
+fun Context.openGoogleMaps(latitude: Double, longitude: Double) {
+    val mapsUrl = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude"
+    startActivity(
+        Intent(Intent.ACTION_VIEW, mapsUrl.toUri()).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+    )
 }

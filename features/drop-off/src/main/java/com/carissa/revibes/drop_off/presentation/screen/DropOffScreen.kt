@@ -83,6 +83,7 @@ import com.carissa.revibes.core.presentation.compose.components.MaintenanceCheck
 import com.carissa.revibes.core.presentation.compose.components.SearchConfig
 import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextField
 import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextFieldDefaults
+import com.carissa.revibes.core.presentation.util.openGoogleMaps
 import com.carissa.revibes.drop_off.R
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.navigation.DropOffGraph
@@ -333,7 +334,16 @@ fun DropOffScreenContent(
                                                 loc.distance
                                             ),
                                             style = RevibesTheme.typography.body2,
-                                            color = RevibesTheme.colors.primary
+                                            color = RevibesTheme.colors.primary,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Text(
+                                            text = "Open Maps",
+                                            style = RevibesTheme.typography.body2,
+                                            color = RevibesTheme.colors.primary,
+                                            modifier = Modifier.clickable {
+                                                context.openGoogleMaps(loc.latitude, loc.longitude)
+                                            }
                                         )
                                     }
                                 }

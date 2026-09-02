@@ -32,7 +32,6 @@ interface NewsRemoteApi {
     suspend fun deleteNews(@Path("id") id: String): NewsResponse
 }
 
-
 @Single
 internal class NewsRemoteApiImpl(ktorfit: Ktorfit) :
     NewsRemoteApi by ktorfit.createNewsRemoteApi()

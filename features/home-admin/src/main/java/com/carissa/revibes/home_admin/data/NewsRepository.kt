@@ -28,4 +28,3 @@ class NewsRepository(
         execute { remoteApi.deleteNews(id) }
     }
 }
-

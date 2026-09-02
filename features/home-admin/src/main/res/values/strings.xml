@@ -12,4 +12,6 @@
     <string name="manage_transactions_desc">Monitor and manage all transactions</string>
     <string name="manage_claimed_vouchers">Claimed Vouchers</string>
     <string name="manage_claimed_vouchers_desc">View user claimed vouchers and exchanges</string>
+    <string name="manage_drop_off_points">Manage Drop-off Points</string>
+    <string name="manage_drop_off_points_desc">Add store locations with Google Maps pins</string>
 </resources>

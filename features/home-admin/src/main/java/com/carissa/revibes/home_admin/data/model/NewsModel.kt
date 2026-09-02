@@ -35,4 +35,3 @@ data class UpdateNewsRequest(
     val title: String,
     val content: String
 )
-

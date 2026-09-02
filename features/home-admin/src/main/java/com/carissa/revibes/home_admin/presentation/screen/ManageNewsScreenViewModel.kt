@@ -125,7 +125,7 @@ class ManageNewsScreenViewModel(
             }
 
             reduce { state.copy(isSubmitting = true, errorMessage = null, successMessage = null) }
-            
+
             val isEditingMode = state.isEditing && !state.currentNewsId.isNullOrEmpty()
             runCatching {
                 if (isEditingMode) {
@@ -162,7 +162,14 @@ class ManageNewsScreenViewModel(
                 return@intent
             }
 
-            reduce { state.copy(isDeleting = true, showDeleteDialog = false, errorMessage = null, successMessage = null) }
+            reduce {
+                state.copy(
+                    isDeleting = true,
+                    showDeleteDialog = false,
+                    errorMessage = null,
+                    successMessage = null
+                )
+            }
             runCatching {
                 newsRepository.deleteNews(newsId)
             }.onSuccess {

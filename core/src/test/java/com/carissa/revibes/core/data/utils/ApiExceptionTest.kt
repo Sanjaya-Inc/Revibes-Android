@@ -11,7 +11,9 @@ class ApiExceptionTest {
         val exception = ApiException(
             statusCode = 404,
             errorResponse = null,
-            cause = RuntimeException("Client request(POST https://v1-via54wl6oa-et.a.run.app/news) invalid response 404 Not Found")
+            cause = RuntimeException(
+                "Client request(POST https://v1-via54wl6oa-et.a.run.app/news) invalid response 404 Not Found"
+            )
         )
 
         assertEquals("Requested endpoint not found (404)", exception.message)
@@ -30,7 +32,12 @@ class ApiExceptionTest {
 
     @Test
     fun `uses error response message field when provided`() {
-        val errorResponse = ErrorResponse(status = "failed", code = 400, error = "NEWS.INVALID_TITLE", message = "Invalid news title")
+        val errorResponse = ErrorResponse(
+            status = "failed",
+            code = 400,
+            error = "NEWS.INVALID_TITLE",
+            message = "Invalid news title"
+        )
         val exception = ApiException(
             statusCode = 400,
             errorResponse = errorResponse
