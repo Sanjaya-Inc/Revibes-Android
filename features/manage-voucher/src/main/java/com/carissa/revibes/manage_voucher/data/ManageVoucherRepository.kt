@@ -140,7 +140,8 @@ class ManageVoucherRepository(
 
     suspend fun updateVoucherStatus(id: String, isAvailable: Boolean) {
         val request = UpdateVoucherStatusRequest(isAvailable = isAvailable)
-        remoteApi.updateVoucherStatus(id, request)
+        execute { remoteApi.updateVoucherStatus(id, request) }
+        notifyChanged()
     }
 
     suspend fun updateVoucher(

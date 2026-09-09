@@ -15,7 +15,11 @@ class ExchangePointsRepository(
 ) : BaseRepository() {
 
     suspend fun getVouchers(): List<Voucher> {
-        return execute { remoteApi.getVouchers().data.items.map { it.toVoucher() } }
+        return execute {
+            remoteApi.getVouchers().data.items
+                .filter { it.isAvailable }
+                .map { it.toVoucher() }
+        }
     }
 
     suspend fun getUserVouchers(): List<UserVoucher> {

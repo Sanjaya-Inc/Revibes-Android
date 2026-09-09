@@ -17,6 +17,8 @@ data class ExchangeItem(
     val createdAt: String,
     @SerialName("updatedAt")
     val updatedAt: String,
+    @SerialName("isAvailable")
+    val isAvailable: Boolean = true,
     @SerialName("metadata")
     val metadata: VoucherMetadata
 )
