@@ -42,12 +42,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.carissa.revibes.core.presentation.compose.RevibesTheme
 import com.carissa.revibes.core.presentation.compose.components.Button
 import com.carissa.revibes.core.presentation.compose.components.ButtonVariant
 import com.carissa.revibes.core.presentation.compose.components.ContentStateSwitcher
+import com.carissa.revibes.core.presentation.compose.components.textfield.OutlinedTextField as RevibesOutlinedTextField
 import com.carissa.revibes.manage_transaction.R
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailItemDomain
@@ -166,6 +170,10 @@ fun TransactionDetailScreen(
 
     if (showCompleteDialog) {
         CompleteTransactionDialog(
+            points = uiState.customPoints,
+            onPointsChange = {
+                viewModel.onEvent(TransactionDetailScreenUiEvent.CustomPointsChanged(it))
+            },
             onConfirm = {
                 viewModel.onEvent(TransactionDetailScreenUiEvent.CompleteTransaction)
                 showCompleteDialog = false
@@ -332,7 +340,7 @@ private fun TransactionItemCard(
 
             InfoRow(
                 label = stringResource(R.string.weight),
-                value = stringResource(R.string.weight_kg, item.weight)
+                value = stringResource(R.string.quantity_value, item.weight, item.unit)
             )
 
             InfoRow(
@@ -425,6 +433,8 @@ private fun RejectTransactionDialog(
 
 @Composable
 private fun CompleteTransactionDialog(
+    points: TextFieldValue,
+    onPointsChange: (TextFieldValue) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -434,7 +444,19 @@ private fun CompleteTransactionDialog(
             Text(stringResource(R.string.accept_transaction_title))
         },
         text = {
-            Text(stringResource(R.string.accept_transaction_message))
+            Column {
+                Text(stringResource(R.string.accept_transaction_message))
+                Spacer(modifier = Modifier.height(16.dp))
+                RevibesOutlinedTextField(
+                    value = points,
+                    onValueChange = { next ->
+                        if (next.text.all { it.isDigit() }) onPointsChange(next)
+                    },
+                    label = { Text(stringResource(R.string.awarded_points_optional)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {

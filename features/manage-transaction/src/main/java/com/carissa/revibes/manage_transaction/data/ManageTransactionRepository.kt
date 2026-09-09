@@ -2,6 +2,7 @@ package com.carissa.revibes.manage_transaction.data
 
 import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.manage_transaction.data.mapper.toDomain
+import com.carissa.revibes.manage_transaction.data.model.CompleteTransactionRequest
 import com.carissa.revibes.manage_transaction.data.model.RejectTransactionRequest
 import com.carissa.revibes.manage_transaction.data.remote.ManageTransactionRemoteApi
 import com.carissa.revibes.manage_transaction.domain.model.ManageTransactionDomain
@@ -66,7 +67,7 @@ internal class ManageTransactionRepository(
         }
     }
 
-    suspend fun completeTransaction(id: String) {
-        execute { remoteApi.completeTransaction(id) }
+    suspend fun completeTransaction(id: String, customTotalPoint: Int? = null) {
+        execute { remoteApi.completeTransaction(id, request = CompleteTransactionRequest(customTotalPoint)) }
     }
 }

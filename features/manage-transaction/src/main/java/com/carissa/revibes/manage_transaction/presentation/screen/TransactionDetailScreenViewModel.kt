@@ -1,5 +1,6 @@
 package com.carissa.revibes.manage_transaction.presentation.screen
 
+import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.manage_transaction.data.ManageTransactionRepository
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
@@ -10,6 +11,7 @@ sealed interface TransactionDetailScreenUiEvent {
     data class LoadTransactionDetail(val transactionId: String) : TransactionDetailScreenUiEvent
     data class RejectTransaction(val reason: String) : TransactionDetailScreenUiEvent
     data object CompleteTransaction : TransactionDetailScreenUiEvent
+    data class CustomPointsChanged(val value: TextFieldValue) : TransactionDetailScreenUiEvent
     data class OnTransactionActionFailed(val message: String) : TransactionDetailScreenUiEvent
 }
 
@@ -20,7 +22,8 @@ data class TransactionDetailScreenUiState(
     val isRejecting: Boolean = false,
     val actionCompleted: Boolean = false,
     val actionMessage: String? = null,
-    val error: String? = null
+    val error: String? = null,
+    val customPoints: TextFieldValue = TextFieldValue()
 )
 
 @KoinViewModel
@@ -42,6 +45,9 @@ class TransactionDetailScreenViewModel internal constructor(
 
             is TransactionDetailScreenUiEvent.RejectTransaction -> rejectTransaction(event.reason)
             is TransactionDetailScreenUiEvent.CompleteTransaction -> completeTransaction()
+            is TransactionDetailScreenUiEvent.CustomPointsChanged -> intent {
+                reduce { state.copy(customPoints = event.value) }
+            }
             else -> Unit
         }
     }
@@ -63,7 +69,8 @@ class TransactionDetailScreenViewModel internal constructor(
     private fun completeTransaction() = intent {
         reduce { state.copy(isProcessing = true) }
 
-        repository.completeTransaction(state.transactionDetail!!.id)
+        val customTotalPoint = state.customPoints.text.trim().toIntOrNull()
+        repository.completeTransaction(state.transactionDetail!!.id, customTotalPoint)
 
         reduce {
             state.copy(

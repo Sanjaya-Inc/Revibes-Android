@@ -1,5 +1,6 @@
 package com.carissa.revibes.manage_transaction.data.remote
 
+import com.carissa.revibes.manage_transaction.data.model.CompleteTransactionRequest
 import com.carissa.revibes.manage_transaction.data.model.RejectTransactionRequest
 import com.carissa.revibes.manage_transaction.data.model.TransactionActionResponse
 import com.carissa.revibes.transaction_history.data.model.TransactionDetailResponse
@@ -48,7 +49,9 @@ interface ManageTransactionRemoteApi {
 
     @PATCH("logistic-orders/{id}/complete")
     suspend fun completeTransaction(
-        @Path("id") id: String
+        @Path("id") id: String,
+        @Header("Content-Type") contentType: String = "application/json",
+        @Body request: CompleteTransactionRequest
     ): TransactionActionResponse
 }
 

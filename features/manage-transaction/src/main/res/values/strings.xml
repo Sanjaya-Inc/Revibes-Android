@@ -34,8 +34,9 @@
     <string name="store_name_value">Store: %1$s</string>
     <string name="status">Status</string>
     <string name="type">Type</string>
-    <string name="weight">Weight</string>
+    <string name="weight">Quantity</string>
     <string name="weight_kg">%1$d kg</string>
+    <string name="quantity_value">%1$d %2$s</string>
     <string name="points">Points</string>
     
     <!-- Actions -->
@@ -48,6 +49,7 @@
     <!-- Dialog Messages -->
     <string name="accept_transaction_title">Accept Transaction</string>
     <string name="accept_transaction_message">Are you sure you want to accept this transaction? This action cannot be undone.</string>
+    <string name="awarded_points_optional">Awarded points (optional)</string>
     <string name="reject_transaction_title">Reject Transaction</string>
     <string name="reject_transaction_message">Are you sure you want to reject this transaction? You can optionally provide a reason below.</string>
     <string name="rejection_reason_optional">Rejection reason</string>
