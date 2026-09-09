@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -102,18 +103,13 @@ fun DropOffScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.collectAsState()
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
     val navigator = RevibesTheme.navigator
     viewModel.collectSideEffect { event ->
         when (event) {
             is DropOffScreenUiEvent.NavigateBack -> {
                 navigator.navigateUp()
             }
-            is DropOffScreenUiEvent.OnLoadDropOffDataFailed -> {
-                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-            }
-
-            is DropOffScreenUiEvent.OnImageUploadFailed -> {
+            is DropOffScreenUiEvent.OnError -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
 
@@ -135,7 +131,13 @@ fun DropOffScreen(
         MaintenanceChecker(FeatureName.DROP_OFF, onBackAction = {
             viewModel.onEvent(DropOffScreenUiEvent.NavigateBack)
         }, onFeatureEnabled = {
-            ContentStateSwitcher(state.isLoading) {
+            ContentStateSwitcher(
+                isLoading = state.isLoading,
+                error = state.error,
+                actionButton = context.getString(com.carissa.revibes.core.R.string.retry) to {
+                    viewModel.onEvent(DropOffScreenUiEvent.LoadDropOffData)
+                }
+            ) {
                 DropOffScreenContent(
                     modifier = Modifier
                         .padding(contentPadding)
@@ -147,7 +149,9 @@ fun DropOffScreen(
                     nearestStores = state.stores,
                     selectedStore = state.selectedStore,
                     isFormValid = state.isFormValid,
-                    validationErrors = state.validationErrors
+                    validationErrors = state.validationErrors,
+                    isAddingItem = state.isAddingItem,
+                    uploadingItemIndex = state.uploadingItemIndex
                 )
             }
         })
@@ -165,6 +169,8 @@ fun DropOffScreenContent(
     selectedStore: StoreData? = null,
     isFormValid: Boolean = false,
     validationErrors: ValidationErrors = ValidationErrors(),
+    isAddingItem: Boolean = false,
+    uploadingItemIndex: Int? = null,
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -437,17 +443,19 @@ fun DropOffScreenContent(
                         )
                     )
                 },
+                isUploading = index == uploadingItemIndex,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
-        val primaryColor = RevibesTheme.colors.primary
         Button(
             text = context.getString(R.string.add_item_button),
             onClick = { eventReceiver.onEvent(DropOffScreenUiEvent.AddItemToOrder(orderId)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            variant = ButtonVariant.SecondaryOutlined
+            variant = ButtonVariant.SecondaryOutlined,
+            loading = isAddingItem,
+            enabled = !isAddingItem && orderId.isNotEmpty()
         )
         validationErrors.itemsError?.let { error ->
             Text(
@@ -480,7 +488,8 @@ private fun ItemSection(
     onItemChange: (DropOffItem) -> Unit,
     onRemove: () -> Unit,
     onImageUpload: (Uri, String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isUploading: Boolean = false
 ) {
     val isItemNameValid = item.name.trim().isNotEmpty()
     val isItemTypeValid = item.type.isNotEmpty()
@@ -715,18 +724,27 @@ private fun ItemSection(
                         color = DropOffTextFieldBg,
                         shape = RoundedCornerShape(16.dp)
                     )
-                    .clickable {
+                    .clickable(enabled = !isUploading) {
                         imagePickerLauncher.launch(context.getString(R.string.image_mime_type))
                     }
-                    .padding(16.dp)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_upload),
-                    contentDescription = context.getString(R.string.upload_photo_desc),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(36.dp)
-                )
+                if (isUploading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(32.dp),
+                        color = RevibesTheme.colors.primary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.ic_upload),
+                        contentDescription = context.getString(R.string.upload_photo_desc),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(36.dp)
+                    )
+                }
                 Text(
                     text = if (item.photos.isEmpty()) {
                         context.getString(R.string.upload_photo_button)

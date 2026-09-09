@@ -11,6 +11,7 @@ import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.drop_off.data.DropOffRepository
 import com.carissa.revibes.drop_off.domain.model.StoreData
+import com.carissa.revibes.drop_off.presentation.handler.DropOffExceptionHandler
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -21,6 +22,9 @@ import org.koin.core.annotation.KoinViewModel
 
 data class DropOffScreenUiState(
     val isLoading: Boolean = false,
+    val isAddingItem: Boolean = false,
+    val uploadingItemIndex: Int? = null,
+    val error: String? = null,
     val isMaintenance: Boolean = false,
     val stores: ImmutableList<StoreData> = persistentListOf(),
     val currentOrderId: String? = null,
@@ -44,8 +48,7 @@ sealed interface DropOffScreenUiEvent {
         DropOffScreenUiEvent, NavigationEvent
 
     data object LoadDropOffData : DropOffScreenUiEvent
-    data class OnLoadDropOffDataFailed(override val message: String) : DropOffScreenUiEvent,
-        Throwable(message)
+    data class OnError(val message: String) : DropOffScreenUiEvent
 
     data class AddItemToOrder(val orderId: String) : DropOffScreenUiEvent
     data object MakeOrder : DropOffScreenUiEvent
@@ -72,10 +75,6 @@ sealed interface DropOffScreenUiEvent {
         val itemIndex: Int,
         val imageUrl: String
     ) : DropOffScreenUiEvent
-
-    data class OnImageUploadFailed(
-        val message: String
-    ) : DropOffScreenUiEvent
 }
 
 @Serializable
@@ -90,6 +89,7 @@ data class DropOffItem(
 @KoinViewModel
 class DropOffScreenViewModel(
     private val dropOffRepository: DropOffRepository,
+    dropOffExceptionHandler: DropOffExceptionHandler,
     configRepository: ConfigRepository
 ) : BaseViewModel<DropOffScreenUiState, DropOffScreenUiEvent>(
     initialState = DropOffScreenUiState(
@@ -101,14 +101,7 @@ class DropOffScreenViewModel(
         }
     },
     exceptionHandler = { syntax, throwable ->
-        when (throwable) {
-            is DropOffScreenUiEvent.OnLoadDropOffDataFailed -> {
-                syntax.postSideEffect(throwable)
-                syntax.reduce {
-                    state.copy(isLoading = false)
-                }
-            }
-        }
+        dropOffExceptionHandler.onDropOffFormError(syntax, throwable)
     }
 ) {
     override fun onEvent(event: DropOffScreenUiEvent) {
@@ -143,7 +136,7 @@ class DropOffScreenViewModel(
                     event.imageUrl
                 )
 
-                is DropOffScreenUiEvent.OnImageUploadFailed -> Unit
+                is DropOffScreenUiEvent.OnError -> Unit
                 else -> Unit
             }
         }
@@ -221,29 +214,23 @@ class DropOffScreenViewModel(
 
     private fun loadDropOffData() {
         intent {
-            reduce { state.copy(isLoading = true) }
+            reduce { state.copy(isLoading = true, error = null) }
 
             coroutineScope {
-                runCatching {
-                    val storesDeferred = async {
-                        dropOffRepository.getStores(
-                            longitude = 106.8456,
-                            latitude = -6.2088
-                        )
-                    }
-                    val orderIdDeferred = async { dropOffRepository.createLogisticOrder() }
+                val storesDeferred = async {
+                    dropOffRepository.getStores(
+                        longitude = 106.8456,
+                        latitude = -6.2088
+                    )
+                }
+                val orderIdDeferred = async { dropOffRepository.createLogisticOrder() }
 
-                    val (stores, orderId) = storesDeferred.await() to orderIdDeferred.await()
-                    reduce {
-                        state.copy(
-                            stores = stores.toImmutableList(),
-                            currentOrderId = orderId,
-                            isLoading = false
-                        )
-                    }
-                }.onFailure {
-                    throw DropOffScreenUiEvent.OnLoadDropOffDataFailed(
-                        it.message ?: "Something went wrong!"
+                val (stores, orderId) = storesDeferred.await() to orderIdDeferred.await()
+                reduce {
+                    state.copy(
+                        stores = stores.toImmutableList(),
+                        currentOrderId = orderId,
+                        isLoading = false
                     )
                 }
             }
@@ -252,12 +239,13 @@ class DropOffScreenViewModel(
 
     private fun addItemToOrder(orderId: String) {
         intent {
-            reduce { state.copy(isLoading = true) }
+            if (state.isAddingItem) return@intent
+            reduce { state.copy(isAddingItem = true) }
             val itemId = dropOffRepository.createLogisticOrderItem(orderId = orderId)
             val newItems = state.items.toMutableList().apply {
                 add(DropOffItem(id = itemId))
             }.toImmutableList()
-            reduce { state.copy(isLoading = false, items = newItems) }
+            reduce { state.copy(isAddingItem = false, items = newItems) }
             validateForm()
         }
     }
@@ -268,13 +256,11 @@ class DropOffScreenViewModel(
         contentType: String
     ) {
         intent {
-            reduce { state.copy(isLoading = true) }
             dropOffRepository.getPresignedUrl(
                 orderId = orderId,
                 itemId = itemId,
                 contentType = contentType
             )
-            reduce { state.copy(isLoading = false) }
         }
     }
 
@@ -287,34 +273,26 @@ class DropOffScreenViewModel(
         contentType: String
     ) {
         intent {
-            reduce { state.copy(isLoading = true) }
-            try {
-                val (uploadUrl, downloadUrl, _) = dropOffRepository.getPresignedUrl(
-                    orderId = orderId,
-                    itemId = itemId,
-                    contentType = contentType
-                )
+            if (state.uploadingItemIndex != null) return@intent
+            reduce { state.copy(uploadingItemIndex = itemIndex) }
+            val (uploadUrl, downloadUrl, _) = dropOffRepository.getPresignedUrl(
+                orderId = orderId,
+                itemId = itemId,
+                contentType = contentType
+            )
 
-                val uploadSuccess = dropOffRepository.uploadImageToUrl(
-                    context = context,
-                    uploadUrl = uploadUrl,
-                    imageUri = imageUri,
-                    contentType = contentType
-                )
+            val uploadSuccess = dropOffRepository.uploadImageToUrl(
+                context = context,
+                uploadUrl = uploadUrl,
+                imageUri = imageUri,
+                contentType = contentType
+            )
 
-                if (uploadSuccess) {
-                    onEvent(DropOffScreenUiEvent.OnImageUploadSuccess(itemIndex, downloadUrl))
-                } else {
-                    onEvent(DropOffScreenUiEvent.OnImageUploadFailed(UPLOAD_FAILED_MESSAGE))
-                }
-            } catch (e: Exception) {
-                onEvent(
-                    DropOffScreenUiEvent.OnImageUploadFailed(
-                        e.message ?: UNKNOWN_ERROR_MESSAGE
-                    )
-                )
+            if (!uploadSuccess) {
+                error(UPLOAD_FAILED_MESSAGE)
             }
-            reduce { state.copy(isLoading = false) }
+            onEvent(DropOffScreenUiEvent.OnImageUploadSuccess(itemIndex, downloadUrl))
+            reduce { state.copy(uploadingItemIndex = null) }
         }
     }
 
@@ -335,12 +313,8 @@ class DropOffScreenViewModel(
 
     private fun makeOrder() {
         intent {
-            if (!isFormValid(state)) {
-                reduce { state.copy(isLoading = false) }
-                return@intent
-            }
+            if (!isFormValid(state)) return@intent
 
-            reduce { state.copy(isLoading = true) }
             val orderId = requireNotNull(
                 value = state.currentOrderId
             ) { DROP_OFF_SESSION_FAILED_MESSAGE }
@@ -355,7 +329,6 @@ class DropOffScreenViewModel(
                 items = state.items,
             )
             onEvent(DropOffScreenUiEvent.NavigateToConfirmOrder(arguments))
-            reduce { state.copy(isLoading = false) }
         }
     }
 
@@ -391,7 +364,6 @@ class DropOffScreenViewModel(
         const val ITEM_DETAILS_REQUIRED_ERROR =
             "Please complete all item details (name, type, weight, and photo)"
         const val UPLOAD_FAILED_MESSAGE = "Failed to upload image"
-        const val UNKNOWN_ERROR_MESSAGE = "Unknown error"
         const val DROP_OFF_SESSION_FAILED_MESSAGE = "Failed to initiate the Drop off session!"
     }
 }

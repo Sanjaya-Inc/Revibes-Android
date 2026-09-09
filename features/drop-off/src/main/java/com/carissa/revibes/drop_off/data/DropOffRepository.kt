@@ -2,6 +2,8 @@ package com.carissa.revibes.drop_off.data
 
 import android.content.Context
 import android.net.Uri
+import com.carissa.revibes.core.data.model.ErrorResponse
+import com.carissa.revibes.core.data.utils.ApiException
 import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.drop_off.data.mapper.toStoreDataList
 import com.carissa.revibes.drop_off.data.model.EstimatePointItem
@@ -15,7 +17,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.annotation.Single
-import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 data class EstimatePointItemData(
     val name: String,
@@ -33,8 +35,14 @@ data class SubmitOrderItemData(
 @Single
 class DropOffRepository(
     private val remoteApi: DropOffRemoteApi,
-    private val httpClient: OkHttpClient
+    httpClient: OkHttpClient
 ) : BaseRepository() {
+    private val uploadClient: OkHttpClient = httpClient.newBuilder()
+        .connectTimeout(UPLOAD_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .readTimeout(UPLOAD_IO_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .writeTimeout(UPLOAD_IO_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .callTimeout(UPLOAD_CALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .build()
 
     suspend fun getStores(longitude: Double, latitude: Double): List<StoreData> {
         return execute { remoteApi.getStores(longitude, latitude).data.toStoreDataList() }
@@ -67,24 +75,18 @@ class DropOffRepository(
         contentType: String
     ): Boolean {
         return execute {
-            try {
-                val inputStream = context.contentResolver.openInputStream(imageUri)
-                val imageBytes = requireNotNull(inputStream?.readBytes())
-                inputStream.close()
+            val imageBytes = context.contentResolver.openInputStream(imageUri)?.use { it.readBytes() }
+                ?: error("Unable to read image")
 
-                val requestBody = imageBytes.toRequestBody(contentType = contentType.toMediaType())
-                val request = Request.Builder()
-                    .url(uploadUrl)
-                    .put(requestBody)
-                    .addHeader("Content-Type", contentType)
-                    .addHeader("X-GOOG-ACL", "public-read")
-                    .build()
+            val requestBody = imageBytes.toRequestBody(contentType = contentType.toMediaType())
+            val request = Request.Builder()
+                .url(uploadUrl)
+                .put(requestBody)
+                .addHeader("Content-Type", contentType)
+                .addHeader("X-GOOG-ACL", "public-read")
+                .build()
 
-                val response = httpClient.newCall(request).execute()
-                response.isSuccessful
-            } catch (e: IOException) {
-                false
-            }
+            uploadClient.newCall(request).execute().use { it.isSuccessful }
         }
     }
 
@@ -111,8 +113,8 @@ class DropOffRepository(
         country: String,
         storeId: String,
         items: List<SubmitOrderItemData>
-    ): Boolean {
-        return execute {
+    ) {
+        execute {
             val request = SubmitOrderRequest(
                 type = type,
                 name = name,
@@ -128,7 +130,23 @@ class DropOffRepository(
                 }
             )
             val response = remoteApi.submitOrder(orderId, request)
-            response.code == 200
+            if (response.code != HTTP_SUCCESS_CODE) {
+                throw ApiException(
+                    statusCode = response.code,
+                    errorResponse = ErrorResponse(
+                        status = response.status,
+                        code = response.code,
+                        message = response.message
+                    )
+                )
+            }
         }
+    }
+
+    private companion object {
+        const val HTTP_SUCCESS_CODE = 200
+        const val UPLOAD_CONNECT_TIMEOUT_SECONDS = 15L
+        const val UPLOAD_IO_TIMEOUT_SECONDS = 30L
+        const val UPLOAD_CALL_TIMEOUT_SECONDS = 45L
     }
 }

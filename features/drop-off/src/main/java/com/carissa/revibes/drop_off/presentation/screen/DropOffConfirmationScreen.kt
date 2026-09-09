@@ -163,7 +163,7 @@ private fun DropOffConfirmationWrapperScreen(
                     Button(
                         text = context.getString(com.carissa.revibes.drop_off.R.string.submit_button),
                         onClick = { eventReceiver.onEvent(event = MakeOrder(arguments = arguments)) },
-                        enabled = true,
+                        enabled = !uiState.isLoading,
                         loading = uiState.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()

@@ -52,6 +52,7 @@ class DropOffConfirmationScreenViewModel(
                 }
 
                 is DropOffConfirmationScreenUiEvent.MakeOrder -> {
+                    if (state.isLoading) return@intent
                     val orderItems = event.arguments.items.map { item ->
                         SubmitOrderItemData(
                             id = item.id,
