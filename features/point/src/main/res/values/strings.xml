@@ -3,4 +3,11 @@
     <string name="point_title">Point</string>
     <string name="back_to_home">Back to Home</string>
     <string name="back_desc">Back</string>
+    <string name="recent_points">Recent points</string>
+    <string name="point_source_daily_check_in">Daily check-in</string>
+    <string name="point_source_drop_off">Drop off</string>
+    <string name="point_source_mission">Mission</string>
+    <string name="point_source_exchange">Exchange</string>
+    <string name="point_history_value">%1$s%2$d</string>
+
 </resources>

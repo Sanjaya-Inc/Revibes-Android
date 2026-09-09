@@ -60,6 +60,7 @@ import com.carissa.revibes.core.presentation.compose.components.Text
 import com.carissa.revibes.point.R
 import com.carissa.revibes.point.domain.model.Mission
 import com.carissa.revibes.point.domain.model.MissionType
+import com.carissa.revibes.point.domain.model.PointHistory
 import com.carissa.revibes.point.presentation.navigation.PointGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.point.destinations.DailyCheckInNewsScreenDestination
@@ -222,6 +223,17 @@ private fun PointScreenContent(
                             loading = uiState.isClaimingReward,
                             enabled = uiState.allowedToClaimReward,
                         )
+                        if (uiState.pointHistories.isNotEmpty()) {
+                            Text(
+                                text = stringResource(R.string.recent_points),
+                                fontWeight = FontWeight.Bold,
+                                color = RevibesTheme.colors.primary,
+                                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            )
+                            uiState.pointHistories.take(10).forEach { history ->
+                                PointHistoryRow(history)
+                            }
+                        }
                     }
 
                     Column(
@@ -261,6 +273,31 @@ private fun PointScreenContent(
                 }
             }
         })
+    }
+}
+
+@Composable
+private fun PointHistoryRow(history: PointHistory) {
+    val source = when (history.sourceType) {
+        "daily-reward" -> stringResource(R.string.point_source_daily_check_in)
+        "logistic-order" -> stringResource(R.string.point_source_drop_off)
+        "mission" -> stringResource(R.string.point_source_mission)
+        "exchange" -> stringResource(R.string.point_source_exchange)
+        else -> history.sourceType.orEmpty()
+    }
+    val sign = if (history.symbol == "minus") "-" else "+"
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = source, color = RevibesTheme.colors.primary)
+        Text(
+            text = stringResource(R.string.point_history_value, sign, history.value),
+            color = RevibesTheme.colors.primary,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 

@@ -7,6 +7,7 @@ import com.carissa.revibes.core.presentation.model.UserPointFlow
 import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.point.data.PointRepository
 import com.carissa.revibes.point.domain.model.Mission
+import com.carissa.revibes.point.domain.model.PointHistory
 import com.carissa.revibes.point.presentation.handler.PointExceptionHandler
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
@@ -18,6 +19,7 @@ data class PointScreenUiState(
     val isAlreadyCheckedInToday: Boolean = false,
     val dailyRewards: List<DailyReward> = emptyList(),
     val missions: List<Mission> = emptyList(),
+    val pointHistories: List<PointHistory> = emptyList(),
     val isMissionsLoading: Boolean = false,
     val claimingMissionId: String? = null,
     val missionError: String? = null,
@@ -95,11 +97,13 @@ class PointScreenViewModel(
             reduce { state.copy(isLoading = true) }
             val dailyRewards = pointRepository.getDailyRewards()
             val alreadyCheckedIn = checkIsAlreadyCheckedInToday(dailyRewards)
+            val pointHistories = runCatching { pointRepository.getPointHistories() }.getOrDefault(emptyList())
             reduce {
                 state.copy(
                     isLoading = false,
                     dailyRewards = dailyRewards,
-                    isAlreadyCheckedInToday = alreadyCheckedIn
+                    isAlreadyCheckedInToday = alreadyCheckedIn,
+                    pointHistories = pointHistories
                 )
             }
         }
@@ -120,12 +124,14 @@ class PointScreenViewModel(
                     pointRepository.claimDailyReward()
                 }.onSuccess {
                     val updatedDailyRewards = pointRepository.getDailyRewards()
+                    val pointHistories = runCatching { pointRepository.getPointHistories() }.getOrDefault(emptyList())
                     userPointFlow.update()
                     reduce {
                         state.copy(
                             isClaimingReward = false,
                             dailyRewards = updatedDailyRewards,
-                            isAlreadyCheckedInToday = checkIsAlreadyCheckedInToday(updatedDailyRewards)
+                            isAlreadyCheckedInToday = checkIsAlreadyCheckedInToday(updatedDailyRewards),
+                            pointHistories = pointHistories
                         )
                     }
                 }.onFailure { ex ->

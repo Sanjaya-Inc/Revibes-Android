@@ -75,6 +75,14 @@ class TransactionHistoryContentScope {
                 "${data.items.count()} Item - ${data.items.joinToString(" ; ")}",
                 style = RevibesTheme.typography.body3
             )
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Image(
+                    painterResource(R.drawable.ic_coin),
+                    contentDescription = "Coin",
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(data.coinReceive.toString(), style = RevibesTheme.typography.body3)
+            }
         }
     }
 

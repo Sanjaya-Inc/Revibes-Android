@@ -6,6 +6,7 @@ import com.carissa.revibes.point.data.mapper.toDomain
 import com.carissa.revibes.point.data.model.NewsData
 import com.carissa.revibes.point.data.remote.PointRemoteApi
 import com.carissa.revibes.point.domain.model.Mission
+import com.carissa.revibes.point.domain.model.PointHistory
 import com.carissa.revibes.point.presentation.screen.DailyReward
 import org.koin.core.annotation.Single
 
@@ -35,5 +36,19 @@ class PointRepository(
 
     suspend fun getDailyNews(): NewsData? {
         return execute { remoteApi.getDailyNews().data }
+    }
+
+    suspend fun getPointHistories(): List<PointHistory> {
+        return execute {
+            remoteApi.getPointHistories().data.items.map { item ->
+                PointHistory(
+                    id = item.id,
+                    timestamp = item.timestamp,
+                    sourceType = item.sourceType,
+                    symbol = item.symbol,
+                    value = item.value
+                )
+            }
+        }
     }
 }
