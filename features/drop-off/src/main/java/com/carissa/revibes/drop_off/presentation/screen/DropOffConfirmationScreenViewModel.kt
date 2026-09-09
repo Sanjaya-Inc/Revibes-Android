@@ -58,7 +58,8 @@ class DropOffConfirmationScreenViewModel(
                             id = item.id,
                             name = item.name,
                             type = item.type,
-                            weight = item.weight?.second ?: -1
+                            weight = item.weight?.second ?: -1,
+                            unit = item.unit
                         )
                     }
                     submitLogisticOrder(
@@ -83,7 +84,8 @@ class DropOffConfirmationScreenViewModel(
                 EstimatePointItemData(
                     name = item.name,
                     type = item.type,
-                    weight = item.weight?.second ?: 0
+                    weight = item.weight?.second ?: 0,
+                    unit = item.unit
                 )
             }
             val (itemPoints, totalPoints) = dropOffRepository.estimatePoint(estimateItems)

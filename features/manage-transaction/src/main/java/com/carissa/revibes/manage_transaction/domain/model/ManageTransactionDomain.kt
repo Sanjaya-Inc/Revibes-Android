@@ -20,6 +20,7 @@ data class TransactionItemDomain(
     val name: String,
     val type: String,
     val weight: Int,
+    val unit: String = "kg",
     val point: Int,
     val media: List<TransactionMediaDomain>
 )
@@ -50,6 +51,7 @@ data class TransactionDetailItemDomain(
     val name: String,
     val type: String,
     val weight: Int,
+    val unit: String = "kg",
     val point: Int,
     val media: List<TransactionDetailMediaDomain>
 )

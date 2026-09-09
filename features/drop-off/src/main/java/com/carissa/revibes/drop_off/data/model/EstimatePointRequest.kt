@@ -11,5 +11,6 @@ data class EstimatePointRequest(
 data class EstimatePointItem(
     val name: String,
     val type: String,
-    val weight: Int
+    val weight: Int,
+    val unit: String
 )

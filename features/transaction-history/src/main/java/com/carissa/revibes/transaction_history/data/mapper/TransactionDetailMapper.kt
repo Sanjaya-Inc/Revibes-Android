@@ -45,6 +45,7 @@ fun TransactionDetailItemData.toDomain(): TransactionDetailItem {
         name = name,
         type = type,
         weight = weight,
+        unit = unit,
         point = point,
         media = media.map { it.toDomain() }
     )
@@ -82,7 +83,7 @@ fun TransactionDetailItem.toTransactionItem(): TransactionItem {
         id = this.id,
         name = this.name,
         type = this.type,
-        weight = this.weight.toString(),
+        weight = "${this.weight} ${this.unit}",
         photos = this.media.map { it.downloadUri }
     )
 }

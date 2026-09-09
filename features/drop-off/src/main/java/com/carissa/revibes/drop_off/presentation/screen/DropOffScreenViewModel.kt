@@ -82,9 +82,13 @@ data class DropOffItem(
     val id: String,
     val name: String = "",
     val type: String = "",
+    val unit: String = UNIT_KG,
     val weight: Pair<String, Int>? = null,
     val photos: List<String> = emptyList(),
 )
+
+const val UNIT_KG = "kg"
+const val UNIT_PCS = "pcs"
 
 @KoinViewModel
 class DropOffScreenViewModel(

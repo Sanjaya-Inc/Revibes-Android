@@ -502,16 +502,32 @@ private fun ItemSection(
         context.getString(R.string.b3_option) to context.getString(R.string.b3_type_value)
     )
     var expanded by remember { mutableStateOf(false) }
-    val weightOptions = listOf(
-        context.getString(R.string.weight_less_1kg) to 1,
-        context.getString(R.string.weight_4_6kg) to 5,
-        context.getString(R.string.weight_7_9kg) to 8,
-        context.getString(R.string.weight_more_10kg) to 10
+    val unitOptions = listOf(
+        context.getString(R.string.unit_kg) to UNIT_KG,
+        context.getString(R.string.unit_pcs) to UNIT_PCS
     )
+    val weightOptions = if (item.unit == UNIT_PCS) {
+        listOf(
+            context.getString(R.string.pcs_1) to 1,
+            context.getString(R.string.pcs_2_5) to 5,
+            context.getString(R.string.pcs_6_10) to 8,
+            context.getString(R.string.pcs_more_10) to 10
+        )
+    } else {
+        listOf(
+            context.getString(R.string.weight_less_1kg) to 1,
+            context.getString(R.string.weight_4_6kg) to 5,
+            context.getString(R.string.weight_7_9kg) to 8,
+            context.getString(R.string.weight_more_10kg) to 10
+        )
+    }
     val selectedTypeLabel = typeOptions.find { it.second == item.type }?.first ?: context.getString(
         R.string.empty_string
     )
+    var unitExpanded by remember { mutableStateOf(false) }
     var weightExpanded by remember { mutableStateOf(false) }
+    val selectedUnitLabel =
+        unitOptions.find { it.second == item.unit }?.first ?: context.getString(R.string.unit_kg)
     val selectedWeightLabel =
         weightOptions.find { it.second == item.weight?.second }?.first ?: context.getString(
             R.string.empty_string
@@ -642,7 +658,54 @@ private fun ItemSection(
                 }
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = context.getString(R.string.weight_number, index + 1),
+                        text = context.getString(R.string.unit_label, index + 1),
+                        color = DropOffLabelColor,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                    )
+                    ExposedDropdownMenuBox(
+                        expanded = unitExpanded,
+                        onExpandedChange = { unitExpanded = !unitExpanded },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = selectedUnitLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitExpanded) },
+                            modifier = Modifier
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors().copy(
+                                focusedContainerColor = DropOffTextFieldBg,
+                                unfocusedContainerColor = DropOffTextFieldBg,
+                                disabledContainerColor = DropOffTextFieldBg,
+                                errorContainerColor = DropOffTextFieldBg,
+                                unfocusedOutlineColor = DropOffTextFieldBg,
+                                focusedOutlineColor = RevibesTheme.colors.primary
+                            ),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = unitExpanded,
+                            onDismissRequest = { unitExpanded = false }
+                        ) {
+                            unitOptions.forEach { (label, option) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        onItemChange(item.copy(unit = option, weight = null))
+                                        unitExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    Text(
+                        text = if (item.unit == UNIT_PCS) {
+                            context.getString(R.string.quantity_number, index + 1)
+                        } else {
+                            context.getString(R.string.weight_number, index + 1)
+                        },
                         color = DropOffLabelColor,
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                     )

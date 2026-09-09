@@ -37,6 +37,14 @@
     <string name="weight_4_6kg">&gt;4 kg - &lt;6 kg</string>
     <string name="weight_7_9kg">&gt;7 kg - &lt;9 kg</string>
     <string name="weight_more_10kg">&gt;10 kg</string>
+    <string name="unit_label">Unit %1$d</string>
+    <string name="unit_kg">kg</string>
+    <string name="unit_pcs">pcs</string>
+    <string name="quantity_number">Quantity %1$d (Estimation)</string>
+    <string name="pcs_1">1 pcs</string>
+    <string name="pcs_2_5">2 - 5 pcs</string>
+    <string name="pcs_6_10">6 - 10 pcs</string>
+    <string name="pcs_more_10">&gt;10 pcs</string>
 
     <!-- Buttons -->
     <string name="add_item_button">Add Item</string>

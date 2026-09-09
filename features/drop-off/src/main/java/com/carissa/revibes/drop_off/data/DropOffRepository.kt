@@ -22,14 +22,16 @@ import java.util.concurrent.TimeUnit
 data class EstimatePointItemData(
     val name: String,
     val type: String,
-    val weight: Int
+    val weight: Int,
+    val unit: String
 )
 
 data class SubmitOrderItemData(
     val id: String,
     val name: String,
     val type: String,
-    val weight: Int
+    val weight: Int,
+    val unit: String
 )
 
 @Single
@@ -97,7 +99,8 @@ class DropOffRepository(
                     EstimatePointItem(
                         name = item.name,
                         type = item.type,
-                        weight = item.weight
+                        weight = item.weight,
+                        unit = item.unit
                     )
                 }
             )
@@ -125,7 +128,8 @@ class DropOffRepository(
                         id = item.id,
                         name = item.name,
                         type = item.type,
-                        weight = item.weight
+                        weight = item.weight,
+                        unit = item.unit
                     )
                 }
             )

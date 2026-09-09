@@ -37,6 +37,7 @@ fun LogisticItemData.toDomain(): TransactionItemDomain {
         name = name,
         type = type,
         weight = weight,
+        unit = unit,
         point = point,
         media = media.map { it.toDomain() }
     )
@@ -73,6 +74,7 @@ fun TransactionDetailItemData.toDomain(): TransactionDetailItemDomain {
         name = name,
         type = type,
         weight = weight,
+        unit = unit,
         point = point,
         media = media.map { it.toDomain() }
     )

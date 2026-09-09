@@ -34,6 +34,7 @@ data class TransactionDetailItemData(
     val name: String,
     val type: String,
     val weight: Int,
+    val unit: String = "kg",
     val point: Int,
     val media: List<TransactionDetailMediaData>
 )
