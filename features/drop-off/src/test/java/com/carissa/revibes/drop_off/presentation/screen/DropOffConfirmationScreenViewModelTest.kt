@@ -6,12 +6,16 @@ import com.carissa.revibes.core.data.utils.ApiException
 import com.carissa.revibes.core.domain.utils.GeneralErrorMapper
 import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.drop_off.data.DropOffRepository
+import com.carissa.revibes.drop_off.data.SubmitOrderItemData
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.handler.DropOffExceptionHandler
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.slot
 import io.mockk.unmockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +25,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.koin.core.context.startKoin
@@ -142,5 +147,35 @@ class DropOffConfirmationScreenViewModelTest {
         verify(exactly = 0) {
             navigationEventBus.post(DropOffConfirmationScreenUiEvent.NavigateToHome)
         }
+    }
+
+    @Test
+    fun `submit includes pcs unit from drop-off items`() = runTest {
+        val itemsSlot = slot<List<SubmitOrderItemData>>()
+        coEvery {
+            dropOffRepository.submitOrder(any(), any(), any(), any(), any(), capture(itemsSlot))
+        } just Runs
+
+        val arguments = screenArguments.copy(
+            items = listOf(
+                DropOffItem(
+                    id = "item-1",
+                    name = "Bottles",
+                    type = "non-organic",
+                    weight = "5 pcs" to 5,
+                    photos = listOf("https://example.com/photo.jpg"),
+                    unit = UNIT_PCS
+                )
+            )
+        )
+        val viewModel = DropOffConfirmationScreenViewModel(dropOffRepository, exceptionHandler)
+        viewModel.test(this) {
+            containerHost.onEvent(DropOffConfirmationScreenUiEvent.MakeOrder(arguments))
+            expectState { copy(isLoading = true) }
+            expectState { copy(isLoading = false) }
+        }
+
+        assertEquals("pcs", itemsSlot.captured.single().unit)
+        assertEquals(5, itemsSlot.captured.single().weight)
     }
 }

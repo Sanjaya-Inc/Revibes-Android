@@ -61,6 +61,7 @@ import com.carissa.revibes.point.R
 import com.carissa.revibes.point.domain.model.Mission
 import com.carissa.revibes.point.domain.model.MissionType
 import com.carissa.revibes.point.domain.model.PointHistory
+import com.carissa.revibes.point.domain.model.PointSourceKind
 import com.carissa.revibes.point.presentation.navigation.PointGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.point.destinations.DailyCheckInNewsScreenDestination
@@ -278,14 +279,13 @@ private fun PointScreenContent(
 
 @Composable
 private fun PointHistoryRow(history: PointHistory) {
-    val source = when (history.sourceType) {
-        "daily-reward" -> stringResource(R.string.point_source_daily_check_in)
-        "logistic-order" -> stringResource(R.string.point_source_drop_off)
-        "mission" -> stringResource(R.string.point_source_mission)
-        "exchange" -> stringResource(R.string.point_source_exchange)
-        else -> history.sourceType.orEmpty()
+    val source = when (history.sourceKind()) {
+        PointSourceKind.DAILY_CHECK_IN -> stringResource(R.string.point_source_daily_check_in)
+        PointSourceKind.DROP_OFF -> stringResource(R.string.point_source_drop_off)
+        PointSourceKind.MISSION -> stringResource(R.string.point_source_mission)
+        PointSourceKind.EXCHANGE -> stringResource(R.string.point_source_exchange)
+        PointSourceKind.UNKNOWN -> history.sourceType.orEmpty()
     }
-    val sign = if (history.symbol == "minus") "-" else "+"
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -294,7 +294,7 @@ private fun PointHistoryRow(history: PointHistory) {
     ) {
         Text(text = source, color = RevibesTheme.colors.primary)
         Text(
-            text = stringResource(R.string.point_history_value, sign, history.value),
+            text = history.signedAmount(),
             color = RevibesTheme.colors.primary,
             fontWeight = FontWeight.Medium
         )

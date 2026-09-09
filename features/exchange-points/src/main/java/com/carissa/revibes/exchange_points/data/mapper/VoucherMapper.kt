@@ -16,6 +16,10 @@ fun ExchangeItem.toVoucher(): Voucher {
     )
 }
 
+fun List<ExchangeItem>.toListedVouchers(): List<Voucher> {
+    return filter { it.isAvailable }.map { it.toVoucher() }
+}
+
 fun UserVoucherItem.toUserVoucher(): UserVoucher {
     return UserVoucher(
         id = this.id,
