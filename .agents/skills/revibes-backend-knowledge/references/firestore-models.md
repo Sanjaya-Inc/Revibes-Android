@@ -205,8 +205,10 @@ interface News {
 
 - **Role**: `"USER"` | `"ADMIN"` | `"SUPER_ADMIN"`
 - **Account Status**: `"ACTIVE"` | `"SUSPENDED"` | `"INACTIVE"`
-- **Logistic Order Type**: `"DROP_OFF"` | `"PICK_UP"`
-- **Logistic Order Status**: `"SUBMITTED"` | `"PROCESSING"` | `"COMPLETED"` | `"CANCELLED"`
+- **Logistic Order Type**: `"drop-off"` | `"pick-up"` (not `DROP_OFF`)
+- **Logistic Order Status**: `"draft"` | `"submitted"` | `"assigned"` | `"en-route"` | `"picked-up"` | `"awaiting-inspection"` | `"rejected"` | `"completed"`. `completeOrder` requires `"submitted"`.
+- **Point history `sourceType`**: `"logistic-order"` | `"daily-reward"`
+- **AppSetting (`app_settings`)**: `{ point: { organic, "non-organic", b3 }, dailyReward: { days, initialPoint, multiplier } }`. Defaults 5 / 7-5-5. See [logistic-points.md](logistic-points.md).
 - **Mission Type**: `"DROP_OFF_WEIGHT"` | `"TRANSACTION_COUNT"` | `"DAILY_LOGIN"` | `"RECYCLING_STREAK"`
 - **Mission Progress Status**: `"IN_PROGRESS"` | `"COMPLETED"` | `"CLAIMED"`
 - **User Voucher Status**: `"AVAILABLE"` | `"USED"` | `"EXPIRED"`

@@ -25,31 +25,17 @@ Prefix all command line operations with `rtk`:
 - **Decisions Memory**: Log changes and design decisions using `write_memory` / `read_memory`.
 </rules>
 
-<design>
-## 2. Core Code Design & Architecture
-
-- **Clean Architecture & MVI**: Orbit MVI is used.
-  - Every screen VM must extend `BaseViewModel<ScreenUiState, ScreenUiEvent>`.
-  - Use `@KoinViewModel` annotation on ViewModels to register them with Koin DI.
-- **Forms**: Represent text inputs via `TextFieldValue` to preserve cursor and selection states rather than raw Strings.
-- **Dependencies**: Inject via constructor parameters. Use Version Catalog (`libs.versions.toml`) to refer to dependencies and plugins.
-- **Self-Documenting Code**: No comments explaining *what* — only *why* when non-obvious. Do not include docstrings or backwards-compat shims.
-</design>
-
 <skills>
-## 3. Specialized Skills Index (Heavy Lifting)
+## 2. Skills
 
-Consult these custom skills for specific tasks:
-- `revibes-architecture` — Guidelines and architectural specifications for the Revibes Android application (modularity system, networking, local storage, DI, Orbit MVI, and utilities).
-- `revibes-design-system` — Source of truth for styling, colors/typography mappings, custom components (Button, Text, TextFields), and NavigationEventBus patterns.
-- `revibes-backend-knowledge` — Guidelines, specifications, and full knowledge graph mapping for the Revibes Node.js/TypeScript Express & Firebase Cloud Functions backend service.
+Load these; keep details in each skill's `references/`:
+- `/revibes-architecture` — modules, Ktorfit, DI, Orbit MVI, drop-off points
+- `/revibes-design-system` — tokens, components, NavigationEventBus
+- `/revibes-backend-knowledge` — HTTP, DTO, Firestore
 
-- `compose-component-expert` — Guidelines for custom modifiers, slot APIs, Modifier.Node, and stability optimization.
-- `compose-m3-theme-expert` — Material 3 custom theme overrides, wallpaper Monet schemes, and CompositionLocal setups.
-- `koin-expert` — Koin compile-time DI, compiler annotation settings.
-- `ktor-expert` — Client/server communication, client engines, authentication tokens.
-- `kotlin-coroutine-expert` — Flows, structured concurrency, tests (Turbine / runTest).
-- `offline-first-expert` — Caching, database models (Room / SQLite Bundled), repository sync logic.
-- `solid-expert` — Clean architecture patterns, composition over inheritance.
-- `testing-expert` — Unit/integration tests, MockK, flows verification.
+Also: `compose-component-expert`, `compose-m3-theme-expert`, `koin-expert`, `ktor-expert`, `kotlin-coroutine-expert`, `offline-first-expert`, `solid-expert`, `testing-expert`.
 </skills>
+
+<constraints>
+AGENTS.md must stay rules + skill refs only. Domain facts go in skill `references/`.
+</constraints>

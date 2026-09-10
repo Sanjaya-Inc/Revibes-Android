@@ -1,5 +1,7 @@
 # Revibes Backend API Endpoints Reference
 
+Live Cloud Function is `v1`. Android `BASE_URL` currently targets Iowa (`us-central1`). Drop-off scoring, `/setting/app`, complete-order, and smoke: [logistic-points.md](logistic-points.md).
+
 All API routes are served under the Cloud Function `v1` prefix: `https://<region>-<project_id>.cloudfunctions.net/v1/<group>/<path>`
 
 ---
@@ -80,6 +82,8 @@ All API routes are served under the Cloud Function `v1` prefix: `https://<region
 
 ## 7. Logistic Orders (Drop-off & Pick-up) (`/logistic-orders`)
 
+Verified routes and point rules: [logistic-points.md](logistic-points.md). Do not use `PATCH /:id/status` or `weightKg`-only items from the table below for new work.
+
 | Method | Path | Auth Required | Description | Request Payload DTO | Response DTO |
 |--------|------|---------------|-------------|---------------------|--------------|
 | `POST` | `/logistic-orders` | Yes | Create waste drop-off / pick-up order | `CreateLogisticOrderDto` (`type`: `DROP_OFF` \| `PICK_UP`, `storeBranchId?`, `pickupAddress?`, `items`: `[{inventoryItemId, weightKg}]`) | `LogisticOrderDto` |
@@ -124,7 +128,9 @@ All API routes are served under the Cloud Function `v1` prefix: `https://<region
 
 ---
 
-## 11. System Settings (`/settings`)
+## 11. System Settings (`/setting/app`)
+
+Admin conversion rates: `GET`/`PUT /setting/app` (not `/settings`). Schema and PUT-both-fields rule: [logistic-points.md](logistic-points.md).
 
 | Method | Path | Auth Required | Description | Request Payload DTO | Response DTO |
 |--------|------|---------------|-------------|---------------------|--------------|

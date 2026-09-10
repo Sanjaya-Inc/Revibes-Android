@@ -66,6 +66,8 @@ To prevent raw unintercepted `ClientRequestException` crashes, `KtorfitCreator` 
 3. Parses error JSON payloads into `ApiException` with `message` field support and intelligent `displayMessage` fallback humanization (e.g. `message.ifBlank { reasons.firstOrNull() ?: humanizeErrorCode(error) }`).
 4. Triggers `TokenExpiredUseCase` on 401 Unauthorized response to clear session state.
 
+Drop-off GCS PUT and `GeneralErrorMapper` host/timeout rules: [drop-off-points.md](drop-off-points.md).
+
 ```kotlin
 abstract class BaseRepository(
     private val shouldKickWhenAuthFailed: Boolean = true,

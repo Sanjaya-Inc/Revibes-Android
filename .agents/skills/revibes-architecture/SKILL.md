@@ -1,23 +1,29 @@
 ---
 name: revibes-architecture
-description: "Guidelines and architectural specifications for the Revibes Android application (modularity system, networking, local storage, DI, Orbit MVI, and utilities). Make sure to use this skill whenever the user mentions adding new modules, writing database/preferences storage, implementing Ktorfit services, configuring Koin injection, creating MVI ViewModels, or implementing custom navigation transitions."
+description: "Revibes Android architecture: modules, Ktorfit, MMKV, Koin, Orbit MVI. Use when adding modules, storage, Ktorfit, Koin, ViewModels, or navigation transitions."
 ---
 
-# Revibes Architecture Skill
-
-Source of truth for the Revibes Android architecture, modular design, Ktorfit networking, MMKV/SharedPreferences local storage, Koin dependency injection, Orbit MVI presentation pattern, and core reusable utilities.
+# Revibes Architecture
 
 <instructions>
-Refer to specific reference documents for detailed specs on modularity, dependency injection, networking, local storage, and presentation. Follow the architectural design patterns, testing standards, and module creation guides defined within.
+Read the matching reference. Do not invent module edges, HTTP clients, or drop-off scoring.
 </instructions>
 
+<rules>
+- VM extends `BaseViewModel<UiState, UiEvent>`; register with `@KoinViewModel`.
+- Text inputs: `TextFieldValue`, not raw `String`.
+- Inject via constructor. Dependencies from Version Catalog (`libs.versions.toml` / `sjy`).
+- Comments: *why* only. No docstrings or compat shims.
+- `:features:*` depend on `:core` only. Cross-feature DTOs are copied, not imported.
+</rules>
+
 <references>
-- **Colors & Theme Mode**: [colors.md](.agents/skills/revibes-design-system/references/colors.md) — SmokePine palette, Light/Dark mode semantic mappings.
-- **Modularity & New Modules**: [modularity.md](.agents/skills/revibes-architecture/references/modularity.md) — Precompiled script plugins, custom `sjy` catalog, feature module registration, and step-by-step module creation.
-- **Dependency Injection**: [di.md](.agents/skills/revibes-architecture/references/di.md) — Koin compile-time annotations, startup initialization, and VM injection.
-- **Networking**: [networking.md](.agents/skills/revibes-architecture/references/networking.md) — Ktorfit & Ktor, OkHttp client configuration, auth headers, and ApiException handler.
-- **Local Storage**: [storage.md](.agents/skills/revibes-architecture/references/storage.md) — LocalDataSource (MMKV/SharedPref hybrid), interface delegation for auth tokens and user data.
-- **Presentation & Navigation**: [presentation.md](.agents/skills/revibes-architecture/references/presentation.md) — Orbit MVI, BaseViewModel, decoupled NavigationEventBus, and custom host navigation transitions.
+- **Modularity**: [modularity.md](references/modularity.md) — plugins, `sjy` catalog, new feature module steps.
+- **DI**: [di.md](references/di.md) — Koin compile-time, startup, VM injection.
+- **Networking**: [networking.md](references/networking.md) — Ktorfit, OkHttp, auth, `ApiException`.
+- **Storage**: [storage.md](references/storage.md) — LocalDataSource, tokens, user data.
+- **Presentation**: [presentation.md](references/presentation.md) — Orbit MVI, NavigationEventBus.
+- **Drop-off points**: [drop-off-points.md](references/drop-off-points.md) — pcs vs kg, conversion UI, accept points, GCS PUT.
 </references>
 
 <related>

@@ -143,4 +143,8 @@ abstract class NavigationEventHandler {
        }
    }
    ```
+
+### Home admin destinations
+- `NavigateToManageDropOffPoints` → store locations
+- `NavigateToManageDropOffConversion` → `ManageDropOffConversionScreenDestination` (organic / non-organic / B3 rates on `GET/PUT /setting/app`)
 </guide>

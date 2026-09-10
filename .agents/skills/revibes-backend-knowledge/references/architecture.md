@@ -68,8 +68,12 @@ When creating networking code in Revibes Android (e.g. Ktorfit interfaces, repos
 ### Storage URL Resolution
 - `FileStorage` checks active emulator environment variables (`STORAGE_EMULATOR_HOST`, `FIREBASE_STORAGE_EMULATOR_HOST`, or `FUNCTIONS_EMULATOR === "true"`) to decide whether to construct emulator URLs (`http://localhost:9199/...`) or production cloud URLs (`https://firebasestorage.googleapis.com/...`).
 - Prevents bundled `.env` files (`ENV=local`) in Cloud Functions deployments from serving `localhost` URLs in production.
+- Signed upload URLs must omit `x-goog-acl` (Firebase UBLA). Details: [logistic-points.md](logistic-points.md).
 
 ### Backend Unit Testing
 - Unit tests use Node native test runner (`node --test`) with `node:assert` and AAA structure.
 - Executed via `npm test` script (`tsc && node --test lib/**/*.test.js`).
+
+### Deploy & smoke
+Production `v1` is `us-central1`. Smoke uses `demo-revibes` emulators + Express on `:5012`, never production `.env` without emulator hosts. Full checklist: [logistic-points.md](logistic-points.md).
 

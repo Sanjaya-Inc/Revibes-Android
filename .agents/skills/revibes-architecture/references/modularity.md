@@ -9,7 +9,7 @@ Revibes is structured as a highly modularized Android application to encourage c
 The project has three main layers of modularization:
 - **`:app` module**: The main application runner. Handles launching the entry activity (`MainActivity`), hosting the main Compose Destintations navigation host, and tying all feature modules together.
 - **`:core` module**: The central foundation module. Contains app-wide services, local storage wrapper (`LocalDataSource`), network creator (`KtorfitCreator`), dependency injection configurations, and global presentation components (themes, typography, base ViewModels, common helpers).
-- **`:features` modules**: Specialized horizontal modules focused on cohesive user actions (e.g., `:features:auth`, `:features:home`, `:features:profile`). Each feature depends on `:core` but is decoupled from other features, routing navigation through an event bus.
+- `:features` modules depend on `:core` only. Do not add `implementation(project(":features:..."))` from another feature. Copy small DTOs (e.g. `AppSetting` in manage-transaction). Cross-feature routing goes through `:app` `NavigationEventHandler`s.
 
 ```mermaid
 graph TD
