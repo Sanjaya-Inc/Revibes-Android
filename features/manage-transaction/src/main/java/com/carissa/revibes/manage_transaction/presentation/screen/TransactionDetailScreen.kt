@@ -147,6 +147,10 @@ fun TransactionDetailScreen(
                     uiState.transactionDetail != null -> {
                         TransactionDetailContent(
                             transaction = uiState.transactionDetail!!,
+                            verifiedPoints = uiState.customPoints,
+                            onVerifiedPointsChange = {
+                                viewModel.onEvent(TransactionDetailScreenUiEvent.CustomPointsChanged(it))
+                            },
                             onAccept = { showCompleteDialog = true },
                             onReject = { showRejectDialog = true },
                             isRejecting = uiState.isRejecting,
@@ -170,10 +174,7 @@ fun TransactionDetailScreen(
 
     if (showCompleteDialog) {
         CompleteTransactionDialog(
-            points = uiState.customPoints,
-            onPointsChange = {
-                viewModel.onEvent(TransactionDetailScreenUiEvent.CustomPointsChanged(it))
-            },
+            points = uiState.customPoints.text,
             onConfirm = {
                 viewModel.onEvent(TransactionDetailScreenUiEvent.CompleteTransaction)
                 showCompleteDialog = false
@@ -186,6 +187,8 @@ fun TransactionDetailScreen(
 @Composable
 private fun TransactionDetailContent(
     transaction: TransactionDetailDomain,
+    verifiedPoints: TextFieldValue,
+    onVerifiedPointsChange: (TextFieldValue) -> Unit,
     onAccept: () -> Unit,
     onReject: () -> Unit,
     isRejecting: Boolean,
@@ -215,7 +218,30 @@ private fun TransactionDetailContent(
 
         if (transaction.status == TransactionStatus.PENDING) {
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.verified_points),
+                        style = RevibesTheme.typography.h3,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = stringResource(R.string.verified_points_hint),
+                        style = RevibesTheme.typography.body2,
+                        color = RevibesTheme.colors.primary
+                    )
+                    RevibesOutlinedTextField(
+                        value = verifiedPoints,
+                        onValueChange = { next ->
+                            if (next.text.all(Char::isDigit)) onVerifiedPointsChange(next)
+                        },
+                        label = { Text(stringResource(R.string.awarded_points)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -433,8 +459,7 @@ private fun RejectTransactionDialog(
 
 @Composable
 private fun CompleteTransactionDialog(
-    points: TextFieldValue,
-    onPointsChange: (TextFieldValue) -> Unit,
+    points: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -444,19 +469,13 @@ private fun CompleteTransactionDialog(
             Text(stringResource(R.string.accept_transaction_title))
         },
         text = {
-            Column {
-                Text(stringResource(R.string.accept_transaction_message))
-                Spacer(modifier = Modifier.height(16.dp))
-                RevibesOutlinedTextField(
-                    value = points,
-                    onValueChange = { next ->
-                        if (next.text.all { it.isDigit() }) onPointsChange(next)
-                    },
-                    label = { Text(stringResource(R.string.awarded_points_optional)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
+            Text(
+                if (points.isBlank()) {
+                    stringResource(R.string.accept_transaction_message)
+                } else {
+                    stringResource(R.string.accept_transaction_message_with_points, points)
+                }
+            )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {

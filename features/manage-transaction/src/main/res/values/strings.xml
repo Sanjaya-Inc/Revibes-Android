@@ -38,6 +38,9 @@
     <string name="weight_kg">%1$d kg</string>
     <string name="quantity_value">%1$d %2$s</string>
     <string name="points">Points</string>
+    <string name="verified_points">Verified points</string>
+    <string name="verified_points_hint">User points are added only after you accept. Revise the amount here if needed.</string>
+    <string name="awarded_points">Awarded points</string>
     
     <!-- Actions -->
     <string name="accept_transaction">Accept</string>
@@ -49,6 +52,7 @@
     <!-- Dialog Messages -->
     <string name="accept_transaction_title">Accept Transaction</string>
     <string name="accept_transaction_message">Are you sure you want to accept this transaction? This action cannot be undone.</string>
+    <string name="accept_transaction_message_with_points">Award %1$s points and accept this drop-off? This cannot be undone.</string>
     <string name="awarded_points_optional">Awarded points (optional)</string>
     <string name="reject_transaction_title">Reject Transaction</string>
     <string name="reject_transaction_message">Are you sure you want to reject this transaction? You can optionally provide a reason below.</string>

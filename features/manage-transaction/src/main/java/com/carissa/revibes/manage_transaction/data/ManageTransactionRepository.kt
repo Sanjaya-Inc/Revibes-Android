@@ -2,6 +2,7 @@ package com.carissa.revibes.manage_transaction.data
 
 import com.carissa.revibes.core.data.utils.BaseRepository
 import com.carissa.revibes.manage_transaction.data.mapper.toDomain
+import com.carissa.revibes.manage_transaction.data.model.AppSettingPointData
 import com.carissa.revibes.manage_transaction.data.model.CompleteTransactionRequest
 import com.carissa.revibes.manage_transaction.data.model.RejectTransactionRequest
 import com.carissa.revibes.manage_transaction.data.remote.ManageTransactionRemoteApi
@@ -59,6 +60,10 @@ internal class ManageTransactionRepository(
 
     suspend fun getTransactionDetail(id: String): TransactionDetailDomain {
         return execute { remoteApi.getTransactionDetail(id).data.toDomain() }
+    }
+
+    suspend fun getPointRates(): AppSettingPointData {
+        return execute { remoteApi.getAppSetting().data?.point ?: AppSettingPointData() }
     }
 
     suspend fun rejectTransaction(id: String, reason: String) {

@@ -2,6 +2,7 @@ plugins {
     alias(sjy.plugins.buildlogic.lib)
     alias(sjy.plugins.buildlogic.compose)
     alias(sjy.plugins.buildlogic.detekt)
+    alias(sjy.plugins.buildlogic.test)
 }
 
 android {

@@ -3,6 +3,7 @@ package com.carissa.revibes.manage_transaction.presentation.screen
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.BaseViewModel
 import com.carissa.revibes.manage_transaction.data.ManageTransactionRepository
+import com.carissa.revibes.manage_transaction.data.model.AppSettingPointData
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
 import com.carissa.revibes.manage_transaction.presentation.handler.ManageTransactionExceptionHandler
 import org.koin.core.annotation.KoinViewModel
@@ -26,6 +27,18 @@ data class TransactionDetailScreenUiState(
     val customPoints: TextFieldValue = TextFieldValue()
 )
 
+internal fun suggestedAcceptPoints(
+    totalPoint: Int,
+    itemPoints: List<Int>,
+    itemTypes: List<String>,
+    rates: AppSettingPointData
+): Int {
+    if (totalPoint > 0) return totalPoint
+    val stored = itemPoints.sum()
+    if (stored > 0) return stored
+    return itemTypes.sumOf(rates::forType)
+}
+
 @KoinViewModel
 class TransactionDetailScreenViewModel internal constructor(
     private val repository: ManageTransactionRepository,
@@ -46,7 +59,9 @@ class TransactionDetailScreenViewModel internal constructor(
             is TransactionDetailScreenUiEvent.RejectTransaction -> rejectTransaction(event.reason)
             is TransactionDetailScreenUiEvent.CompleteTransaction -> completeTransaction()
             is TransactionDetailScreenUiEvent.CustomPointsChanged -> intent {
-                reduce { state.copy(customPoints = event.value) }
+                if (event.value.text.all(Char::isDigit)) {
+                    reduce { state.copy(customPoints = event.value) }
+                }
             }
             else -> Unit
         }
@@ -85,10 +100,18 @@ class TransactionDetailScreenViewModel internal constructor(
         reduce { state.copy(isLoading = true) }
 
         val transactionDetail = repository.getTransactionDetail(transactionId)
+        val rates = runCatching { repository.getPointRates() }.getOrDefault(AppSettingPointData())
+        val suggested = suggestedAcceptPoints(
+            totalPoint = transactionDetail.totalPoint,
+            itemPoints = transactionDetail.items.map { it.point },
+            itemTypes = transactionDetail.items.map { it.type },
+            rates = rates
+        )
 
         reduce {
             state.copy(
                 transactionDetail = transactionDetail,
+                customPoints = if (suggested > 0) TextFieldValue(suggested.toString()) else TextFieldValue(),
                 isLoading = false
             )
         }

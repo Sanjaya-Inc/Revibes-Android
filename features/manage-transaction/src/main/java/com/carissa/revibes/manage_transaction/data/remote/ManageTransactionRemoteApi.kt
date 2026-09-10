@@ -1,5 +1,6 @@
 package com.carissa.revibes.manage_transaction.data.remote
 
+import com.carissa.revibes.manage_transaction.data.model.AppSettingResponse
 import com.carissa.revibes.manage_transaction.data.model.CompleteTransactionRequest
 import com.carissa.revibes.manage_transaction.data.model.RejectTransactionRequest
 import com.carissa.revibes.manage_transaction.data.model.TransactionActionResponse
@@ -39,6 +40,9 @@ interface ManageTransactionRemoteApi {
     suspend fun getTransactionDetail(
         @Path("id") id: String
     ): TransactionDetailResponse
+
+    @GET("setting/app")
+    suspend fun getAppSetting(): AppSettingResponse
 
     @PATCH("logistic-orders/{id}/reject")
     suspend fun rejectTransaction(
