@@ -21,10 +21,5 @@ internal fun cachePickedMedia(context: Context, uri: Uri): CachedMedia {
 }
 
 internal fun uriContentType(context: Context, uri: Uri): String {
-    return context.contentResolver.getType(uri)
-        ?.substringBefore(';')
-        ?.trim()
-        ?.lowercase()
-        ?.ifBlank { null }
-        ?: "image/jpeg"
+    return normalizedContentType(context.contentResolver.getType(uri))
 }

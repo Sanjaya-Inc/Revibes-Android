@@ -89,6 +89,7 @@ import com.carissa.revibes.drop_off.R
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.navigation.DropOffGraph
 import com.carissa.revibes.drop_off.presentation.util.cachePickedMedia
+import com.carissa.revibes.drop_off.presentation.util.parsePositiveCount
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -507,19 +508,15 @@ private fun ItemSection(
         context.getString(R.string.unit_kg) to UNIT_KG,
         context.getString(R.string.unit_pcs) to UNIT_PCS
     )
-    val weightOptions = if (item.unit == UNIT_PCS) {
-        listOf(
-            context.getString(R.string.pcs_1) to 1,
-            context.getString(R.string.pcs_2_5) to 5,
-            context.getString(R.string.pcs_6_10) to 8,
-            context.getString(R.string.pcs_more_10) to 10
-        )
-    } else {
-        listOf(
-            context.getString(R.string.weight_less_1kg) to 1,
-            context.getString(R.string.weight_4_6kg) to 5,
-            context.getString(R.string.weight_7_9kg) to 8,
-            context.getString(R.string.weight_more_10kg) to 10
+    val weightOptions = listOf(
+        context.getString(R.string.weight_less_1kg) to 1,
+        context.getString(R.string.weight_4_6kg) to 5,
+        context.getString(R.string.weight_7_9kg) to 8,
+        context.getString(R.string.weight_more_10kg) to 10
+    )
+    var pcsInput by remember(item.id, item.unit) {
+        mutableStateOf(
+            TextFieldValue(item.weight?.second?.takeIf { it > 0 }?.toString().orEmpty())
         )
     }
     val selectedTypeLabel = typeOptions.find { it.second == item.type }?.first ?: context.getString(
@@ -715,49 +712,108 @@ private fun ItemSection(
                         color = DropOffLabelColor,
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                     )
-                    ExposedDropdownMenuBox(
-                        expanded = weightExpanded,
-                        onExpandedChange = { weightExpanded = !weightExpanded },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    if (item.unit == UNIT_PCS) {
                         OutlinedTextField(
-                            value = selectedWeightLabel,
-                            onValueChange = {},
-                            readOnly = true,
+                            value = pcsInput,
+                            onValueChange = { next ->
+                                if (next.text.all(Char::isDigit)) {
+                                    pcsInput = next
+                                    val count = parsePositiveCount(next.text)
+                                    onItemChange(
+                                        item.copy(
+                                            weight = count?.let {
+                                                context.getString(R.string.pcs_count, it) to it
+                                            }
+                                        )
+                                    )
+                                }
+                            },
                             placeholder = {
                                 Text(
-                                    context.getString(R.string.weight_placeholder),
+                                    context.getString(R.string.pcs_placeholder),
                                     color = DropOffPlaceholderColor
                                 )
                             },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = weightExpanded) },
-                            modifier = Modifier
-                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
-                                .fillMaxWidth(),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth(),
                             colors = OutlinedTextFieldDefaults.colors().copy(
                                 focusedContainerColor = DropOffTextFieldBg,
                                 unfocusedContainerColor = DropOffTextFieldBg,
                                 disabledContainerColor = DropOffTextFieldBg,
                                 errorContainerColor = DropOffTextFieldBg,
-                                unfocusedOutlineColor = if (!isItemWeightValid) Color.Red else DropOffTextFieldBg,
-                                focusedOutlineColor = if (!isItemWeightValid) Color.Red else RevibesTheme.colors.primary
+                                unfocusedOutlineColor = if (!isItemWeightValid) {
+                                    Color.Red
+                                } else {
+                                    DropOffTextFieldBg
+                                },
+                                focusedOutlineColor = if (!isItemWeightValid) {
+                                    Color.Red
+                                } else {
+                                    RevibesTheme.colors.primary
+                                }
                             ),
                             shape = RoundedCornerShape(16.dp),
                             isError = !isItemWeightValid
                         )
-                        ExposedDropdownMenu(
+                    } else {
+                        ExposedDropdownMenuBox(
                             expanded = weightExpanded,
-                            onDismissRequest = { weightExpanded = false }
+                            onExpandedChange = { weightExpanded = !weightExpanded },
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            weightOptions.forEach { weightOption ->
-                                val (label, _) = weightOption
-                                DropdownMenuItem(
-                                    text = { Text(label) },
-                                    onClick = {
-                                        onItemChange(item.copy(weight = weightOption))
-                                        weightExpanded = false
+                            OutlinedTextField(
+                                value = selectedWeightLabel,
+                                onValueChange = {},
+                                readOnly = true,
+                                placeholder = {
+                                    Text(
+                                        context.getString(R.string.weight_placeholder),
+                                        color = DropOffPlaceholderColor
+                                    )
+                                },
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = weightExpanded)
+                                },
+                                modifier = Modifier
+                                    .menuAnchor(
+                                        type = ExposedDropdownMenuAnchorType.PrimaryEditable,
+                                        enabled = true
+                                    )
+                                    .fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors().copy(
+                                    focusedContainerColor = DropOffTextFieldBg,
+                                    unfocusedContainerColor = DropOffTextFieldBg,
+                                    disabledContainerColor = DropOffTextFieldBg,
+                                    errorContainerColor = DropOffTextFieldBg,
+                                    unfocusedOutlineColor = if (!isItemWeightValid) {
+                                        Color.Red
+                                    } else {
+                                        DropOffTextFieldBg
+                                    },
+                                    focusedOutlineColor = if (!isItemWeightValid) {
+                                        Color.Red
+                                    } else {
+                                        RevibesTheme.colors.primary
                                     }
-                                )
+                                ),
+                                shape = RoundedCornerShape(16.dp),
+                                isError = !isItemWeightValid
+                            )
+                            ExposedDropdownMenu(
+                                expanded = weightExpanded,
+                                onDismissRequest = { weightExpanded = false }
+                            ) {
+                                weightOptions.forEach { weightOption ->
+                                    val (label, _) = weightOption
+                                    DropdownMenuItem(
+                                        text = { Text(label) },
+                                        onClick = {
+                                            onItemChange(item.copy(weight = weightOption))
+                                            weightExpanded = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
