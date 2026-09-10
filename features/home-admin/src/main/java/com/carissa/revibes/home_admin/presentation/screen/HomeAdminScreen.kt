@@ -211,6 +211,14 @@ private fun AdminMenuSection(
                     eventReceiver.onEvent(HomeAdminScreenUiEvent.NavigateToManageDropOffPoints)
                 }
             )
+
+            AdminMenuCard(
+                title = stringResource(R.string.manage_drop_off_conversion),
+                description = stringResource(R.string.manage_drop_off_conversion_desc),
+                onClick = {
+                    eventReceiver.onEvent(HomeAdminScreenUiEvent.NavigateToManageDropOffConversion)
+                }
+            )
         }
     }
 }

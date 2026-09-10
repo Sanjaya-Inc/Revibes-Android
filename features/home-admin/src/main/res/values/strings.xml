@@ -14,4 +14,13 @@
     <string name="manage_claimed_vouchers_desc">View user claimed vouchers and exchanges</string>
     <string name="manage_drop_off_points">Manage Drop-off Points</string>
     <string name="manage_drop_off_points_desc">Add store locations with Google Maps pins</string>
+    <string name="manage_drop_off_conversion">Drop-off Point Values</string>
+    <string name="manage_drop_off_conversion_desc">Edit points awarded per waste type</string>
+    <string name="manage_drop_off_conversion_hint">These values are used when a drop-off is estimated or completed without a custom total. Quantity does not change the points.</string>
+    <string name="organic_points">Organic</string>
+    <string name="non_organic_points">Non-organic</string>
+    <string name="b3_points">B3</string>
+    <string name="save_conversion">Save</string>
+    <string name="retry">Retry</string>
+    <string name="back_desc">Back</string>
 </resources>

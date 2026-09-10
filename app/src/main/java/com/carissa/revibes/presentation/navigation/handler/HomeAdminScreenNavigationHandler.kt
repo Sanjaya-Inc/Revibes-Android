@@ -4,6 +4,7 @@ import com.carissa.revibes.core.presentation.navigation.NavigationEvent
 import com.carissa.revibes.home_admin.presentation.screen.HomeAdminScreenUiEvent
 import com.carissa.revibes.home_admin.presentation.screen.ManageDropOffPointsScreenUiEvent
 import com.ramcosta.composedestinations.generated.homeadmin.destinations.AddDropOffPointScreenDestination
+import com.ramcosta.composedestinations.generated.homeadmin.destinations.ManageDropOffConversionScreenDestination
 import com.ramcosta.composedestinations.generated.homeadmin.destinations.ManageDropOffPointsScreenDestination
 import com.ramcosta.composedestinations.generated.homeadmin.destinations.ManageNewsScreenDestination
 import com.ramcosta.composedestinations.generated.manageclaimedvouchers.destinations.ManageClaimedVouchersScreenDestination
@@ -24,6 +25,7 @@ class HomeAdminScreenNavigationHandler : NavigationEventHandler() {
             event is HomeAdminScreenUiEvent.NavigateToClaimedVouchers ||
             event is HomeAdminScreenUiEvent.NavigateToManageNews ||
             event is HomeAdminScreenUiEvent.NavigateToManageDropOffPoints ||
+            event is HomeAdminScreenUiEvent.NavigateToManageDropOffConversion ||
             event is ManageDropOffPointsScreenUiEvent.NavigateToAddDropOffPoint ||
             event is ManageDropOffPointsScreenUiEvent.NavigateToEditDropOffPoint ||
             event is HomeAdminScreenUiEvent.NavigateToProfile
@@ -48,6 +50,9 @@ class HomeAdminScreenNavigationHandler : NavigationEventHandler() {
             )
             is HomeAdminScreenUiEvent.NavigateToManageDropOffPoints -> navigator.navigate(
                 ManageDropOffPointsScreenDestination
+            )
+            is HomeAdminScreenUiEvent.NavigateToManageDropOffConversion -> navigator.navigate(
+                ManageDropOffConversionScreenDestination
             )
             is ManageDropOffPointsScreenUiEvent.NavigateToAddDropOffPoint -> navigator.navigate(
                 AddDropOffPointScreenDestination()
