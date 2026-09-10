@@ -12,6 +12,7 @@ import com.carissa.revibes.drop_off.data.model.SubmitOrderResponse
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Headers
 import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
@@ -31,7 +32,8 @@ interface DropOffRemoteApi {
     @POST("logistic-orders/{orderId}/items")
     suspend fun createLogisticOrderItem(@Path("orderId") orderId: String): LogisticOrderItemResponse
 
-    @POST("logistic-orders/{orderId}/items/{itemId}/media/presigned-url/")
+    @POST("logistic-orders/{orderId}/items/{itemId}/media/presigned-url")
+    @Headers("Content-Type: application/json")
     suspend fun getPresignedUrl(
         @Path("orderId") orderId: String,
         @Path("itemId") itemId: String,
@@ -39,9 +41,11 @@ interface DropOffRemoteApi {
     ): PresignedUrlResponse
 
     @POST("logistic-orders/estimate-point")
+    @Headers("Content-Type: application/json")
     suspend fun estimatePoint(@Body request: EstimatePointRequest): EstimatePointResponse
 
     @PATCH("logistic-orders/{id}/submit")
+    @Headers("Content-Type: application/json")
     suspend fun submitOrder(
         @Path("id") id: String,
         @Body request: SubmitOrderRequest

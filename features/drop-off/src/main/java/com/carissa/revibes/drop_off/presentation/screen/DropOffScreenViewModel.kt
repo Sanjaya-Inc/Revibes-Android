@@ -279,7 +279,7 @@ class DropOffScreenViewModel(
         intent {
             if (state.uploadingItemIndex != null) return@intent
             reduce { state.copy(uploadingItemIndex = itemIndex) }
-            val (uploadUrl, downloadUrl, _) = dropOffRepository.getPresignedUrl(
+            val (uploadUrl, _, _) = dropOffRepository.getPresignedUrl(
                 orderId = orderId,
                 itemId = itemId,
                 contentType = contentType
@@ -295,7 +295,7 @@ class DropOffScreenViewModel(
             if (!uploadSuccess) {
                 error(UPLOAD_FAILED_MESSAGE)
             }
-            onEvent(DropOffScreenUiEvent.OnImageUploadSuccess(itemIndex, downloadUrl))
+            onEvent(DropOffScreenUiEvent.OnImageUploadSuccess(itemIndex, imageUri.toString()))
             reduce { state.copy(uploadingItemIndex = null) }
         }
     }

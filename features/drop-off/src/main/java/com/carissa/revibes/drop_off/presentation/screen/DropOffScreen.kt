@@ -88,6 +88,7 @@ import com.carissa.revibes.core.presentation.util.openGoogleMaps
 import com.carissa.revibes.drop_off.R
 import com.carissa.revibes.drop_off.domain.model.StoreData
 import com.carissa.revibes.drop_off.presentation.navigation.DropOffGraph
+import com.carissa.revibes.drop_off.presentation.util.cachePickedMedia
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -537,10 +538,15 @@ private fun ItemSection(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { selectedUri ->
-            val contentType = context.contentResolver.getType(selectedUri) ?: context.getString(
-                R.string.default_image_content_type
-            )
-            onImageUpload(selectedUri, contentType)
+            runCatching { cachePickedMedia(context, selectedUri) }
+                .onSuccess { cached -> onImageUpload(cached.uri, cached.contentType) }
+                .onFailure { error ->
+                    Toast.makeText(
+                        context,
+                        error.message ?: context.getString(R.string.photo_required_error),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
         }
     }
 

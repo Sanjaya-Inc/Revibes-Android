@@ -26,8 +26,20 @@ abstract class BaseUseCase(
 class GeneralErrorMapper {
     fun mapError(e: ApiException): Throwable {
         return when (e.statusCode) {
-            -1 -> Throwable("Network error, please check your connection", e)
+            -1 -> Throwable(connectionErrorMessage(e), e)
             else -> Throwable(e.message ?: "Unknown error, please contact our support", e)
         }
+    }
+
+    private fun connectionErrorMessage(e: ApiException): String {
+        val cause = e.cause
+        val isUnreachable = cause is java.net.UnknownHostException ||
+            cause is java.net.ConnectException ||
+            cause is java.net.SocketTimeoutException
+        if (isUnreachable) {
+            return "Network error, please check your connection"
+        }
+        return cause?.message?.takeIf { it.isNotBlank() }
+            ?: "Network error, please check your connection"
     }
 }

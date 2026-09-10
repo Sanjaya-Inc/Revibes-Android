@@ -17,6 +17,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.annotation.Single
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 data class EstimatePointItemData(
@@ -37,9 +38,9 @@ data class SubmitOrderItemData(
 @Single
 class DropOffRepository(
     private val remoteApi: DropOffRemoteApi,
-    httpClient: OkHttpClient
 ) : BaseRepository() {
-    private val uploadClient: OkHttpClient = httpClient.newBuilder()
+    private val uploadClient: OkHttpClient = OkHttpClient.Builder()
+        .retryOnConnectionFailure(false)
         .connectTimeout(UPLOAD_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .readTimeout(UPLOAD_IO_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .writeTimeout(UPLOAD_IO_TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -77,18 +78,27 @@ class DropOffRepository(
         contentType: String
     ): Boolean {
         return execute {
-            val imageBytes = context.contentResolver.openInputStream(imageUri)?.use { it.readBytes() }
-                ?: error("Unable to read image")
-
+            val imageBytes = readMediaBytes(context, imageUri)
             val requestBody = imageBytes.toRequestBody(contentType = contentType.toMediaType())
             val request = Request.Builder()
                 .url(uploadUrl)
                 .put(requestBody)
                 .addHeader("Content-Type", contentType)
-                .addHeader("X-GOOG-ACL", "public-read")
                 .build()
 
-            uploadClient.newCall(request).execute().use { it.isSuccessful }
+            uploadClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    throw ApiException(
+                        statusCode = response.code,
+                        errorResponse = ErrorResponse(
+                            status = "failed",
+                            code = response.code,
+                            message = "Upload failed (${response.code})"
+                        )
+                    )
+                }
+                true
+            }
         }
     }
 
@@ -145,6 +155,14 @@ class DropOffRepository(
                 )
             }
         }
+    }
+
+    private fun readMediaBytes(context: Context, imageUri: Uri): ByteArray {
+        if (imageUri.scheme == "file") {
+            return File(requireNotNull(imageUri.path)).readBytes()
+        }
+        return context.contentResolver.openInputStream(imageUri)?.use { it.readBytes() }
+            ?: error("Unable to read image")
     }
 
     private companion object {
