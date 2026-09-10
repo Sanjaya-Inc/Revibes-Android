@@ -1,0 +1,11 @@
+# Crashlytics retrace needs line numbers; class names stay obfuscated.
+-keepattributes SourceFile,LineNumberTable
+
+# Ktor's debug detector references JDK management APIs that do not exist on
+# Android. R8 otherwise fails the release build on missing classes.
+-dontwarn java.lang.management.ManagementFactory
+-dontwarn java.lang.management.RuntimeMXBean
+
+-keep class androidx.credentials.** { *; }
+-keep class androidx.credentials.playservices.** { *; }
+-keep class com.google.android.libraries.identity.googleid.** { *; }

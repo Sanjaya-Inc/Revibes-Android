@@ -18,7 +18,6 @@ android {
     namespace = "com.carissa.revibes.core"
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
 
         buildConfigField(
             "String",
@@ -28,15 +27,6 @@ android {
     }
     buildFeatures {
         buildConfig = true
-    }
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
     }
 }
 
