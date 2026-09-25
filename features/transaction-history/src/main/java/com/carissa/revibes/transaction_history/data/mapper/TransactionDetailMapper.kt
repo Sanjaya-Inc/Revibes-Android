@@ -1,5 +1,6 @@
 package com.carissa.revibes.transaction_history.data.mapper
 
+import android.util.Log
 import com.carissa.revibes.core.presentation.compose.components.TransactionItem
 import com.carissa.revibes.transaction_history.data.model.PositionData
 import com.carissa.revibes.transaction_history.data.model.StoreData
@@ -79,12 +80,14 @@ fun PositionData.toDomain(): Position {
 }
 
 fun TransactionDetailItem.toTransactionItem(): TransactionItem {
+    val photos = this.media.map { it.downloadUri }
+    Log.d("OrderImage", "history-detail item=$id mediaCount=${photos.size} urls=$photos")
     return TransactionItem(
         id = this.id,
         name = this.name,
         type = this.type,
         weight = "${this.weight} ${this.unit}",
-        photos = this.media.map { it.downloadUri }
+        photos = photos
     )
 }
 

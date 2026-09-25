@@ -1,5 +1,6 @@
 package com.carissa.revibes.transaction_history.data.mapper
 
+import android.util.Log
 import com.carissa.revibes.transaction_history.data.model.LogisticOrderData
 import com.carissa.revibes.transaction_history.data.model.TransactionHistoryData
 import kotlinx.collections.immutable.toPersistentList
@@ -24,6 +25,10 @@ fun LogisticOrderData.toTransactionHistoryData(): TransactionHistoryData {
 
     val imageUrl = items.firstOrNull()?.media?.firstOrNull()?.downloadUri ?: ""
     val itemNames = items.map { it.name.ifEmpty { "Unknown Item" } }
+    Log.d(
+        "OrderImage",
+        "history-list order=$id mediaCount=${items.sumOf { it.media.size }} url=$imageUrl"
+    )
 
     return TransactionHistoryData(
         id = id,

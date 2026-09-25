@@ -72,4 +72,17 @@ class SuggestedAcceptPointsTest {
             )
         )
     }
+
+    @Test
+    fun `omitted types do not invent default rates`() {
+        assertEquals(
+            0,
+            suggestedAcceptPoints(
+                totalPoint = 0,
+                itemPoints = listOf(0, 0),
+                itemTypes = emptyList(),
+                rates = AppSettingPointData()
+            )
+        )
+    }
 }

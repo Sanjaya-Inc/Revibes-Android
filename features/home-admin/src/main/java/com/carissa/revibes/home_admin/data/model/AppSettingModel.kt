@@ -1,30 +1,35 @@
 package com.carissa.revibes.home_admin.data.model
 
 import androidx.annotation.Keep
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Keep
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class AppSettingPointData(
-    val organic: Int = 5,
-    @SerialName("non-organic") val nonOrganic: Int = 5,
-    val b3: Int = 5
+    @EncodeDefault val organic: Int = 5,
+    @SerialName("non-organic") @EncodeDefault val nonOrganic: Int = 5,
+    @EncodeDefault val b3: Int = 5
 )
 
 @Keep
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class AppSettingDailyRewardData(
-    val days: Int = 7,
-    val initialPoint: Int = 5,
-    val multiplier: Int = 5
+    @EncodeDefault val days: Int = 7,
+    @EncodeDefault val initialPoint: Int = 1,
+    @EncodeDefault val multiplier: Int = 0
 )
 
 @Keep
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class AppSettingData(
-    val point: AppSettingPointData = AppSettingPointData(),
-    val dailyReward: AppSettingDailyRewardData = AppSettingDailyRewardData()
+    @EncodeDefault val point: AppSettingPointData = AppSettingPointData(),
+    @EncodeDefault val dailyReward: AppSettingDailyRewardData = AppSettingDailyRewardData()
 )
 
 @Keep

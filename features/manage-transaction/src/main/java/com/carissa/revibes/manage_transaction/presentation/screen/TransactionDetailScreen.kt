@@ -1,5 +1,6 @@
 package com.carissa.revibes.manage_transaction.presentation.screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -374,7 +375,12 @@ private fun TransactionItemCard(
                 value = item.point.toString()
             )
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(item.media) { imageUrl ->
+                items(item.media) { media ->
+                    val imageUrl = media.downloadUri
+                    Log.d(
+                        "OrderImage",
+                        "admin-detail item=${item.id} empty=${imageUrl.isBlank()} http=${imageUrl.startsWith("http")} url=$imageUrl"
+                    )
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = null,
@@ -382,7 +388,13 @@ private fun TransactionItemCard(
                         modifier = Modifier
                             .size(100.dp)
                             .clip(RoundedCornerShape(8.dp)),
-                        placeholder = painterResource(R.drawable.image_placeholder)
+                        placeholder = painterResource(R.drawable.image_placeholder),
+                        onError = {
+                            Log.e("OrderImage", "admin-detail coilFail url=$imageUrl", it.result.throwable)
+                        },
+                        onSuccess = {
+                            Log.d("OrderImage", "admin-detail coilOk url=$imageUrl")
+                        }
                     )
                 }
             }

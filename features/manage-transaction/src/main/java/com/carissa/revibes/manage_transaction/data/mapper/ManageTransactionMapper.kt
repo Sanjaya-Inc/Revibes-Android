@@ -1,5 +1,6 @@
 package com.carissa.revibes.manage_transaction.data.mapper
 
+import android.util.Log
 import com.carissa.revibes.manage_transaction.domain.model.ManageTransactionDomain
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailDomain
 import com.carissa.revibes.manage_transaction.domain.model.TransactionDetailItemDomain
@@ -81,6 +82,10 @@ fun TransactionDetailItemData.toDomain(): TransactionDetailItemDomain {
 }
 
 fun TransactionDetailMediaData.toDomain(): TransactionDetailMediaDomain {
+    Log.d(
+        "OrderImage",
+        "admin-detail media downloadUri=$downloadUri uploadUrlEmpty=${uploadUrl.isBlank()}"
+    )
     return TransactionDetailMediaDomain(
         uploadUrl = uploadUrl,
         downloadUri = downloadUri,

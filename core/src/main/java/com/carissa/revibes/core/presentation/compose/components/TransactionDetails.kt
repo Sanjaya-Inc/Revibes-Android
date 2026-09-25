@@ -1,5 +1,6 @@
 package com.carissa.revibes.core.presentation.compose.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -139,13 +140,23 @@ fun TransactionDetailsContent(
                 modifier = Modifier.padding(start = 24.dp)
             ) {
                 item.photos.forEach { imageUrl ->
+                    Log.d(
+                        "OrderImage",
+                        "history-detail empty=${imageUrl.isBlank()} http=${imageUrl.startsWith("http")} url=$imageUrl"
+                    )
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(100.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(8.dp)),
+                        onError = {
+                            Log.e("OrderImage", "history-detail coilFail url=$imageUrl", it.result.throwable)
+                        },
+                        onSuccess = {
+                            Log.d("OrderImage", "history-detail coilOk url=$imageUrl")
+                        }
                     )
                 }
             }

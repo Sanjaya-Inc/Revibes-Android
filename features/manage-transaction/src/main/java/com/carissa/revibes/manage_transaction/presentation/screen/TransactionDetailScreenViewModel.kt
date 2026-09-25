@@ -100,12 +100,16 @@ class TransactionDetailScreenViewModel internal constructor(
         reduce { state.copy(isLoading = true) }
 
         val transactionDetail = repository.getTransactionDetail(transactionId)
-        val rates = runCatching { repository.getPointRates() }.getOrDefault(AppSettingPointData())
+        val rates = runCatching { repository.getPointRates() }.getOrNull()
         val suggested = suggestedAcceptPoints(
             totalPoint = transactionDetail.totalPoint,
             itemPoints = transactionDetail.items.map { it.point },
-            itemTypes = transactionDetail.items.map { it.type },
-            rates = rates
+            itemTypes = if (rates != null) {
+                transactionDetail.items.map { it.type }
+            } else {
+                emptyList()
+            },
+            rates = rates ?: AppSettingPointData()
         )
 
         reduce {

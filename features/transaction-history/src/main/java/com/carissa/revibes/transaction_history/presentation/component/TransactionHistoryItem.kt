@@ -4,6 +4,7 @@
 
 package com.carissa.revibes.transaction_history.presentation.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -62,6 +63,12 @@ fun TransactionHistoryItem(
                     contentDescription = null,
                     modifier = imageModifier,
                     contentScale = ContentScale.Crop,
+                    onError = {
+                        Log.e("OrderImage", "history-list coilFail url=${data.imageUrl}", it.result.throwable)
+                    },
+                    onSuccess = {
+                        Log.d("OrderImage", "history-list coilOk url=${data.imageUrl}")
+                    }
                 )
             }
 
