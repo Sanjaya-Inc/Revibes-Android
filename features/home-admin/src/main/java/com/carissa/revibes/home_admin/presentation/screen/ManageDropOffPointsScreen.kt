@@ -138,31 +138,31 @@ private fun ManageDropOffPointsScreenContent(
                 },
                 modifier = Modifier.fillMaxSize()
             ) {
-            if (uiState.stores.isEmpty()) {
-                RevibesEmptyState(
-                    title = "No drop-off points",
-                    message = "Add a store location with a Google Maps pin.",
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(
-                        items = uiState.stores,
-                        key = { it.id },
-                        contentType = { DropOffPointContentType }
-                    ) { store ->
-                        DropOffPointItem(
-                            store = store,
-                            onEvent = onEvent,
-                            modifier = Modifier.animateItem()
-                        )
+                if (uiState.stores.isEmpty()) {
+                    RevibesEmptyState(
+                        title = "No drop-off points",
+                        message = "Add a store location with a Google Maps pin.",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(
+                            items = uiState.stores,
+                            key = { it.id },
+                            contentType = { DropOffPointContentType }
+                        ) { store ->
+                            DropOffPointItem(
+                                store = store,
+                                onEvent = onEvent,
+                                modifier = Modifier.animateItem()
+                            )
+                        }
                     }
                 }
-            }
             }
         }
     }

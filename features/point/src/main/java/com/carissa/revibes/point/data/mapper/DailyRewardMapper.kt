@@ -12,6 +12,7 @@ fun DailyRewardData.toDailyPoint(): DailyReward {
         id = id,
         dayIndex = index,
         amount = amount,
-        claimedAt = claimedAt
+        claimedAt = claimedAt,
+        bannerText = bannerText
     )
 }

@@ -33,6 +33,7 @@ data class DailyReward(
     val dayIndex: Int,
     val amount: Int,
     val claimedAt: String? = null,
+    val bannerText: String? = null
 )
 
 sealed interface PointScreenUiEvent {

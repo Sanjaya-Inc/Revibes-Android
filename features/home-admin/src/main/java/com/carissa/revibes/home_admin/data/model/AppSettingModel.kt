@@ -21,7 +21,8 @@ data class AppSettingPointData(
 data class AppSettingDailyRewardData(
     @EncodeDefault val days: Int = 7,
     @EncodeDefault val initialPoint: Int = 1,
-    @EncodeDefault val multiplier: Int = 0
+    @EncodeDefault val multiplier: Int = 0,
+    @EncodeDefault val bannerText: String = "Check in 30 Days & Get Voucher Rp25k"
 )
 
 @Keep

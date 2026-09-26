@@ -19,5 +19,6 @@ data class DailyRewardData(
     val index: Int,
     val amount: Int,
     val createdAt: String,
-    val claimedAt: String?
+    val claimedAt: String?,
+    val bannerText: String? = null
 )

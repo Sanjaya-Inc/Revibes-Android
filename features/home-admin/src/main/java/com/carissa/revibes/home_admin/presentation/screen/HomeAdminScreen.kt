@@ -205,6 +205,14 @@ private fun AdminMenuSection(
             )
 
             AdminMenuCard(
+                title = stringResource(R.string.manage_daily_check_in),
+                description = stringResource(R.string.manage_daily_check_in_desc),
+                onClick = {
+                    eventReceiver.onEvent(HomeAdminScreenUiEvent.NavigateToManageDailyCheckIn)
+                }
+            )
+
+            AdminMenuCard(
                 title = stringResource(R.string.manage_drop_off_points),
                 description = stringResource(R.string.manage_drop_off_points_desc),
                 onClick = {

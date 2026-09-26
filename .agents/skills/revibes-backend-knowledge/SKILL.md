@@ -16,7 +16,7 @@ Match routes, param names, and JSON fields exactly. Prefer `logistic-points.md` 
 </rules>
 
 <references>
-- **Logistic points**: [logistic-points.md](references/logistic-points.md) — type rates, `customTotalPoint` including 0, `/setting/app`, smoke/deploy.
+- **Daily rewards**: [daily-rewards.md](references/daily-rewards.md) — flat `initialPoint`, `bannerText`, `applySettingAmount` read-override, admin UI mapping.
 - **API Endpoints**: [api-endpoints.md](references/api-endpoints.md) — route tables. Prefer `logistic-points.md` for drop-off/settings.
 - **Firestore**: [firestore-models.md](references/firestore-models.md) — collections. Overlay in `logistic-points.md` for order/points fields.
 - **Architecture**: [architecture.md](references/architecture.md) — Express `v1`, JWT, error JSON, Ktorfit mapping.

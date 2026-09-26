@@ -34,5 +34,6 @@ class AppSettingModelTest {
         assertEquals(7, dailyReward.getValue("days").jsonPrimitive.int)
         assertEquals(1, dailyReward.getValue("initialPoint").jsonPrimitive.int)
         assertEquals(0, dailyReward.getValue("multiplier").jsonPrimitive.int)
+        assertEquals("Check in 30 Days & Get Voucher Rp25k", dailyReward.getValue("bannerText").jsonPrimitive.content)
     }
 }

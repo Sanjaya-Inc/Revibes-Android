@@ -147,4 +147,6 @@ abstract class NavigationEventHandler {
 ### Home admin destinations
 - `NavigateToManageDropOffPoints` → store locations
 - `NavigateToManageDropOffConversion` → `ManageDropOffConversionScreenDestination` (organic / non-organic / B3 rates on `GET/PUT /setting/app`)
-</guide>
+- `NavigateToManageDailyCheckIn` → `ManageDailyCheckInScreenDestination` (banner text + daily check-in point amount on `GET/PUT /setting/app`)
+- Admin menu cards live in `AdminMenuSection` (`HomeAdminScreen.kt`); each card needs a string resource pair (`*_desc`) in `features/home-admin/.../values/strings.xml`.
+- Admin settings screens must re-fetch the full `AppSettingData` before `PUT` — the endpoint requires both `point` and `dailyReward` objects.

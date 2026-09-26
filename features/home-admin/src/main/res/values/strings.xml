@@ -20,6 +20,11 @@
     <string name="organic_points">Organic</string>
     <string name="non_organic_points">Non-organic</string>
     <string name="b3_points">B3</string>
+    <string name="manage_daily_check_in">Daily Check-in Settings</string>
+    <string name="manage_daily_check_in_desc">Edit daily check-in banner and reward points</string>
+    <string name="manage_daily_check_in_hint">These settings control the daily check-in screen. The banner text is shown to users, and the point amount is awarded on every check-in.</string>
+    <string name="daily_check_in_point_amount">Point Amount</string>
+    <string name="daily_check_in_banner_text">Banner Text</string>
     <string name="save_conversion">Save</string>
     <string name="retry">Retry</string>
     <string name="back_desc">Back</string>

@@ -283,3 +283,19 @@ Follow these 2026 Jetpack Compose design rules when adding/modifying reusable wi
 5. **Primitive State**: Use primitive state holders (e.g. `mutableIntStateOf()`) to bypass Java autoboxing memory overhead.
 6. **No Composed Modifiers**: Use `Modifier.Node` elements instead of `composed { ... }` blocks for custom modifiers to avoid performance issues during layout passes.
 </conventions>
+
+<screen-layouts>
+### Scrollable Screen Layouts (mixed content)
+
+When a screen mixes a fixed card, an unbounded list (histories), and a continuous colored panel (missions):
+
+1. **One `LazyColumn` for the whole screen** — never nest a `LazyColumn` inside a non-scrollable `Column`; long content clips.
+2. **Key + contentType every item list**: `key = { it.id }`, `contentType = { "kind" }` for pool reuse.
+3. **Continuous panels = ONE item**: a section with a shared background (e.g. rounded green missions panel) must be a single `item { Column(background) { header + all cards } }`. Splitting it across lazy items lets `spacedBy` gaps show background through — striped/broken look.
+4. **Unbounded lists = keyed items**: histories/feeds stay individual `items(...)` so lazy reuse applies.
+5. **Handful of cards inside a panel**: plain `forEach` inside the panel item is fine; laziness buys nothing under ~20 rows.
+6. **Hoist padding to call site**: row composables take `modifier` (first optional param); the list applies `Modifier.padding(horizontal = 16.dp)` per item.
+7. **Empty optional text**: replace with `Spacer(Modifier.height(<same padding>))` to keep section rhythm.
+
+Reference implementation: `PointScreen.kt` (`:features:point`).
+</screen-layouts>

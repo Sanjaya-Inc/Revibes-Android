@@ -3,6 +3,7 @@ package com.carissa.revibes.home_admin.presentation.screen
 import androidx.compose.ui.text.input.TextFieldValue
 import com.carissa.revibes.core.presentation.navigation.NavigationEventBus
 import com.carissa.revibes.home_admin.data.AppSettingRepository
+import com.carissa.revibes.home_admin.data.model.AppSettingDailyRewardData
 import com.carissa.revibes.home_admin.data.model.AppSettingData
 import com.carissa.revibes.home_admin.data.model.AppSettingPointData
 import io.mockk.coEvery
@@ -49,7 +50,8 @@ class ManageDropOffConversionScreenViewModelTest {
     @Test
     fun `loadSettings fills point fields from app setting`() = runTest {
         coEvery { appSettingRepository.getAppSetting() } returns AppSettingData(
-            point = AppSettingPointData(organic = 3, nonOrganic = 5, b3 = 8)
+            point = AppSettingPointData(organic = 3, nonOrganic = 5, b3 = 8),
+            dailyReward = AppSettingDailyRewardData(bannerText = "Special Check-in Promo")
         )
 
         val viewModel = ManageDropOffConversionScreenViewModel(appSettingRepository)
@@ -61,7 +63,8 @@ class ManageDropOffConversionScreenViewModelTest {
                     hasLoaded = true,
                     organicInput = TextFieldValue("3"),
                     nonOrganicInput = TextFieldValue("5"),
-                    b3Input = TextFieldValue("8")
+                    b3Input = TextFieldValue("8"),
+                    dailyReward = AppSettingDailyRewardData(bannerText = "Special Check-in Promo")
                 )
             }
         }

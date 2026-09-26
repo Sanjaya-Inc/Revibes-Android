@@ -65,3 +65,23 @@ For the full detailed specification on the decoupled navigation architecture, ho
 - **Prevent Double Navigation**: Do not trigger both `onEvent(event)` (which routes to `NavigationEventBus`) AND manual `navigator.navigate(...)` in `collectSideEffect`.
 - **State Sync Across Backstack**: Parent ViewModels should collect global flows (e.g., `userPointFlow`) inside `init { viewModelScope.launch { ... } }` to refresh screen state when returning from sub-screens.
 - **No Fake Fallback Text**: Never display fake placeholder text when remote APIs return null or fail. Pass `error` to `ContentStateSwitcher` to show standard `GeneralError` with retry actions.
+
+## 6. Orbit MVI Test Pattern
+
+`org.orbitmvi.orbit.test.test` — assertions run against the **initial state**, and every state emission must be consumed **in order**:
+
+```kotlin
+viewModel.test(this) {
+    runOnCreate()
+    expectState { copy(/* full expected state after onCreate */) }
+    containerHost.onEvent(UiEvent.OnFieldChange(TextFieldValue("x"))) // NOT sendEvent
+    expectState { copy(fieldInput = TextFieldValue("x")) }
+}
+```
+
+- **`containerHost.onEvent(...)`** dispatches events; `sendEvent` does not exist in this API.
+- **Every `expectState` must list the full expected state** (all fields that differ from initial), because `copy` starts from the *expected previous* state, not the actual.
+- Skipping an intermediate emission fails with `TurbineAssertionError: Unconsumed events found` — consume each reduce in order.
+- Test setup: `Dispatchers.setMain(UnconfinedTestDispatcher())` + `startKoin` with a relaxed `NavigationEventBus` mock; teardown `stopKoin()` + `Dispatchers.resetMain()`.
+
+Reference: `ManageDropOffConversionScreenViewModelTest`, `ManageDailyCheckInScreenViewModelTest`.

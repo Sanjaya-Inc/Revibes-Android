@@ -45,9 +45,9 @@ import com.carissa.revibes.core.R as CoreR
 
 @Destination<HomeAdminGraph>
 @Composable
-fun ManageDropOffConversionScreen(
+fun ManageDailyCheckInScreen(
     modifier: Modifier = Modifier,
-    viewModel: ManageDropOffConversionScreenViewModel = koinViewModel()
+    viewModel: ManageDailyCheckInScreenViewModel = koinViewModel()
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -55,7 +55,7 @@ fun ManageDropOffConversionScreen(
 
     viewModel.collectSideEffect { event ->
         when (event) {
-            is ManageDropOffConversionScreenUiEvent.NavigateBack -> navigator.navigateUp()
+            is ManageDailyCheckInScreenUiEvent.NavigateBack -> navigator.navigateUp()
             else -> Unit
         }
     }
@@ -63,7 +63,7 @@ fun ManageDropOffConversionScreen(
     LaunchedEffect(state.successMessage) {
         if (state.successMessage != null) {
             Toast.makeText(context, state.successMessage, Toast.LENGTH_SHORT).show()
-            viewModel.onEvent(ManageDropOffConversionScreenUiEvent.ClearMessage)
+            viewModel.onEvent(ManageDailyCheckInScreenUiEvent.ClearMessage)
         }
     }
 
@@ -71,11 +71,11 @@ fun ManageDropOffConversionScreen(
         val message = state.errorMessage ?: return@LaunchedEffect
         if (state.hasLoaded) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            viewModel.onEvent(ManageDropOffConversionScreenUiEvent.ClearMessage)
+            viewModel.onEvent(ManageDailyCheckInScreenUiEvent.ClearMessage)
         }
     }
 
-    ManageDropOffConversionScreenContent(
+    ManageDailyCheckInScreenContent(
         uiState = state,
         modifier = modifier,
         eventReceiver = viewModel
@@ -84,10 +84,10 @@ fun ManageDropOffConversionScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ManageDropOffConversionScreenContent(
-    uiState: ManageDropOffConversionScreenUiState,
+private fun ManageDailyCheckInScreenContent(
+    uiState: ManageDailyCheckInScreenUiState,
     modifier: Modifier = Modifier,
-    eventReceiver: EventReceiver<ManageDropOffConversionScreenUiEvent> = EventReceiver { }
+    eventReceiver: EventReceiver<ManageDailyCheckInScreenUiEvent> = EventReceiver { }
 ) {
     val navigator = RevibesTheme.navigator
     Scaffold(
@@ -97,7 +97,7 @@ private fun ManageDropOffConversionScreenContent(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.manage_drop_off_conversion),
+                        text = stringResource(R.string.manage_daily_check_in),
                         style = RevibesTheme.typography.h2,
                         fontWeight = FontWeight.Bold,
                         color = RevibesTheme.colors.primary,
@@ -125,7 +125,7 @@ private fun ManageDropOffConversionScreenContent(
             isLoading = uiState.isLoading,
             error = uiState.errorMessage.takeIf { !uiState.hasLoaded },
             actionButton = stringResource(R.string.retry) to {
-                eventReceiver.onEvent(ManageDropOffConversionScreenUiEvent.LoadSettings)
+                eventReceiver.onEvent(ManageDailyCheckInScreenUiEvent.LoadSettings)
             }
         ) {
             Box(
@@ -141,35 +141,45 @@ private fun ManageDropOffConversionScreenContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.manage_drop_off_conversion_hint),
+                        text = stringResource(R.string.manage_daily_check_in_hint),
                         style = RevibesTheme.typography.body1,
                         color = RevibesTheme.colors.onSurface
                     )
-                    PointField(
-                        label = stringResource(R.string.organic_points),
-                        value = uiState.organicInput,
-                        onValueChange = {
-                            eventReceiver.onEvent(ManageDropOffConversionScreenUiEvent.OnOrganicChange(it))
-                        }
-                    )
-                    PointField(
-                        label = stringResource(R.string.non_organic_points),
-                        value = uiState.nonOrganicInput,
-                        onValueChange = {
-                            eventReceiver.onEvent(ManageDropOffConversionScreenUiEvent.OnNonOrganicChange(it))
-                        }
-                    )
-                    PointField(
-                        label = stringResource(R.string.b3_points),
-                        value = uiState.b3Input,
-                        onValueChange = {
-                            eventReceiver.onEvent(ManageDropOffConversionScreenUiEvent.OnB3Change(it))
-                        }
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = stringResource(R.string.daily_check_in_banner_text),
+                            style = RevibesTheme.typography.body1,
+                            color = RevibesTheme.colors.primary
+                        )
+                        OutlinedTextField(
+                            value = uiState.bannerTextInput,
+                            onValueChange = {
+                                eventReceiver.onEvent(ManageDailyCheckInScreenUiEvent.OnBannerTextChange(it))
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = stringResource(R.string.daily_check_in_point_amount),
+                            style = RevibesTheme.typography.body1,
+                            color = RevibesTheme.colors.primary
+                        )
+                        OutlinedTextField(
+                            value = uiState.pointAmountInput,
+                            onValueChange = {
+                                eventReceiver.onEvent(ManageDailyCheckInScreenUiEvent.OnPointAmountChange(it))
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                    }
                     Button(
                         text = stringResource(R.string.save_conversion),
                         onClick = {
-                            eventReceiver.onEvent(ManageDropOffConversionScreenUiEvent.SaveSettings)
+                            eventReceiver.onEvent(ManageDailyCheckInScreenUiEvent.SaveSettings)
                         },
                         loading = uiState.isSubmitting,
                         modifier = Modifier.fillMaxWidth()
@@ -181,36 +191,13 @@ private fun ManageDropOffConversionScreenContent(
 }
 
 @Composable
-private fun PointField(
-    label: String,
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = label,
-            style = RevibesTheme.typography.body1,
-            color = RevibesTheme.colors.primary
-        )
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-    }
-}
-
-@Composable
 @Preview
-private fun ManageDropOffConversionScreenPreview() {
+private fun ManageDailyCheckInScreenPreview() {
     RevibesTheme {
-        ManageDropOffConversionScreenContent(
-            uiState = ManageDropOffConversionScreenUiState(
-                organicInput = TextFieldValue("5"),
-                nonOrganicInput = TextFieldValue("5"),
-                b3Input = TextFieldValue("5")
+        ManageDailyCheckInScreenContent(
+            uiState = ManageDailyCheckInScreenUiState(
+                bannerTextInput = TextFieldValue("Check in 30 Days & Get Voucher Rp25k"),
+                pointAmountInput = TextFieldValue("1")
             )
         )
     }
